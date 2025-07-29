@@ -21,8 +21,15 @@ const withMDX = createMDX({
       require('remark-autolink-headings'),
       require('remark-external-links'),
       require('remark-frontmatter'),
+      require('./src/mdx-plugins/remark-toc'),
+      require('./src/mdx-plugins/remark-html-nodes'),
+      require('./src/mdx-plugins/mdast-to-string'),
+      require('./src/mdx-plugins/extract-mdast'),
     ],
-    rehypePlugins: [],
+    rehypePlugins: [
+      require('./src/mdx-plugins/rehype-math'),
+      require('./src/mdx-plugins/rehype-snippets'),
+    ],
   },
 });
 
