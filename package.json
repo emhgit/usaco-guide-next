@@ -15,6 +15,7 @@
     "@next/mdx": "^15.4.5",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "hast-util-to-string": "^3.0.1",
     "hast-util-to-text": "^4.0.2",
     "katex": "^0.16.22",
     "mdast": "^3.0.0",

@@ -2837,6 +2837,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hast-util-to-string@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "hast-util-to-string@npm:3.0.1"
+  dependencies:
+    "@types/hast": "npm:^3.0.0"
+  checksum: 10c0/b5fa1912a6ba6131affae52a0f4394406c4c0d23c2b0307f1d69988f1030c7bb830289303e67c5ad8f674f5f23a454c1dcd492c39e45a22c1f46d3c9bce5bd0c
+  languageName: node
+  linkType: hard
+
 "hast-util-to-text@npm:^4.0.2":
   version: 4.0.2
   resolution: "hast-util-to-text@npm:4.0.2"
@@ -5667,6 +5676,7 @@ __metadata:
     eslint-config-next: "npm:15.4.5"
     github-slugger: "npm:^2.0.0"
     gray-matter: "npm:^4.0.3"
+    hast-util-to-string: "npm:^3.0.1"
     hast-util-to-text: "npm:^4.0.2"
     katex: "npm:^0.16.22"
     mdast: "npm:^3.0.0"
