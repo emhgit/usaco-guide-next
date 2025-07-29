@@ -5,11 +5,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Configure page extensions to include MDX files
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
-  // Optional: Configure webpack for MDX if needed
-  webpack: (config, { isServer }) => {
-    // Important: return the modified config
-    return config;
-  },
 };
 
 // MDX configuration with remark/rehype plugins
@@ -18,8 +13,6 @@ const withMDX = createMDX({
   options: {
     remarkPlugins: [
       require('remark-math'),
-      require('remark-autolink-headings'),
-      require('remark-external-links'),
       require('remark-frontmatter'),
       require('./src/mdx-plugins/remark-toc'),
       require('./src/mdx-plugins/remark-html-nodes'),
@@ -29,6 +22,8 @@ const withMDX = createMDX({
     rehypePlugins: [
       require('./src/mdx-plugins/rehype-math'),
       require('./src/mdx-plugins/rehype-snippets'),
+      require('rehype-autolink-headings'),
+      require('rehype-external-links'),
     ],
   },
 });

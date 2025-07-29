@@ -1,9 +1,11 @@
 /*eslint-disable */
-const visit = require('unist-util-visit');
-const katex = require('katex').renderToString;
-const unified = require('unified');
-const parse = require('rehype-parse');
-const toText = require('hast-util-to-text');
+import { visit } from 'unist-util-visit';
+import katexPkg from 'katex';
+import { unified } from 'unified';
+import parse from 'rehype-parse';
+import { toText } from 'hast-util-to-text';
+
+const { renderToString: katex } = katexPkg;
 
 const assign = Object.assign;
 
@@ -77,4 +79,4 @@ const customRehypeKatex = options => {
   }
 };
 
-module.exports = customRehypeKatex;
+export default customRehypeKatex;
