@@ -891,7 +891,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mdx@npm:^2.0.0":
+"@types/mdx@npm:^2.0.0, @types/mdx@npm:^2.0.13":
   version: 2.0.13
   resolution: "@types/mdx@npm:2.0.13"
   checksum: 10c0/5edf1099505ac568da55f9ae8a93e7e314e8cbc13d3445d0be61b75941226b005e1390d9b95caecf5dcb00c9d1bab2f1f60f6ff9876dc091a48b547495007720
@@ -2342,6 +2342,15 @@ __metadata:
     astring: "npm:^1.8.0"
     source-map: "npm:^0.7.0"
   checksum: 10c0/ac88cb831401ef99e365f92f4af903755d56ae1ce0e0f0fb8ff66e678141f3d529194f0fb15f6c78cd7554c16fda36854df851d58f9e05cfab15bddf7a97cea0
+  languageName: node
+  linkType: hard
+
+"estree-util-value-to-estree@npm:^3.0.0":
+  version: 3.4.0
+  resolution: "estree-util-value-to-estree@npm:3.4.0"
+  dependencies:
+    "@types/estree": "npm:^1.0.0"
+  checksum: 10c0/e90e0c784b29182a3feb471589ab3c031be3ff1ab068b2b473e9ee96467f99442f2c571b2708ee3493906af5bf1a0aa9712d9f90fb113a30d99669100235ba4f
   languageName: node
   linkType: hard
 
@@ -4682,20 +4691,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-autolink-headings@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "remark-autolink-headings@npm:8.0.0"
-  checksum: 10c0/856f6b4ab5c78bed73b326ab9b759ae1387bf3d26415af76d5dbc003fdfacd9f3cb8df7b6eaf82d6fb7825ad7c4b0f82628fb934e2e6c9da3aeaadfb5d65a624
-  languageName: node
-  linkType: hard
-
-"remark-external-links@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "remark-external-links@npm:10.0.0"
-  checksum: 10c0/4b353a6742ce1458a5a0bacc3b8ed9fd2506a10f9d11453770453d10885b2c73b836c6240c79116b364eaa3d68496e99c071e2b4118be04b770e4bc23dede92e
-  languageName: node
-  linkType: hard
-
 "remark-frontmatter@npm:^5.0.0":
   version: 5.0.0
   resolution: "remark-frontmatter@npm:5.0.0"
@@ -4717,6 +4712,20 @@ __metadata:
     micromark-extension-math: "npm:^3.0.0"
     unified: "npm:^11.0.0"
   checksum: 10c0/859613c4db194bb6b3c9c063661dc52b8ceda9c5cf3256b42f73d93eb8f38a6d634eb5f976fe094425f6f1035aaf329eb49ada314feb3b2b1073326b6d3aaa02
+  languageName: node
+  linkType: hard
+
+"remark-mdx-frontmatter@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "remark-mdx-frontmatter@npm:5.2.0"
+  dependencies:
+    "@types/mdast": "npm:^4.0.0"
+    estree-util-value-to-estree: "npm:^3.0.0"
+    toml: "npm:^3.0.0"
+    unified: "npm:^11.0.0"
+    unist-util-mdx-define: "npm:^1.0.0"
+    yaml: "npm:^2.0.0"
+  checksum: 10c0/72c6ee94c927e0ff9d941481b568d34f8103655cb30fe9315510410c733af7e89d6c64417cf2e59d8a2396f6e4663ba122e98a25e1277bda57be7f381a763e7d
   languageName: node
   linkType: hard
 
@@ -5347,6 +5356,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"toml@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "toml@npm:3.0.0"
+  checksum: 10c0/8d7ed3e700ca602e5419fca343e1c595eb7aa177745141f0761a5b20874b58ee5c878cd045c408da9d130cb2b611c639912210ba96ce2f78e443569aa8060c18
+  languageName: node
+  linkType: hard
+
 "trim-lines@npm:^3.0.0":
   version: 3.0.1
   resolution: "trim-lines@npm:3.0.1"
@@ -5524,6 +5540,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"unist-util-mdx-define@npm:^1.0.0":
+  version: 1.1.2
+  resolution: "unist-util-mdx-define@npm:1.1.2"
+  dependencies:
+    "@types/estree": "npm:^1.0.0"
+    "@types/hast": "npm:^3.0.0"
+    "@types/mdast": "npm:^4.0.0"
+    estree-util-is-identifier-name: "npm:^3.0.0"
+    estree-util-scope: "npm:^1.0.0"
+    estree-walker: "npm:^3.0.0"
+    vfile: "npm:^6.0.0"
+  checksum: 10c0/83a78b427ccba7cb14101da9842dc31170ce7133dead795fd5e6ac0b9222b813753b2374a7208b192eb8916effbcf9acbdd5ae63f20069a12133f6a74d92c3cf
+  languageName: node
+  linkType: hard
+
 "unist-util-position-from-estree@npm:^2.0.0":
   version: 2.0.0
   resolution: "unist-util-position-from-estree@npm:2.0.0"
@@ -5669,6 +5700,7 @@ __metadata:
     "@next/mdx": "npm:^15.4.5"
     "@tailwindcss/postcss": "npm:^4"
     "@types/mdast": "npm:^3"
+    "@types/mdx": "npm:^2.0.13"
     "@types/node": "npm:^20"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
@@ -5687,10 +5719,9 @@ __metadata:
     rehype-autolink-headings: "npm:^7.1.0"
     rehype-external-links: "npm:^3.0.0"
     rehype-parse: "npm:^9.0.1"
-    remark-autolink-headings: "npm:^8.0.0"
-    remark-external-links: "npm:^10.0.0"
     remark-frontmatter: "npm:^5.0.0"
     remark-math: "npm:^6.0.0"
+    remark-mdx-frontmatter: "npm:^5.2.0"
     tailwindcss: "npm:^4"
     typescript: "npm:^5"
     unified: "npm:^11.0.5"
@@ -5818,6 +5849,15 @@ __metadata:
   version: 5.0.0
   resolution: "yallist@npm:5.0.0"
   checksum: 10c0/a499c81ce6d4a1d260d4ea0f6d49ab4da09681e32c3f0472dee16667ed69d01dae63a3b81745a24bd78476ec4fcf856114cb4896ace738e01da34b2c42235416
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.0.0":
+  version: 2.8.0
+  resolution: "yaml@npm:2.8.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/f6f7310cf7264a8107e72c1376f4de37389945d2fb4656f8060eca83f01d2d703f9d1b925dd8f39852a57034fafefde6225409ddd9f22aebfda16c6141b71858
   languageName: node
   linkType: hard
 
