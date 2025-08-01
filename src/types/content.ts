@@ -16,22 +16,23 @@ export interface TableOfContents {
 
 export interface MdxFrontmatter {
   id: string;
-
   title: string;
-
   author?: string;
-
   contributors?: string;
-
   description?: string;
-
   prerequisites?: string[];
-
   redirects?: string[];
-
   frequency?: number;
-
   isIncomplete?: boolean;
+  lastUpdated?: string;
+  division?: string;
+  
+  // Problem-specific fields
+  source?: string;
+  difficulty?: string;
+  tags?: string[];
+  isStarred?: boolean;
+  solution?: string | ProblemSolutionInfo;
 }
 
 export interface MdxContent {
@@ -85,7 +86,7 @@ export interface ModuleProblemInfo {
 }
 
 export interface ProblemInfo extends ModuleProblemInfo {
-  inModule: boolean;
+  inModule?: boolean;
 
   module?: MdxContent; // Reference to parent module
 }
