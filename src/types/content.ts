@@ -26,7 +26,7 @@ export interface MdxFrontmatter {
   isIncomplete?: boolean;
   lastUpdated?: string;
   division?: string;
-  
+
   // Problem-specific fields
   source?: string;
   difficulty?: string;
@@ -39,6 +39,8 @@ export interface MdxContent {
   body: string;
 
   fileAbsolutePath: string;
+
+  slug?: string;
 
   frontmatter: MdxFrontmatter;
 

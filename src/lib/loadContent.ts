@@ -68,7 +68,7 @@ async function loadAllProblems(): Promise<ProblemInfo[]> {
 
                 // Handle solution if it exists
                 if (problem.frontmatter.solution) {
-                    problemInfo.solution = typeof problem.frontmatter.solution === 'string' 
+                    problemInfo.solution = typeof problem.frontmatter.solution === 'string'
                         ? { kind: 'internal', url: problem.frontmatter.solution }
                         : problem.frontmatter.solution;
                 }
@@ -120,6 +120,7 @@ export async function loadContent() {
                     ...parsed.frontmatter,
                     division,
                 },
+                slug: file.replace(/\.mdx$/, ''),
             });
         } catch (error) {
             console.error(`Error loading module ${file}:`, error);
