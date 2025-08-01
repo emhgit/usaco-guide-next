@@ -1,4 +1,4 @@
-import { MdxContent, ProblemInfo, ModuleProblemLists } from "@/types/content";
+import { MdxContent, ProblemInfo, ModuleProblemLists } from "../types/content";
 
 export function validateProblemConsistency(problems: ProblemInfo[]): void {
   const uniqueIdMap = new Map<string, ProblemInfo>();
