@@ -1,5 +1,6 @@
 import { loadContent } from '../src/lib/loadContent';
 
+// set `module: commonjs` and `moduleResolution: Node` in in `tsconfig.json`
 async function testLoadContent() {
     try {
         console.log('Starting to load content...');
@@ -42,7 +43,12 @@ async function testLoadContent() {
 
         console.log('\n=== Solutions ===');
         console.log(`Loaded ${content.solutions.length} solutions`);
-
+        content.solutions.slice(0, 3).forEach((solution, i) => {
+            console.log(`  ${i + 1}. ${solution.frontmatter.title} (${solution.frontmatter.division}) (${solution.frontmatter.source})`);
+        });
+        if (content.solutions.length > 3) {
+            console.log(`  ... and ${content.solutions.length - 3} more`);
+        }
     } catch (error) {
         console.error('Error loading content:');
         console.error(error);
