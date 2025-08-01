@@ -1,0 +1,405 @@
+---
+id: usaco-740
+source: USACO Silver 2017 US Open
+title: Where's Bessie?
+author: Qi Wang, Pranav Jadhav, David Guo
+---
+
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_where_silver_open17.html)
+
+## Explanation
+
+Any rectangle with sides parallel to the grid is uniquely defined by its top-left and bottom-right corners.
+There are $\mathcal{O}(N^2)$ choices for the top-left corner and $\mathcal{O}(N^2)$ choices for the bottom-right corner,
+resulting in $\mathcal{O}(N^4)$ total rectangles.
+Since $N$ is at most $20$, an $\mathcal{O}(N^6)$ algorithm is efficient enough to solve the problem within the constraints.
+To achieve this, we require $\mathcal{O}(N^2)$ work to determine whether each rectangle is a PCL.
+
+Since there are $\mathcal{O}(N^4)$ total rectangles, there are $\mathcal{O}(N^8)$ total possible rectangle pairs.
+However, this realistically is not the number of PCL pairs and therefore our solution will still pass.
+
+To check whether a rectangle is a PCL, we use a flood-fill algorithm.
+For each rectangle, we count the number of connected components for each color within its bounds.
+A rectangle qualifies as a PCL if it contains exactly two colors,
+with one color forming a single connected component and the other forming two or more connected components.
+By setting bounds for the flood-fill and skipping already-visited cells,
+we ensure that each cell in the rectangle is processed only once, leading to $\mathcal{O}(N^2)$ work per rectangle.
+
+Once all candidate PCLs are identified, we need to ensure no PCL is nested within another.
+Rather than using clever ordering, we handle this with a straightforward approach:
+for each identified PCL, we check whether it is completely contained within any other PCL.
+Since the number of valid PCLs is significantly smaller than the total number of rectangles
+as invalid rectangles are discarded early, this approach remains efficient.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N^6+P^2)$, where $P$ is the number of PCLs in the input.
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAX_N = 20;
+vector<vector<char>> image(MAX_N, vector<char>(MAX_N));
+vector<vector<bool>> visited(MAX_N, vector<bool>(MAX_N));
+
+/** PCL delimited by the top left corner (i1, j1) & bottom right corner (i2, j2) */
+struct PCL {
+	int i1, j1;
+	int i2, j2;
+
+	bool is_inside(PCL other) {
+		return (i1 >= other.i1 && i2 <= other.i2 && j1 >= other.j1 && j2 <= other.j2);
+	}
+};
+
+// Floodfill to find connected regions
+int i_min, i_max, j_min, j_max;
+void floodfill(int i, int j, char color) {
+	if (i < i_min || j < j_min || i > i_max || j > j_max || visited[i][j] ||
+	    image[i][j] != color) {
+		return;
+	}
+
+	visited[i][j] = true;
+
+	floodfill(i + 1, j, color);
+	floodfill(i - 1, j, color);
+	floodfill(i, j + 1, color);
+	floodfill(i, j - 1, color);
+}
+
+// Check whether a given region is a PCL
+bool is_pcl(int i1, int j1, int i2, int j2) {
+	// keep track of num of regions for each color A-Z
+	vector<int> region_count(26);
+
+	// set bounds for floodfill
+	i_min = i1;
+	i_max = i2;
+	j_min = j1;
+	j_max = j2;
+
+	// Count # of connected regions for each color present in bounds
+	for (int i = i1; i <= i2; i++) {
+		for (int j = j1; j <= j2; j++) {
+			if (!visited[i][j]) {
+				char curr_color = image[i][j];
+				region_count[curr_color - 'A']++;
+				floodfill(i, j, curr_color);
+			}
+		}
+	}
+
+	// Reset visited vector for the next call
+	fill(visited.begin(), visited.end(), vector<bool>(MAX_N));
+
+	// Verify PCL conditions
+	int color_count = 0;
+	bool color_with_one_region = false;
+	bool color_with_more_regions = false;
+	for (int i = 0; i < region_count.size(); i++) {
+		if (region_count[i] != 0) { color_count++; }
+		if (region_count[i] == 1) { color_with_one_region = true; }
+		if (region_count[i] > 1) { color_with_more_regions = true; }
+	}
+
+	return (color_count == 2 && color_with_one_region && color_with_more_regions);
+}
+
+int main() {
+	freopen("where.in", "r", stdin);
+	int n;
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) { cin >> image[i][j]; }
+	}
+
+	vector<PCL> pcl_list;
+	// Brute force every rectangle to find PCLs
+	for (int i1 = 0; i1 < n; i1++) {
+		for (int j1 = 0; j1 < n; j1++) {
+			for (int i2 = 0; i2 < n; i2++) {
+				for (int j2 = 0; j2 < n; j2++) {
+					if (is_pcl(i1, j1, i2, j2)) {
+						pcl_list.push_back({i1, j1, i2, j2});
+					}
+				}
+			}
+		}
+	}
+
+	int pcl_count = 0;
+	// If a PCL is inside another PCL, don't count it
+	for (int i = 0; i < pcl_list.size(); i++) {
+		bool valid_pcl = true;
+		for (int j = 0; j < pcl_list.size(); j++) {
+			if (i == j) { continue; }
+			if (pcl_list[i].is_inside(pcl_list[j])) {
+				valid_pcl = false;
+				break;
+			}
+		}
+		pcl_count += valid_pcl;
+	}
+
+	freopen("where.out", "w", stdout);
+	cout << pcl_count << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class Where {
+	static final int MAX_N = 20;
+
+	static char[][] image = new char[MAX_N][MAX_N];
+	static boolean[][] visited = new boolean[MAX_N][MAX_N];
+
+	static int iMin, iMax, jMin, jMax;
+	static void floodfill(int i, int j, char color) {
+		if (i < iMin || j < jMin || i > iMax || j > jMax || visited[i][j] ||
+		    image[i][j] != color) {
+			return;
+		}
+
+		visited[i][j] = true;
+
+		floodfill(i + 1, j, color);
+		floodfill(i - 1, j, color);
+		floodfill(i, j + 1, color);
+		floodfill(i, j - 1, color);
+	}
+
+	// Check whether a given region is a PCL
+	static boolean isPCL(int i1, int j1, int i2, int j2) {
+		// keep track of num of regions for each color A-Z
+		int[] regionCount = new int[26];
+
+		// set bounds for floodfill
+		iMin = i1;
+		iMax = i2;
+		jMin = j1;
+		jMax = j2;
+
+		// Count # of connected regions for each color present in bounds
+		for (int i = i1; i <= i2; i++) {
+			for (int j = j1; j <= j2; j++) {
+				if (!visited[i][j]) {
+					char currColor = image[i][j];
+					regionCount[currColor - 'A']++;
+					floodfill(i, j, currColor);
+				}
+			}
+		}
+
+		// Reset visited vector for the next call
+		visited = new boolean[MAX_N][MAX_N];
+
+		// Verify PCL conditions
+		int colorCount = 0;
+		boolean colorWithOneRegion = false;
+		boolean colorWithMoreRegions = false;
+		for (int i = 0; i < regionCount.length; i++) {
+			if (regionCount[i] != 0) { colorCount++; }
+			if (regionCount[i] == 1) { colorWithOneRegion = true; }
+			if (regionCount[i] > 1) { colorWithMoreRegions = true; }
+		}
+
+		return (colorCount == 2 && colorWithOneRegion && colorWithMoreRegions);
+	}
+
+	public static void main(String[] args) throws IOException {
+		BufferedReader read = new BufferedReader(new FileReader("where.in"));
+		int n = Integer.parseInt(read.readLine());
+		for (int i = 0; i < n; i++) {
+			String row = read.readLine();
+			for (int j = 0; j < n; j++) { image[i][j] = row.charAt(j); }
+		}
+		read.close();
+
+		List<PCL> pcls = new ArrayList<>();
+		// Brute force every rectangle to find PCLs
+		for (int i1 = 0; i1 < n; i1++) {
+			for (int j1 = 0; j1 < n; j1++) {
+				for (int i2 = 0; i2 < n; i2++) {
+					for (int j2 = 0; j2 < n; j2++) {
+						if (isPCL(i1, j1, i2, j2)) {
+							pcls.add(new PCL(i1, j1, i2, j2));
+						}
+					}
+				}
+			}
+		}
+
+		int pclCount = 0;
+		// If a PCL is inside another PCL, don't count it
+		for (int i = 0; i < pcls.size(); i++) {
+			boolean validPCL = true;
+			for (int j = 0; j < pcls.size(); j++) {
+				if (i == j) { continue; }
+				if (pcls.get(i).isInside(pcls.get(j))) {
+					validPCL = false;
+					break;
+				}
+			}
+			pclCount += validPCL ? 1 : 0;
+		}
+
+		PrintWriter written = new PrintWriter("where.out");
+		written.println(pclCount);
+		written.close();
+	}
+
+	/**
+	 * PCL delimited by the top left corner (i1, j1)
+	 * & bottom right corner (i2, j2)
+	 */
+	static class PCL {
+		public int i1, j1;
+		public int i2, j2;
+		public PCL(int i1, int j1, int i2, int j2) {
+			this.i1 = i1;
+			this.j1 = j1;
+			this.i2 = i2;
+			this.j2 = j2;
+		}
+
+		public boolean isInside(PCL other) {
+			return (i1 >= other.i1 && i2 <= other.i2 && j1 >= other.j1 &&
+			        j2 <= other.j2);
+		}
+	}
+}
+```
+
+</JavaSection>
+<PySection>
+
+<Warning>
+
+This solution TLEs due to Python's constant factor.
+
+</Warning>
+
+```py
+from typing import List
+
+MAX_N = 20
+
+
+class PCL:
+	def __init__(self, i1: int, j1: int, i2: int, j2: int):
+		self.i1 = i1
+		self.j1 = j1
+		self.i2 = i2
+		self.j2 = j2
+
+	def is_inside(self, other: "PCL") -> bool:
+		return (
+			self.i1 >= other.i1
+			and self.i2 <= other.i2
+			and self.j1 >= other.j1
+			and self.j2 <= other.j2
+		)
+
+
+image = [[""] * MAX_N for _ in range(MAX_N)]
+visited = [[False] * MAX_N for _ in range(MAX_N)]
+
+
+def floodfill(i: int, j: int, color: str):
+	"""Floodfill to find the connected regions"""
+	stack = [(i, j)]
+	visited[i][j] = True
+	while stack:
+		cur_i, cur_j = stack.pop()
+		for di, dj in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+			new_i, new_j = cur_i + di, cur_j + dj
+			if (
+				i_min <= new_i <= i_max
+				and j_min <= new_j <= j_max
+				and not visited[new_i][new_j]
+				and image[new_i][new_j] == color
+			):
+				visited[new_i][new_j] = True
+				stack.append((new_i, new_j))
+
+
+def is_pcl(i1: int, j1: int, i2: int, j2: int) -> bool:
+	""":returns: whether the given rectangle forms a PCL"""
+	global i_min, i_max, j_min, j_max
+	# Keep track of number of regions for each color
+	region_count = [0] * 26
+
+	# Set bounds for floodfill
+	i_min, i_max, j_min, j_max = i1, i2, j1, j2
+
+	# Count connected regions for each color within the rectangle bounds
+	for i in range(i1, i2 + 1):
+		for j in range(j1, j2 + 1):
+			if not visited[i][j]:
+				curr_color = image[i][j]
+				region_count[ord(curr_color) - ord("A")] += 1
+				floodfill(i, j, curr_color)
+
+	# Reset visited array for the current rectangle
+	for i in range(i1, i2 + 1):
+		for j in range(j1, j2 + 1):
+			visited[i][j] = False
+
+	# Verify PCL conditions
+	color_count = 0
+	color_with_one_region = False
+	color_with_more_regions = False
+	for count in region_count:
+		if count != 0:
+			color_count += 1
+		if count == 1:
+			color_with_one_region = True
+		if count > 1:
+			color_with_more_regions = True
+
+	return color_count == 2 and color_with_one_region and color_with_more_regions
+
+
+with open("where.in", "r") as fin:
+	n = int(fin.readline().strip())
+	image = [list(fin.readline().strip()) for _ in range(n)]
+
+pcl_list = []
+# Brute force every rectangle to find PCLs
+for i1 in range(n):
+	for j1 in range(n):
+		for i2 in range(i1, n):
+			for j2 in range(j1, n):
+				if (i2 - i1 + 1) * (j2 - j1 + 1) < 2:
+					continue
+				if is_pcl(i1, j1, i2, j2):
+					pcl_list.append(PCL(i1, j1, i2, j2))
+
+pcl_count = 0
+# Check each PCL and ensure it is not inside another PCL
+for i in range(len(pcl_list)):
+	valid_pcl = True
+	for j in range(len(pcl_list)):
+		if i == j:
+			continue
+		if pcl_list[i].is_inside(pcl_list[j]):
+			valid_pcl = False
+			break
+	pcl_count += valid_pcl
+
+print(pcl_count, file=open("where.out", "w"))
+```
+
+</PySection>
+</LanguageSection>

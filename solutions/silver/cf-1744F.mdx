@@ -1,0 +1,217 @@
+---
+id: cf-1744F
+source: CF
+title: MEX vs MED
+author: Alex Du, Rameez Parwez
+---
+
+<Spoiler title="Hint">
+
+For a subsegment of length $\leq 2 \cdot \texttt{mex}$, the condition $\texttt{mex} > \texttt{med}$ will be satisfied, since the median can be at most $\texttt{mex}-1$.
+
+</Spoiler>
+
+<Spoiler title="Solution">
+
+## Explanation
+
+[Official Analysis](https://codeforces.com/blog/entry/108101)
+
+We will iterate $\texttt{mex}$ from $1$ to $n-1$, finding all valid subsegments of that $\texttt{mex}$ at a time.
+
+Let $l$ and $r$ represent the highest left bound and the lowest right bound, respectively, of a subsegment that satisfies a given $\texttt{mex}$, and $\texttt{pos}$ represent the index of $\texttt{mex}$. If we know $l$, $r$, and $\texttt{pos}$, we can quickly count the subsegments for a given $\texttt{mex}$.
+
+We need to find all subsegments of length $\leq 2 \cdot \texttt{mex}$ that contains $l \ldots r$ and omit $\texttt{pos}$. First, let's solve for $\texttt{pos}>r$. Let's iterate $r$ to $\texttt{pos}-1$, finding all bounds of $l$ that satisfy the constraints for each $r$. This is not a time concern as long as we can find all possible values of $l$ in $\mathcal{O}(1)$, since each time we iterate we are increasing the size of the subsegment by $1$.
+
+Considering this new bound of $r$, we can find the number of possible values of $l$ that form a valid subsegment by finding the number of positions $\leq l$ such that $r-l+1 \leq \texttt{mex} \cdot 2$. The lower
+bound of our smallest value of $l$ is $r-\texttt{mex} \cdot 2 + 1$, which we can find by rearranging the previous inequality.
+
+After this, we know that all values between $l$ and the lower bound of $l$ are valid left bounds for our given $r$, so we can add $l-\texttt{smallest\_l} + 1$ to the answer. However, we must consider the lower bound of $l$ as $0$ if it's negative, and not add $l-\texttt{smallest\_l} + 1$ if it is negative.
+
+If $\texttt{pos} < l$, we can decrement from $l$ to $\texttt{pos}+1$, calculating all possible values of $r$ in a similar fashion.
+
+We can store the position of each integer, allowing us to find the position of the next $\texttt{mex}$ without having to search through the array.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+using ll = long long;
+
+int main() {
+	int test_num;
+	cin >> test_num;
+	for (int t = 0; t < test_num; t++) {
+		int n;
+		cin >> n;
+
+		// stores position of integer
+		vector<int> pos(n);
+
+		for (int i = 0; i < n; i++) {
+			int x;
+			cin >> x;
+			pos[x] = i;
+		}
+
+		// initialize left and right bounds for mex
+		int left = pos[0], right = pos[0];
+		ll res = 1;
+
+		// mex represents the current mex left and right cover
+		for (int mex = 1; mex < n; mex++) {
+			int next_pos = pos[mex];
+
+			// skip if next_pos is already between left and right
+			if (left <= next_pos && next_pos <= right) { continue; }
+
+			// Since we can create a valid subsegment for a given mex up until
+			// size mex * 2, our max difference between left and right is mex * 2 - 1.
+			int max_diff = mex * 2 - 1;
+
+			if (next_pos < left) {
+				for (; left > next_pos; left--) {
+					int largest_right = min(left + max_diff, n - 1);
+					// add all possible right bounds that don't change the
+					// current mex
+					res += max(largest_right - right + 1, 0);
+				}
+			} else {
+				for (; right < next_pos; right++) {
+					int smallest_left = max(right - max_diff, 0);
+					// add all possible left bounds that don't change the
+					// current mex
+					res += max(left - smallest_left + 1, 0);
+				}
+			}
+		}
+
+		cout << res << '\n';
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class MAXvsMED {
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+		int testNum = io.nextInt();
+		for (int t = 0; t < testNum; t++) {
+			int n = io.nextInt();
+
+			// stores position of integer
+			int[] pos = new int[n];
+			for (int i = 0; i < n; i++) {
+				int x = io.nextInt();
+				pos[x] = i;
+			}
+
+			// initialize left and right bounds for mex
+			int left = pos[0], right = pos[0];
+			long res = 1;
+
+			// mex represents the current mex left and right cover
+			for (int mex = 1; mex < n; mex++) {
+				int nextPos = pos[mex];
+
+				// skip if next_pos is already between left and right
+				if (left <= nextPos && nextPos <= right) { continue; }
+				// Since we can create a valid subsegment for a given mex up until
+				// size mex * 2, our max diff between left and right is mex * 2 - 1
+				int maxDiff = mex * 2 - 1;
+
+				if (nextPos < left) {
+					for (; left > nextPos; left--) {
+						int largest_right = Math.min(left + maxDiff, n - 1);
+						// add all possible right bounds that don't change the
+						// current mex
+						res += Math.max(largest_right - right + 1, 0);
+					}
+				} else {
+					for (; right < nextPos; right++) {
+						int smallest_left = Math.max(right - maxDiff, 0);
+						// add all possible left bounds that don't change the
+						// current mex
+						res += Math.max(left - smallest_left + 1, 0);
+					}
+				}
+			}
+
+			io.println(res);
+		}
+
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<PySection>
+
+```py
+for _ in range(int(input())):
+	n = int(input())
+
+	# stores the position of integers
+	pos = [0] * n
+
+	data = list(map(int, input().split()))
+
+	for i in range(n):
+		x = data[i]
+		pos[x] = i
+
+	# initialize left and right bounds for mex
+	left = pos[0]
+	right = pos[0]
+	res = 1
+
+	# mex represents the current mex left and right cover
+	for mex in range(1, n):
+		next_pos = pos[mex]
+
+		# Skip if next_pos is already between left and right
+		if left <= next_pos <= right:
+			continue
+
+		# Since we can create a valid subsegment for a given mex up until
+		# size mex * 2, our max difference between left and right is mex * 2 - 1.
+		max_diff = mex * 2 - 1
+
+		if next_pos < left:
+			while left > next_pos:
+				largest_right = min(left + max_diff, n - 1)
+
+				# Add all possible right bounds that don't change the current mex
+				res += max(largest_right - right + 1, 0)
+				left -= 1
+		else:
+			while right < next_pos:
+				smallest_left = max(right - max_diff, 0)
+
+				# Add all possible left bounds that don't change the current mex
+				res += max(left - smallest_left + 1, 0)
+				right += 1
+
+	print(res)
+```
+
+</PySection>
+</LanguageSection>
+
+</Spoiler>

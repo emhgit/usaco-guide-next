@@ -1,0 +1,108 @@
+---
+id: cf-104002E
+source: CF
+title: William and Robot
+author: Alex Du, Benjamin Qi, Rameez Parwez
+---
+
+## Explanation
+
+First note that the only requirement for a valid solution is that for any even number $k \leq n$, William must have selected at most $\frac{k}{2}$ integers out of the first $k$ integers.
+It is impossible to select more than $\frac{k}{2}$ integers in the first $k$ integers, since the robot will have taken all other $\frac{k}{2}$ integers by the time you can choose your next integer.
+Note that it is also possible to "save" your choices, since you can choose less than $\frac{k}{2}$ integers for $k < n$, allowing you to choose more for a larger $k$.
+
+For example, if we had array of size $4$, we could select either of the first two elements and either of the last two elements, selecting exactly $\frac{k}{2}$ integers for both $k = 2$ and $k = 4$.
+Alternatively, we could select both of the last two elements, selecting 0 integers for $k = 2$ and $2$ integers for $k = 4$.
+Note that we cannot take both the first and second element, since the Robot will take the one we don't pick.
+
+To solve this problem, we can iterate $k$ from $1$ to $n$ and maintain a priority queue of the numbers tentatively selected by William so far. For each $k$ we push $a_k$ to the priority queue, and then if $k$ is even, pop the smallest element of the priority queue while the number of taken integers is greater than $k/2$.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N \log N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+	int n;
+	cin >> n;
+
+	vector<int> a(n);
+	for (int &i : a) { cin >> i; }
+
+	// stores currently selected numbers
+	priority_queue<int, vector<int>, greater<int>> taken;
+
+	for (int i = 0; i < n; ++i) {
+		taken.push(a[i]);
+		if (i & 1) taken.pop();
+	}
+
+	long long ans = 0;
+	while (!taken.empty()) {
+		ans += taken.top();
+		taken.pop();
+	}
+
+	cout << ans << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class WilliamAndRobot {
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+
+		int n = io.nextInt();
+		int[] a = new int[n];
+
+		for (int i = 0; i < n; i++) { a[i] = io.nextInt(); }
+
+		PriorityQueue<Integer> taken = new PriorityQueue<>();
+		for (int i = 0; i < n; i++) {
+			taken.offer(a[i]);
+			if (i % 2 == 1) { taken.poll(); }
+		}
+
+		long ans = 0;
+		while (!taken.isEmpty()) { ans += taken.poll(); }
+
+		io.println(ans);
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<PySection>
+
+```py
+import heapq
+
+n = int(input())
+a = list(map(int, input().split()))
+
+taken = []
+for i in range(n):
+	heapq.heappush(taken, a[i])
+	if i % 2 == 1:
+		heapq.heappop(taken)
+
+print(sum(taken))
+```
+
+</PySection>
+</LanguageSection>

@@ -1,0 +1,438 @@
+---
+id: usaco-989
+source: USACO Bronze 2020 January
+title: Race
+author: Sathvik Chundru, Kevin Sheng, Jonathan Paulson, Rameez Parwez, Justin Ji
+---
+
+## Video Solution
+
+By Jonathan Paulson
+
+<YouTube id="4KcvKIJP9KY" />
+
+<Spoiler title="Video Solution Code">
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <cassert>
+#include <cstdio>
+#include <iostream>
+#include <vector>
+
+// sum(n) = 1 + 2 + ... + n = n * (n + 1) / 2
+long long sum(int n) { return 1LL * n * (n + 1) / 2; }
+
+// a + (a + 1) + (a + 2) + ... + b = \sum_{i = a}^b i
+long long sum(int a, int b) { return a <= b ? sum(b) - sum(a - 1) : 0; }
+
+// Given that we start at speed s, can we slow down to speed x in at most l
+// meters? How many meters does it take to stop given current speed is s and
+// target is x? (s - 1) + (s - 2) + ... + x meters We are allowed to go over, so as
+// long as we have (s - 1) + (s - 2) + ... + (x + 1) + 1 meters, we are OK.
+bool ok(int speed, int x, int l) {
+	if (speed <= x) { return true; }
+
+	long long need = sum(x + 1, speed - 1) + 1;
+	return (need <= l);
+}
+
+int main() {
+	freopen("race.in", "r", stdin);
+	freopen("race.out", "w", stdout);
+
+	int k, n;
+	std::cin >> k >> n;
+	std::vector<int> arr(n);
+
+	for (int &x : arr) { std::cin >> x; }
+
+	for (int i = 0; i < n; i++) {
+		// Greedy. Go as fast as you can but make sure you can stop in time.
+		int x = arr[i];
+		int speed = 0;
+		int left = k;
+		int res = 0;
+
+		while (left > 0) {
+			if (ok(speed + 1, x, left - (speed + 1))) {
+				// speed up if we can
+				speed++;
+			} else if (ok(speed, x, left - speed)) {
+				// otherwise keep the same speed if we can
+			} else if (ok(speed - 1, x, left - (speed - 1))) {
+				// slow down if we have to
+				// check that we have enough space left to stop in time.
+				speed--;
+			}
+
+			left -= speed;
+			res++;
+		}
+		std::cout << res << '\n';
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class race {
+	// S(n) = 1+2+...+n = n*(n+1)/2
+	static long S(long n) { return n * (n + 1) / 2; }
+	// A+(A+1)+(A+2)+...+B = \sum_{i=A}^B i
+	static long sum(long A, long B) { return A <= B ? S(B) - S(A - 1) : 0; }
+
+	// Given that we start at speed S, can we slow down to speed X in at most L
+	// meters? How many meters does it take to stop given current speed is S and
+	// target is X? (S-1) + (S-2) + ... + X meters We are allowed to go over, so
+	// as long as we have (S-1)+(S-2)+...+(X+1)+1 m we are OK.
+	static boolean ok(long S, long X, long L) {
+		if (S <= X) { return true; }
+		long need = sum(X + 1, S - 1) + 1;
+		return need <= L;
+	}
+	static long solve(long k, long x) {
+		// Greedy. Go as fast as you can but make sure you can stop in time.
+		long speed = 0;
+		long left = k;
+		long t = 0;
+		while (left > 0) {
+			if (ok(speed + 1, x, left - (speed + 1))) {
+				// speed up if we can
+				speed += 1;
+			} else if (ok(speed, x, left - speed)) {
+				// otherwise keep the same speed if we can
+			} else {
+				// slow down if we have to
+				// check that we have enough space left to stop in time.
+				assert (ok(speed - 1, x, left - (speed - 1)));
+				speed -= 1;
+			}
+			assert (speed >= 1);
+			left -= speed;
+			t++;
+		}
+		return t;
+	}
+	public static void main(String[] args) throws Exception {
+		BufferedReader in = new BufferedReader(new FileReader("race.in"));
+		PrintWriter out =
+		    new PrintWriter(new BufferedWriter(new FileWriter("race.out")));
+		String[] nk = in.readLine().split(" ");
+		long k = Long.parseLong(nk[0]);
+		int n = Integer.parseInt(nk[1]);
+		for (int i = 0; i < n; i++) {
+			long x = Long.parseLong(in.readLine());
+			out.println(solve(k, x));
+			out.flush();
+		}
+	}
+}
+```
+
+</JavaSection>
+<PySection>
+
+<Info title="TLE">
+
+Due to Python's slow speed, this approach doesn't pass all test cases.
+
+</Info>
+
+```py
+# S(n) = 1+2+...+n = n*(n+1)/2
+def S(n: int) -> int:
+	return n * (n + 1) // 2
+
+
+# A+(A+1)+(A+2)+...+B = \sum_{i=A}^B i
+def sum_(A: int, B: int) -> int:
+	return S(B) - S(A - 1) if A <= B else 0
+
+
+# Given that we start at speed S, can we slow down to speed X in at most L meters?
+# How many meters does it take to stop given current speed is S and target is X?
+# (S-1) + (S-2) + ... + X meters
+# We are allowed to go over, so as long as we have (S-1)+(S-2)+...+(X+1)+1 m we are OK.
+def ok(S: int, X: int, L: int) -> bool:
+	if S <= X:
+		return True
+	need = sum_(X + 1, S - 1) + 1
+	return need <= L
+
+
+line1, *rest = open("race.in").readlines()
+k, n = [int(v) for v in line1.split()]
+X = []
+for line in rest:
+	X.append(int(line))
+
+
+def solve(k, x):
+	# Greedy. Go as fast as you can but make sure you can stop in time.
+	speed = 0
+	left = k
+	t = 0
+	while left > 0:
+		if ok(speed + 1, x, left - (speed + 1)):
+			# speed up if we can
+			speed += 1
+		elif ok(speed, x, left - speed):
+			# otherwise keep the same speed if we can
+			pass
+		else:
+			# slow down if we have to
+			# check that we have enough space left to stop in time.
+			assert ok(speed - 1, x, left - (speed - 1))
+			speed -= 1
+		assert speed >= 1
+		left -= speed
+		t += 1
+	return t
+
+
+with open("race.out", "w") as fout:
+	for x in X:
+		print(solve(k, x), file=fout)
+```
+
+</PySection>
+</LanguageSection>
+
+</Spoiler>
+
+<Spoiler title="Hint 1">
+
+What's the best strategy that Bessie could use if, hypothetically, there wasn't a speed limit at the finish line?
+
+</Spoiler>
+
+<Spoiler title="Answer to Hint 1">
+
+We'd want to increase our speed as much as we can!
+
+</Spoiler>
+
+<Spoiler title="Hint 2">
+
+How can we use this strategy when there **is** a speed limit?
+
+</Spoiler>
+
+<Spoiler title="Answer to Hint 2">
+
+We'll have Bessie continuously speed up until she's forced to slow down because of the speed limit.
+This strategy works because we've observed that when possible, Bessie should always speed up!
+
+This is an example of a [greedy algorithm](/bronze/intro-greedy).
+
+</Spoiler>
+
+<Spoiler title="Solution">
+
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_race_bronze_jan20.html)
+
+## Explanation
+
+From the hints, it is clear that we always want to speed up if possible. But when should we slow down?
+To determine this, we can iterate over our peak speed and maintain the current distance traveled so far,
+along with the distance required to slow down to the maximum allowed speed at the finish line. If the
+total distance covered while accelerating and decelerating is greater than or equal to the length of the
+track, then we know we have reached our optimal speed, and we can return the corresponding time.
+
+<Spoiler title="Why does this run within the time limit?">
+
+Consider the following facts:
+- The number of iterations we do is directly proportional to the top speed
+- Bessie's top speed is $\mathcal{O}(\sqrt{K})$
+
+The first one is pretty straightforward, as we are directly iterating on our top speed.
+To understand the second fact, consider that if Bessie didn't have a speed limit,
+her answer would be the first value of $t$ that satisfies the following inequality.
+
+$$
+\frac{t(t+1)}{2} \geq K
+$$
+
+$t$ is proportional to $\sqrt{K}$, so our code runs in time.
+
+</Spoiler>
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(Q \sqrt{K})$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+int fastest_time(int dist, int max_speed) {
+	int speed_up_dist = 0;   // Amount of distance where Bessie's speeding up
+	int slow_down_dist = 0;  // and slowing down respectively
+	int time = 0;
+
+	// Gradually speed up until we achieve our distance
+	for (int curr_speed = 1;; curr_speed++) {
+		speed_up_dist += curr_speed;
+		time++;
+		if (speed_up_dist + slow_down_dist >= dist) { return time; }
+
+		/*
+		 * If we're above the speed limit, add the current speed
+		 * to the part where we slow down as well.
+		 */
+		if (curr_speed >= max_speed) {
+			slow_down_dist += curr_speed;
+			time++;
+			// Check again if we've reached or passed the finish line
+			if (speed_up_dist + slow_down_dist >= dist) { return time; }
+		}
+	}
+}
+
+int main() {
+	std::ifstream read("race.in");
+	int dist;
+	int query_num;
+	read >> dist >> query_num;
+
+	std::ofstream written("race.out");
+	for (int q = 0; q < query_num; q++) {
+		int max_speed;
+		read >> max_speed;
+		written << fastest_time(dist, max_speed) << '\n';
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+class Race {
+	public static void main(String[] args) throws IOException {
+		Scanner sc = new Scanner(new File("race.in"));
+		int dist = sc.nextInt();
+		int queryNum = sc.nextInt();
+
+		PrintWriter pw = new PrintWriter(new File("race.out"));
+		for (int q = 0; q < queryNum; q++) {
+			int maxSpeed = sc.nextInt();
+			pw.println(fastestTime(dist, maxSpeed));
+		}
+		pw.close();
+	}
+
+	private static int fastestTime(int dist, int maxSpeed) {
+		int speedUpDist = 0;   // Amount of distance where Bessie's speeding up
+		int slowDownDist = 0;  // and slowing down respectively
+		int time = 0;
+
+		// Gradually speed up until we achieve our distance
+		for (int currSpeed = 1;; currSpeed++) {
+			speedUpDist += currSpeed;
+			time++;
+			if (speedUpDist + slowDownDist >= dist) { return time; }
+
+			/*
+			 * If we're above the speed limit, add the current speed
+			 * to the part where we slow down as well.
+			 */
+			if (currSpeed >= maxSpeed) {
+				slowDownDist += currSpeed;
+				time++;
+				// Check again if we've achieved our distance
+				if (speedUpDist + slowDownDist >= dist) { return time; }
+			}
+		}
+	}
+}
+```
+
+</JavaSection>
+<PySection>
+
+<Warning>
+
+Due to Python's slow speed, this approach doesn't immediately pass all the test cases. However, with some optimizations,
+we can improve the speed to where it passes.
+
+First, let's try to calculate how long it would take for Bessie to finish the race purely by increasing her speed. If her end speed remains at or below the maximum speed, then we can return the time calculated. Otherwise, we have to simulate Bessie increasing her speed. Instead of having her start at a speed of $0$ $\text{m/s}$, we can have her start off at her maximum speed. This greatly reduces the number of iterations needed.
+
+To calculate the time it takes for Bessie to finish the race if she only increases her speed,
+we write the following inequality.
+
+$$
+\frac{t(t+1)}{2} \geq K
+$$
+
+Note that the distance Bessie covers in $t$ seconds is equal to the left hand side
+of the inequality. Using the quadratic formula, we get the following bound on $t$.
+
+$$
+t \geq \frac{\sqrt{8K + 1} - 1}{2}
+$$
+
+With this bound on $t$, we can implement the optimizations mentioned above.
+
+</Warning>
+
+```py
+import math
+
+
+def fastest_time(dist: int, max_speed: int) -> int:
+	# We calculate the time it takes if only speeding up
+	no_slow_time = int(math.ceil((math.sqrt(8 * dist + 1) - 1) / 2))
+	if no_slow_time <= max_speed:
+		return no_slow_time
+
+	# Need to speed up past limit, so start at max speed for now
+	speed_up_dist = max_speed * (max_speed - 1) // 2
+	slow_down_dist = 0
+	time = max_speed - 1
+
+	curr_speed = max_speed
+	while True:
+		speed_up_dist += curr_speed
+		time += 1
+		if speed_up_dist + slow_down_dist >= dist:
+			return time
+
+		slow_down_dist += curr_speed
+		time += 1
+		if speed_up_dist + slow_down_dist >= dist:
+			return time
+
+		curr_speed += 1
+
+
+with open("race.in") as read:
+	dist, query_num = map(int, read.readline().split())
+
+	with open("race.out", "w") as write:
+		for _ in range(query_num):
+			max_speed = int(read.readline())
+			write.write(str(fastest_time(dist, max_speed)) + "\n")
+```
+
+</PySection>
+
+</LanguageSection>
+</Spoiler>

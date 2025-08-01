@@ -1,0 +1,109 @@
+---
+id: usaco-647
+source: USACO Gold 2016 Open
+title: '248'
+author: Melody Yu, Qi Wang, Rohak Debnath
+---
+
+[Official Analysis (Java)](http://www.usaco.org/current/data/sol_248_gold_open16.html)
+
+## Video Solution
+
+Note: The video solution might not be the same as other solutions. Code in C++.
+<YouTube id="OdHxOYICx-o" />
+
+## Explanation
+
+Consider a range $A[i..j]$. Since elements need to be adjacent to be merged and each new element will originate from a series of merges on a subarray, we can think about the subarrays of $A[i..j]$.
+
+Let us define $dp[i][j]$ as the subarray of $A$ (with $i$ and $j$ inclusive and 0-based) such that $dp[i][j]$ is the element that can be merged into as a single element. If it cannot be merged into a single element, let it be \(-1\). For $k$ from $i$ to $j-1$ inclusive, we can check for the following transitions:
+
+1. If $i == j$, $dp[i][j] = a[i]$ (base case).
+2. Otherwise, if $dp[i][k] \neq -1$ and $dp[i][k] == dp[k+1][j]$, then $dp[i][j] = dp[i][k] + 1$.
+
+If we find two equal and adjacent ranges, we can merge them for a value of $1$ plus the value of either of the two ranges. It can also be helpful to notice that a range can only merge into a unique number. Hence, it is not necessary to write the transitions as $dp[i][j] = \max(dp[i][j], dp[i][k] + 1)$.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N^3)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+	freopen("248.in", "r", stdin);
+	int n;
+	cin >> n;
+
+	vector<int> a(n);
+	for (int i = 0; i < n; i++) { cin >> a[i]; }
+
+	// dp[i][j] = final element the range i..j gets merged into,
+	// otherwise it's -1 if it cannot be merged into a single element
+	vector<vector<int>> dp(n, vector<int>(n, -1));
+
+	int ans = 0;
+	for (int len = n - 1; len >= 0; len++) {
+		dp[len][len] = a[len];
+		for (int r = len; r < n; r++) {
+			for (int k = len; k < r; k++) {
+				if (dp[len][k] != -1 and dp[len][k] == dp[k + 1][r]) {
+					dp[len][r] = dp[len][k] + 1;
+				}
+			}
+			ans = max(ans, dp[len][r]);
+		}
+	}
+
+	freopen("248.out", "w", stdout);
+	cout << ans << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class U248 {
+	public static void main(String[] args) throws IOException {
+		Kattio io = new Kattio("248");
+
+		int N = io.nextInt();
+		int[] board = new int[N];
+
+		int[][] dp = new int[N + 1][N + 1];
+		for (int i = 0; i < N; i++) {
+			board[i] = io.nextInt();
+			dp[i + 1][i + 1] = board[i];
+		}
+
+		int max_val = 0;
+		for (int i = N - 1; i >= 1; i--) {
+			for (int j = i + 1; j <= N; j++) {
+				for (int k = i; k < j; k++) {
+					if (dp[i][k] == dp[k + 1][j]) {
+						dp[i][j] = Math.max(dp[i][j], dp[i][k] + 1);
+					}
+				}
+
+				max_val = Math.max(max_val, dp[i][j]);
+			}
+		}
+
+		io.println(max_val);
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+</LanguageSection>

@@ -1,0 +1,111 @@
+---
+id: kattis-maxcolinear
+source: Kattis
+title: Maximum Number of Colinear Points
+author: Benjamin Qi
+---
+
+## Explanation
+
+Add one to the line passing through each pair of points.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N^2\log N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+pair<pair<int, int>, int> get_line(pair<int, int> a, pair<int, int> b) {
+	pair<int, int> z = {b.first - a.first, b.second - a.second};
+	swap(z.first, z.second);
+
+	z.first *= -1;
+	int g = __gcd(z.first, z.second);
+	z.first /= g;
+	z.second /= g;
+
+	z = min(z, {-z.first, -z.second});
+	return {z, z.first * a.first + z.second * a.second};
+}
+
+int main() {
+	int n;
+	while (cin >> n) {
+		if (n == 0) { break; }
+
+		vector<pair<int, int>> points(n);
+		for (int i = 0; i < n; i++) { cin >> points[i].first >> points[i].second; }
+		map<pair<pair<int, int>, int>, int> collinear_count;
+		for (int i = 0; i < n; i++) {
+			for (int j = i + 1; j < n; j++) {
+				collinear_count[get_line(points[i], points[j])]++;
+			}
+		}
+
+		int mx = 0;
+		for (auto x : collinear_count) { mx = max(mx, x.second); }
+		int res = 0;
+		for (int i = 1; i <= n; i++) {
+			if (i * (i - 1) / 2 <= mx) { res = i; }
+		}
+
+		cout << res << '\n';
+	}
+}
+```
+
+</CPPSection>
+<PySection>
+
+```py
+import math
+from collections import defaultdict
+from typing import Tuple
+
+
+def get_line(a: Tuple[int, int], b: Tuple[int, int]) -> Tuple[Tuple[int, int], int]:
+	z = (b[0] - a[0], b[1] - a[1])
+	z = (-z[1], z[0])
+
+	g = math.gcd(z[0], z[1])
+	z = (z[0] // g, z[1] // g)
+
+	z = min(z, (-z[0], -z[1]))
+
+	c = z[0] * a[0] + z[1] * a[1]
+	return (z, c)
+
+
+while True:
+	n = int(input())
+	if n == 0:
+		break
+
+	points = []
+	for _ in range(n):
+		x, y = map(int, input().split())
+		points.append((x, y))
+
+	collinear_count = defaultdict(int)
+
+	for i in range(n):
+		for j in range(i + 1, n):
+			collinear_count[get_line(points[i], points[j])] += 1
+
+	mx = max(collinear_count.values(), default=0)
+
+	res = 0
+	for i in range(1, n + 1):
+		if i * (i - 1) // 2 <= mx:
+			res = i
+
+	print(res)
+```
+
+</PySection>
+</LanguageSection>

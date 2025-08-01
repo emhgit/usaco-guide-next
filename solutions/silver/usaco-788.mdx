@@ -1,0 +1,224 @@
+---
+id: usaco-788
+source: USACO Silver 2018 January
+title: Mootube
+author: Óscar Garries, Qi Wang, David Guo
+---
+
+<Spoiler title="Hint 1">
+
+Think about the $N$ videos and the $N - 1$ relationships between them.
+What data structure you think can best store and process those information?
+
+</Spoiler>
+
+<Spoiler title="Hint 2">
+
+Let's imagine manually searching through a tree of videos for a singular query.
+What observations can we make about how the relevance value influences our decision-making process in selecting the relevant videos?
+
+</Spoiler>
+
+<Spoiler title="Solution">
+
+[Official Analysis (Java)](http://www.usaco.org/current/data/sol_mootube_silver_jan18.html)
+
+## Explanation
+
+We represent the videos and their relationships using a tree, where each node corresponds to a video and the edges denote the relevance between them.
+
+For each query, we perform a depth-first search starting from the given video, only traversing edges that are greater than or equal to the relevance threshold.
+
+This allows us to efficiently identify all videos that satisfy the threshold, so we count each valid video and finally output the computed total.
+
+## Implementation
+
+The implementation uses DFS instead of BFS, but the essence is still the same.
+
+**Time Complexity:** $\mathcal{O}(N \cdot Q)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<vector<pair<int, int>>> neighbors;
+vector<bool> visited;
+int threshold;
+int num_reachable;
+
+/** searches all vertices that can be reached through the current video v */
+void search_videos(int v) {
+	visited[v] = true;
+	for (const pair<int, int> &n : neighbors[v]) {
+		/*
+		 * only visit nonvisited videos whose relevance
+		 * is greater than the current threshold
+		 */
+		if (!visited[n.first] && n.second >= threshold) {
+			num_reachable++;
+			search_videos(n.first);
+		}
+	}
+}
+
+int main() {
+	freopen("mootube.in", "r", stdin);
+	int video_num;
+	int query_num;
+	cin >> video_num >> query_num;
+
+	neighbors = vector<vector<pair<int, int>>>(video_num);
+	for (int e = 0; e < video_num - 1; e++) {
+		int a, b;
+		int relevance;
+		cin >> a >> b >> relevance;
+		a--;
+		b--;
+		neighbors[a].push_back({b, relevance});
+		neighbors[b].push_back({a, relevance});
+	}
+
+	freopen("mootube.out", "w", stdout);
+	for (int q = 0; q < query_num; q++) {
+		int start;
+		cin >> threshold >> start;
+		start--;
+
+		// reset our global variables for the current query
+		num_reachable = 0;
+		visited = vector<bool>(video_num);
+		search_videos(start);
+
+		cout << num_reachable << '\n';
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class MooTube {
+	private static class Edge {
+		int to;
+		int relevance;
+		public Edge(int to, int relevance) {
+			this.to = to;
+			this.relevance = relevance;
+		}
+	}
+
+	static int threshold;
+	static int numReachable;
+	static boolean[] visited;
+	static List<Edge>[] neighbors;
+
+	public static void main(String[] args) throws IOException {
+		Kattio io = new Kattio("mootube");
+		int videoNum = io.nextInt();
+		int queryNum = io.nextInt();
+
+		neighbors = new ArrayList[videoNum];
+		for (int v = 0; v < videoNum; v++) { neighbors[v] = new ArrayList<>(); }
+		for (int e = 0; e < videoNum - 1; e++) {
+			int a = io.nextInt() - 1;
+			int b = io.nextInt() - 1;
+			int relevance = io.nextInt();
+			neighbors[a].add(new Edge(b, relevance));
+			neighbors[b].add(new Edge(a, relevance));
+		}
+
+		for (int q = 0; q < queryNum; q++) {
+			threshold = io.nextInt();
+			int start = io.nextInt() - 1;
+
+			// reset our global variables for the current query
+			numReachable = 0;
+			visited = new boolean[videoNum];
+			searchVideos(start);
+
+			io.println(numReachable);
+		}
+
+		io.close();
+	}
+
+	/** searches all vertices that can be reached through the current video v */
+	static void searchVideos(int v) {
+		visited[v] = true;
+		for (Edge e : neighbors[v]) {
+			/*
+			 * only visit nonvisited videos whose relevance
+			 * is greater than the current threshold
+			 */
+			if (!visited[e.to] && e.relevance >= threshold) {
+				numReachable++;
+				searchVideos(e.to);
+			}
+		}
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<PySection>
+
+<Warning>
+Due to the strict time limits, this Python code receives a TLE verdict on a test case.
+</Warning>
+
+```py
+import sys
+
+sys.setrecursionlimit(int(1e9))
+
+
+def search_videos(v: int, threshold: int) -> None:
+	"""Searches all vertices that can be reached through the current vertex v"""
+	global num_reachable
+	visited[v] = True
+	for n in neighbors[v]:
+		# Only visit non-visited vertices whose relevance is greater than the current threshold
+		if not visited[n[0]] and n[1] >= threshold:
+			num_reachable += 1
+			search_videos(n[0], threshold)
+
+
+with open("mootube.in", "r") as read:
+	with open("mootube.out", "w") as write:
+		neighbors = []
+		visited = []
+		num_reachable = 0
+		video_num, query_num = map(int, read.readline().split())
+		neighbors = [[] for _ in range(video_num + 1)]
+		for _ in range(video_num - 1):
+			a, b, relevance = map(int, read.readline().split())
+			a -= 1
+			b -= 1
+			neighbors[a].append((b, relevance))
+			neighbors[b].append((a, relevance))
+
+		for _ in range(query_num):
+			threshold, start = map(int, read.readline().split())
+			start -= 1
+
+			# Reset global variables for the current query
+			num_reachable = 0
+			visited = [False] * video_num
+			search_videos(start, threshold)
+
+			write.write(f"{num_reachable}\n")
+```
+
+</PySection>
+</LanguageSection>
+
+</Spoiler>

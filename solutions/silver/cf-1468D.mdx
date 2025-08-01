@@ -1,0 +1,224 @@
+---
+id: cf-1468D
+source: CF
+title: Firecrackers
+author: Jesse Choe, Rameez Parwez
+---
+
+[Official Editorial](https://codeforces.com/blog/entry/85951)
+
+## Explanation
+
+We can initially attempt this problem by figuring out which firecrackers should explode. Obviously, we should attempt to explode the firecrackers with a minimal
+detonation time to increase the number of firecrackers exploded before eventually being caught. Also, observe that the firecrackers with a longer detonation
+time should be dropped first.
+
+To find the maximum number of firecrackers before the hooligan gets caught by the guard, sort the detonation times in increasing order and figure out the
+maximum number of firecrackers to drop before getting caught by applying binary search.
+
+If we can determine the amount of time before getting caught, then the binary search will be trivial.
+
+There are two cases which determine the amount of time before getting caught:
+
+1. It can be proven that if $a < b$, then the amount of time before getting caught is precisely $b - 1$ seconds.
+2. It can be proven that if $a > b$, then the amount of time before getting caught is precisely $n - b$ seconds.
+
+**Note: these times are computed by assuming that both the hooligan and guard act optimally.**
+
+After computing the amount of time before getting caught, we can simulate whether a particular firecracker will explode in time.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+int main() {
+	int test_num;
+	std::cin >> test_num;
+	for (int t = 0; t < test_num; t++) {
+		int corridor_size;
+		int num_of_firecrackers;
+		int hooligan_location;
+		int guard_location;
+
+		std::cin >> corridor_size >> num_of_firecrackers >> hooligan_location >>
+		    guard_location;
+		std::vector<int> exploding_times(num_of_firecrackers);
+		for (int &x : exploding_times) { std::cin >> x; }
+
+		std::sort(begin(exploding_times), end(exploding_times));
+		int max_firecrackers = std::min(
+		    num_of_firecrackers, std::abs(hooligan_location - guard_location) - 1);
+
+		// Compute the maximum time before the guard catches the
+		// hooligan given their initial positions.
+		int time_before_caught = 0;
+		if (hooligan_location < guard_location) {
+			time_before_caught = guard_location - 1;
+		} else if (hooligan_location > guard_location) {
+			time_before_caught = corridor_size - guard_location;
+		}
+
+		auto works = [&](int firecrackers_exploded) -> bool {
+			int curr_time = 1;
+			for (int i = firecrackers_exploded - 1; i >= 0; i--) {
+				// Check whether a given firecracker could be exploded
+				// before being caught by the guard.
+				if (curr_time + exploding_times[i] > time_before_caught) {
+					return false;
+				} else {
+					curr_time++;
+				}
+			}
+			return true;
+		};
+
+		int lo = 0, hi = max_firecrackers;
+		int max_exploded = 0;
+
+		while (lo <= hi) {
+			int mid = lo + (hi - lo) / 2;
+			if (works(mid)) {
+				max_exploded = mid;
+				lo = mid + 1;
+			} else {
+				hi = mid - 1;
+			}
+		}
+
+		std::cout << max_exploded << '\n';
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class Firecrackers {
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+
+		int testNum = io.nextInt();
+		for (int t = 0; t < testNum; t++) {
+			int corridorSize = io.nextInt();
+			int numOfFirecrackers = io.nextInt();
+			int hooliganLocation = io.nextInt();
+			int guardLocation = io.nextInt();
+
+			int[] explodingTimes = new int[numOfFirecrackers];
+
+			for (int i = 0; i < numOfFirecrackers; i++) {
+				explodingTimes[i] = io.nextInt();
+			}
+
+			Arrays.sort(explodingTimes);
+			int maxFirecrackers = Math.min(
+			    numOfFirecrackers, Math.abs(hooliganLocation - guardLocation) - 1);
+
+			//  Compute the maximum time before the guard catches the
+			//  hooligan given their initial positions.
+			int timeBeforeCaught = 0;
+			if (hooliganLocation < guardLocation) {
+				timeBeforeCaught = guardLocation - 1;
+			} else if (hooliganLocation > guardLocation) {
+				timeBeforeCaught = corridorSize - guardLocation;
+			}
+
+			int lo = 0, hi = maxFirecrackers;
+			int maxExploded = 0;
+
+			while (lo <= hi) {
+				int mid = lo + (hi - lo) / 2;
+				if (works(explodingTimes, mid, timeBeforeCaught)) {
+					maxExploded = mid;
+					lo = mid + 1;
+				} else {
+					hi = mid - 1;
+				}
+			}
+			io.println(maxExploded);
+		}
+		io.close();
+	}
+
+	private static boolean works(int[] explodingTimes, int fireCrackersExploded,
+	                             int timeBeforeCaught) {
+		int currTime = 1;
+		for (int i = fireCrackersExploded - 1; i >= 0; i--) {
+			// Check whether a given firecracker could be exploded
+			// before being caught by the guard.
+			if (currTime + explodingTimes[i] > timeBeforeCaught) {
+				return false;
+			} else {
+				currTime++;
+			}
+		}
+		return true;
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<PySection>
+
+```py
+def works(
+	exploding_times: list, firecrackers_exploded: int, time_before_caught: int
+) -> bool:
+	current_time = 1
+	for i in range(firecrackers_exploded - 1, -1, -1):
+		# Check whether a given firecracker could be exploded before being caught by the guard
+		if current_time + exploding_times[i] > time_before_caught:
+			return False
+		else:
+			current_time += 1
+	return True
+
+
+for _ in range(int(input())):
+	corridor_size, num_of_firecrackers, hooligan_location, guard_location = map(
+		int, input().split()
+	)
+	exploding_times = list(map(int, input().split()))
+	exploding_times.sort()
+
+	max_firecrackers = min(
+		num_of_firecrackers, abs(hooligan_location - guard_location) - 1
+	)
+
+	# Compute the maximum time before the guard catches the hooligan given their initial positions
+	if hooligan_location < guard_location:
+		time_before_caught = guard_location - 1
+	elif hooligan_location > guard_location:
+		time_before_caught = corridor_size - guard_location
+
+	left = 0
+	right = max_firecrackers
+	max_exploded = 0
+	while left <= right:
+		mid = left + (right - left) // 2
+
+		if works(exploding_times, mid, time_before_caught):
+			max_exploded = mid
+			left = mid + 1
+		else:
+			right = mid - 1
+
+	print(max_exploded)
+```
+
+</PySection>
+</LanguageSection>

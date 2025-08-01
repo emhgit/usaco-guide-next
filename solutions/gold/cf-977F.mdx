@@ -1,0 +1,142 @@
+---
+id: cf-977F
+source: CF
+title: Consecutive Subsequence
+author: Sofia Yang, Kevin Sheng, Stathis Konstantinou
+---
+
+[Official Editorial (C++)](https://codeforces.com/blog/entry/59281)
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log N)$
+
+<LanguageSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class ConsecutiveSubsequence {
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+		int N = io.nextInt();
+		int[] arr = new int[N];
+		for (int i = 0; i < N; i++) { arr[i] = io.nextInt(); }
+
+		Map<Integer, Integer> dp = new HashMap<>();
+		for (int i = N - 1; i >= 0; i--) {
+			// If the next number exists, we can continue the subsequence.
+			if (dp.containsKey(arr[i] + 1)) {
+				dp.put(arr[i], dp.get(arr[i] + 1) + 1);
+			} else {
+				// If not we can just start a new subsequence.
+				dp.put(arr[i], 1);
+			}
+		}
+
+		int idx = 0;
+		int maxLen = 0;
+		for (int i : dp.keySet()) {
+			// Find the largest length.
+			if (dp.get(i) > maxLen) {
+				idx = i;
+				maxLen = dp.get(i);
+			}
+		}
+		io.println(maxLen);
+
+		for (int i = 0; i < N; i++) {
+			if (arr[i] == idx) {
+				io.print((i + 1) + " ");
+				idx++;
+			}
+		}
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main(void) {
+	int n;
+	cin >> n;
+
+	vector<int> v(n);
+	for (auto &i : v) cin >> i;
+
+	map<int, int> dp;
+
+	int mx = 0;
+	int last;
+	for (auto i : v) {
+		dp[i] = dp[i - 1] + 1;
+
+		if (dp[i] > mx) {
+			mx = dp[i];
+			last = i;
+		}
+	}
+
+	cout << mx << '\n';
+	for (int cur = last - mx + 1, i = 0; i < n; i++) {
+		if (v[i] == cur) {
+			cout << i + 1 << ' ';
+			cur++;
+		}
+	}
+
+	return 0;
+}
+```
+
+</CPPSection>
+<PySection>
+
+```py
+size = int(input())
+arr = list(map(int, input().split()))
+
+best_len = 1
+# given the ending limit, stores the longest consecutive sequence
+ending_max_len = {}  # {element: (length, index)}
+come_from = {}  # {index: previous_index}
+for i in range(size):
+	n = arr[i]
+	if (n - 1) not in ending_max_len:
+		ending_max_len[n] = (1, i)
+		come_from[i] = -1
+	else:
+		new_len = ending_max_len[n - 1][0] + 1
+		if n not in ending_max_len or ending_max_len[n][0] < new_len:
+			ending_max_len[n] = (new_len, i)
+			best_len = max(best_len, new_len)
+			come_from[i] = ending_max_len[n - 1][1]
+
+at_ind = -1
+for end, (length, index) in ending_max_len.items():
+	if length == best_len:
+		at_ind = index
+
+reverse_inds = []
+for _ in range(best_len):
+	reverse_inds.append(at_ind)
+	at_ind = come_from[at_ind]
+
+print(best_len)
+for i in range(best_len - 1, 0, -1):
+	print(reverse_inds[i] + 1, end=" ")
+print(reverse_inds[0] + 1)
+```
+
+</PySection>
+</LanguageSection>

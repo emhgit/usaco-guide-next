@@ -1,0 +1,219 @@
+{
+  "MODULE_ID": "dp-ranges",
+  "sample": [
+    {
+      "uniqueId": "sapo-15-SpaceJazz",
+      "name": "2015 - Space Jazz",
+      "url": "https://saco-evaluator.org.za/cms/sapo2015z/tasks/jazz/description",
+      "source": "SAPO",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "in-module",
+        "moduleId": "dp-ranges"
+      }
+    }
+  ],
+  "general": [
+    {
+      "uniqueId": "usaco-265",
+      "name": "The Cow Run",
+      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=265",
+      "source": "Old Gold",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-647",
+      "name": "248",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=647",
+      "source": "Gold",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-1114",
+      "name": "Modern Art 3",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=1114",
+      "source": "Gold",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal",
+        "hasHints": true
+      }
+    },
+    {
+      "uniqueId": "cf-245H",
+      "name": "Queries for Number of Palindromes",
+      "url": "https://codeforces.com/contest/245/problem/H",
+      "source": "CF",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-994",
+      "name": "3SUM",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=994",
+      "source": "Gold",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "cses-1080",
+      "name": "Empty String",
+      "url": "https://cses.fi/problemset/task/1080",
+      "source": "CSES",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "cf-607B",
+      "name": "Zuma",
+      "url": "https://codeforces.com/problemset/problem/607/B",
+      "source": "CF",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "autogen-label-from-site",
+        "site": "CF"
+      }
+    },
+    {
+      "uniqueId": "cf-1312E",
+      "name": "Array Shrinking",
+      "url": "https://codeforces.com/contest/1312/problem/E",
+      "source": "CF",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "autogen-label-from-site",
+        "site": "CF"
+      }
+    },
+    {
+      "uniqueId": "sapo-14-genghis",
+      "name": "2014 - The Stables of Genghis Khan",
+      "url": "https://saco-evaluator.org.za/cms/sapo2014z/tasks/genghis/description",
+      "source": "SAPO",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "cc-INOI1602",
+      "name": "Brackets",
+      "url": "https://www.codechef.com/INOIPRAC/problems/INOI1602",
+      "source": "CC",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "baltic-09-beetle",
+      "name": "2009 - Beetle",
+      "url": "https://cses.fi/107/list/",
+      "source": "Baltic OI",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "link",
+        "url": "https://www.csc.kth.se/contest/boi/beetle-spoiler.pdf"
+      }
+    },
+    {
+      "uniqueId": "usaco-972",
+      "name": "Greedy Pie Eaters",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=972",
+      "source": "Platinum",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "972"
+      }
+    },
+    {
+      "uniqueId": "usaco-698",
+      "name": "Subsequence Reversal",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=698",
+      "source": "Platinum",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "698"
+      }
+    },
+    {
+      "uniqueId": "usaco-602",
+      "name": "Lightsout",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=602",
+      "source": "Platinum",
+      "difficulty": "Very Hard",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "602"
+      }
+    },
+    {
+      "uniqueId": "ceoi-12-SailingRace",
+      "name": "2012 - Sailing Race",
+      "url": "https://oj.uz/problem/view/CEOI12_race",
+      "source": "CEOI",
+      "difficulty": "Very Hard",
+      "isStarred": true,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "cfgym-103470G",
+      "name": "Paimon's Tree",
+      "url": "https://codeforces.com/gym/103470/problem/G",
+      "source": "CF Gym",
+      "difficulty": "Very Hard",
+      "isStarred": false,
+      "tags": ["Range DP"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    }
+  ]
+}

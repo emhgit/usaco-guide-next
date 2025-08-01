@@ -1,0 +1,223 @@
+---
+id: usaco-380
+source: USACO Silver 2014 January
+title: Cross Country Skiing
+author: Nathan Gong
+---
+
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_ccski.html)
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(NM\log R)$, where $R$ denotes the maximum height difference between any two cells
+
+<LanguageSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class CrossCountrySkiing {
+	static int n, m;
+	static int startI, startJ;     // Stores starting position of each floodfill
+	static int[][] course;         // Stores the skiing course heights
+	static boolean[][] waypoints;  // Stored as booleans instead of 1s and 0s
+	static boolean[][] vis;        // Visited array for floodfill
+
+	public static void main(String[] args) throws IOException {
+		Kattio io = new Kattio("ccski");
+
+		n = io.nextInt();
+		m = io.nextInt();
+
+		int minHeight = Integer.MAX_VALUE;
+		int maxHeight = Integer.MIN_VALUE;
+
+		course = new int[n][m];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				course[i][j] = io.nextInt();
+				minHeight = Math.min(minHeight, course[i][j]);
+				maxHeight = Math.max(maxHeight, course[i][j]);
+			}
+		}
+
+		waypoints = new boolean[n][m];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (io.nextInt() == 1) {
+					waypoints[i][j] = true;
+
+					// Keep one of the waypoints as the starting position
+					startI = i;
+					startJ = j;
+				} else {
+					waypoints[i][j] = false;
+				}
+			}
+		}
+
+		// Binary search for the minimum possible value of d that works
+		// We can set "hi" to maxHeight - minHeight because that will be the
+		// maximum value of d we need to try
+		int lo = 0;
+		int hi = maxHeight - minHeight;
+		int minD = -1;
+		while (lo <= hi) {
+			int d = (lo + hi) / 2;
+			if (reachable(d)) {
+				minD = d;
+				hi = d - 1;
+			} else {
+				lo = d + 1;
+			}
+		}
+
+		io.println(minD);
+		io.close();
+	}
+
+	// i and j store current position
+	// d stores current value of d
+	// prevHeight stores the height of the previous cell
+	static void floodfill(int i, int j, int d, int prevHeight) {
+		// Check if we are out of bounds
+		if (i < 0 || i >= n || j < 0 || j >= m) { return; }
+		// Check if current position has already been visited
+		if (vis[i][j]) { return; }
+		// Check if current position can be visited from previous position
+		if (Math.abs(course[i][j] - prevHeight) > d) { return; }
+
+		// Mark position as visited if all checks pass
+		vis[i][j] = true;
+
+		// Visit each adjacent cell
+		floodfill(i + 1, j, d, course[i][j]);
+		floodfill(i - 1, j, d, course[i][j]);
+		floodfill(i, j + 1, d, course[i][j]);
+		floodfill(i, j - 1, d, course[i][j]);
+	}
+
+	static boolean reachable(int d) {
+		// Reset visited array and begin floodfill (DFS) from start position
+		vis = new boolean[n][m];
+		floodfill(startI, startJ, d, course[startI][startJ]);
+
+		// Check each cell: if it is a waypoint and it hasn't been visited,
+		// we know not all waypoints are reachable from one another
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (waypoints[i][j] && !vis[i][j]) { return false; }
+			}
+		}
+
+		return true;
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+const int dy[] = {-1, 0, 1, 0};
+const int dx[] = {0, -1, 0, 1};
+constexpr int MAX_N = 500;
+
+int m, n;
+int wy, wx;
+
+vector<vector<int>> grid(MAX_N, vector<int>(MAX_N));
+vector<vector<bool>> wp(MAX_N, vector<bool>(MAX_N));
+vector<vector<bool>> mark(MAX_N, vector<bool>(MAX_N));
+
+/** Floodfill all nodes that can be reached given a value of D */
+void floodfill(int d) {
+	queue<pair<int, int>> q;
+
+	q.push(make_pair(wy, wx));
+	mark[wy][wx] = 1;
+
+	while (!q.empty()) {
+		pair<int, int> p = q.front();
+		q.pop();
+
+		for (int i = 0; i < 4; i++) {
+			int ny = p.first + dy[i];
+			int nx = p.second + dx[i];
+			if (ny >= 0 && ny < m && nx >= 0 && nx < n) {
+				/*
+				 * if the target cell is not visited before
+				 * and the elevation difference is within D
+				 * push the cell into the queue
+				 */
+				if (!mark[ny][nx] && abs(grid[p.first][p.second] - grid[ny][nx]) <= d) {
+					q.push(make_pair(ny, nx));
+					mark[ny][nx] = true;
+				}
+			}
+		}
+	}
+}
+
+/** Checks if all waypoints are reachable within the given D */
+bool reachable(int d) {
+	// reset the grid that keeps the reachable points
+	mark = vector<vector<bool>>(m, vector<bool>(n));
+
+	floodfill(d);
+
+	// check if there is any unreachable waypoints
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			if (wp[i][j] && !mark[i][j]) { return false; }
+		}
+	}
+	return true;
+}
+
+int main() {
+	freopen("ccski.in", "r", stdin);
+	cin >> m >> n;
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) { cin >> grid[i][j]; }
+	}
+
+	for (int i = 0; i < m; i++) {
+		for (int j = 0; j < n; j++) {
+			int is_waypoint;
+			cin >> is_waypoint;
+			wp[i][j] = is_waypoint != 0;
+			// keep one of the waypoints as the starting point
+			if (wp[i][j]) {
+				wy = i;
+				wx = j;
+			}
+		}
+	}
+
+	// binary search for the elevation difference
+	int l = 0;
+	int r = INT32_MAX;
+	while (l < r) {
+		int d = (l + r) / 2;
+		if (reachable(d)) {
+			r = d;
+		} else {
+			l = d + 1;
+		}
+	}
+
+	freopen("ccski.out", "w", stdout);
+	cout << l << endl;
+}
+```
+
+</CPPSection>
+</LanguageSection>

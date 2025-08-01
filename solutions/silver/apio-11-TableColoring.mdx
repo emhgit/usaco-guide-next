@@ -1,0 +1,307 @@
+---
+id: apio-11-TableColoring
+source: APIO 2011
+title: Table Coloring
+author: Andi Qu, Rameez Parwez
+---
+
+## Explanation
+
+### TL;DR
+
+If we view the grid as a graph, we get $K$ connected components. The answer is
+then either $2^{K - 1}$ or $0$ and we use DSU or DFS to determine which one it
+is.
+
+### Intuition
+
+Let $c(x, y) = 1$ if the cell $(x, y)$ is blue and $0$ otherwise. For
+convenience, also add a row 0 and column 0.
+
+Firstly, notice that if we already know the color of 3 cells in a $2 \times 2$
+table, then we also know the last color.
+
+From this, we get the recurrence
+
+$$
+c(x, y) = \lnot (c(x - 1, y - 1) \oplus c(x - 1, y) \oplus c(x, y - 1))
+$$
+
+for all $x, y > 1$.
+
+After analysing this recurrence, we find that we actually have
+
+$$
+c(x, y) = (c(0, 0) \oplus c(0, y) \oplus c(x, 0) \oplus ((x \cdot y) \% 2))
+$$
+
+I made a
+[helpful spreadsheet](https://docs.google.com/spreadsheets/d/1cSNyb3wBq39R2FsSD-kuPpfBsLXCVxSXKsqllo2sUs0/edit?usp=sharing)
+for you to visualise this.
+
+### Counting the colorings
+
+Without loss of generality, let the cell $(0, 0)$ be red (since its color
+doesn't change the answer). This means that without any already-colored cells,
+all cells $(x, 0)$ and $(0, y)$ are independent.
+
+However, an already-colored cell $(x, y)$ makes the 2 cells $(x, 0)$ and
+$(0, y)$ depend on each other.
+
+View the grid as a graph:
+
+- All cells $(x, 0)$ and $(0, y)$ are nodes.
+- For each already-colored cell $(x, y)$, add an edge between $(x, 0)$ and
+  $(0, y)$ with weight $c(x, 0) \oplus c(0, y)$.
+
+This creates $K$ connected components. The answer is thus either $2^{K - 1}$ or
+$0$. This is because each node in a connected component is dependent on the
+other nodes in that component and all connected components are independent. If
+it simply isn't possible to color the table, the answer is $0$.
+
+### Checking Whether the Answer is $0$
+
+This problem then becomes checking whether there is an cycle with odd weight
+in the resulting graph, which we can answer efficiently using DSU or DFS.
+
+One way to implement this is as follows. Since each already-colored cell
+$(x, y)$ determines whether the colors of the cells $(x, 0)$ and $(0, y)$ are
+the same, we can instead split each node in our graph into 2 nodes (one for
+each color) and create edges between nodes with consistent colors.
+The answer is $0$ if two new nodes corresponding to the same original node
+are in the same connected component.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}((N+M+K)\log (N+M+K))$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <algorithm>
+#include <iostream>
+#include <vector>
+
+const int MOD = 1e9;
+
+// BeginCodeSnip{DSU (from the module)}
+class DisjointSets {
+  private:
+	std::vector<int> parents;
+	std::vector<int> sizes;
+
+  public:
+	DisjointSets(int size) : parents(size), sizes(size, 1) {
+		for (int i = 0; i < size; i++) { parents[i] = i; }
+	}
+
+	/** @return the "representative" node in x's component */
+	int find(int x) { return parents[x] == x ? x : (parents[x] = find(parents[x])); }
+
+	/** @return whether the merge changed connectivity */
+	bool unite(int x, int y) {
+		int x_root = find(x);
+		int y_root = find(y);
+		if (x_root == y_root) { return false; }
+
+		if (sizes[x_root] < sizes[y_root]) { std::swap(x_root, y_root); }
+		sizes[x_root] += sizes[y_root];
+		parents[y_root] = x_root;
+		return true;
+	}
+};
+// EndCodeSnip
+
+int main() {
+	int n, m, k;
+	std::cin >> n >> m >> k;
+	DisjointSets dsu(2 * (n + m));
+
+	for (int i = 0; i < k; i++) {
+		int x, y, c;
+		std::cin >> x >> y >> c;
+		x--, y--;
+		c ^= (x & 1) && (y & 1);
+
+		if (c) {
+			dsu.unite(x, y + n);
+			dsu.unite(x + m + n, y + 2 * n + m);
+		} else {
+			dsu.unite(x + m + n, y + n);
+			dsu.unite(x, y + 2 * n + m);
+		}
+	}
+
+	int valid_components = -1;
+	for (int i = 0; i < n + m; i++) {
+		if (dsu.find(i) == dsu.find(i + n + m)) { return std::cout << "0", 0; }
+		if (dsu.find(i) == i) { valid_components++; }
+	}
+
+	int ans = 1;
+	for (int i = 0; i < valid_components; i++) { ans = (ans * 2) % MOD; }
+	std::cout << ans << '\n';
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class TableColoring {
+	static final int MOD = 1000000000;
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+
+		int n = io.nextInt();
+		int m = io.nextInt();
+		int k = io.nextInt();
+
+		DisjointSets dsu = new DisjointSets(2 * (n + m));
+
+		for (int i = 0; i < k; i++) {
+			int x = io.nextInt() - 1;
+			int y = io.nextInt() - 1;
+			int c = io.nextInt();
+
+			c ^= ((x & 1) != 0 && (y & 1) != 0) ? 1 : 0;
+
+			if (c == 1) {
+				dsu.unite(x, y + n);
+				dsu.unite(x + m + n, y + 2 * n + m);
+			} else {
+				dsu.unite(x + m + n, y + n);
+				dsu.unite(x, y + 2 * n + m);
+			}
+		}
+
+		int validComponents = -1;
+		for (int i = 0; i < n + m; i++) {
+			if (dsu.find(i) == dsu.find(i + n + m)) {
+				io.println(0);
+				io.close();
+			}
+
+			if (dsu.find(i) == i) { validComponents += 1; }
+		}
+
+		int ans = 1;
+		for (int i = 0; i < validComponents; i++) { ans = ((ans * 2) % MOD) % MOD; }
+
+		io.println(ans);
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+
+// BeginCodeSnip{DSU (from the module)}
+class DisjointSets {
+	int[] parents;  // 0-indexed
+	int[] sizes;
+
+	public DisjointSets(int size) {
+		parents = new int[size];
+		sizes = new int[size];
+		for (int i = 0; i < size; i++) {
+			parents[i] = i;
+			sizes[i] = 1;
+		}
+	}
+
+	/** @return the "representative" node in x's component */
+	public int find(int x) {
+		return parents[x] == x ? x : (parents[x] = find(parents[x]));
+	}
+
+	/** @return whether the merge changed connectivity */
+	public boolean unite(int x, int y) {
+		int xRoot = find(x);
+		int yRoot = find(y);
+		if (xRoot == yRoot) { return false; }
+
+		if (sizes[xRoot] < sizes[yRoot]) { return unite(yRoot, xRoot); }
+		parents[yRoot] = xRoot;
+		sizes[xRoot] += sizes[yRoot];
+		return true;
+	}
+}
+// EndCodeSnip
+```
+
+</JavaSection>
+<PySection>
+
+```py
+import sys
+
+MOD = 10**9
+
+# BeginCodeSnip{DSU (from the module)}
+class DisjointSets:
+	def __init__(self, size: int) -> None:
+		self.parents = [i for i in range(size)]
+		self.sizes = [1 for _ in range(size)]
+
+	def find(self, x: int) -> int:
+		""":return: the "representative" node in x's component"""
+		if self.parents[x] == x:
+			return x
+		self.parents[x] = self.find(self.parents[x])
+		return self.parents[x]
+
+	def unite(self, x: int, y: int) -> bool:
+		""":return: whether the merge changed connectivity"""
+		x_root = self.find(x)
+		y_root = self.find(y)
+		if x_root == y_root:
+			return False
+
+		if self.sizes[x_root] < self.sizes[y_root]:
+			x_root, y_root = y_root, x_root
+
+		self.parents[y_root] = x_root
+		self.sizes[x_root] += self.sizes[y_root]
+		return True
+
+
+# EndCodeSnip
+
+n, m, k = map(int, input().split())
+
+dsu = DisjointSets(2 * (n + m))
+for i in range(k):
+	x, y, c = map(int, input().split())
+	x -= 1
+	y -= 1
+	c ^= (x & 1) and (y & 1)
+
+	if c:
+		dsu.unite(x, y + n)
+		dsu.unite(x + m + n, y + 2 * n + m)
+	else:
+		dsu.unite(x + m + n, y + n)
+		dsu.unite(x, y + 2 * n + m)
+
+valid_components = -1
+for i in range(n + m):
+	if dsu.find(i) == dsu.find(i + n + m):
+		print(0)
+		sys.exit()
+
+	if dsu.find(i) == i:
+		valid_components += 1
+
+ans = 1
+for _ in range(valid_components):
+	ans = (ans * 2) % MOD
+
+print(ans)
+```
+
+</PySection>
+</LanguageSection>

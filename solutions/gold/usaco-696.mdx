@@ -1,0 +1,443 @@
+---
+id: usaco-696
+source: USACO Platinum 2017 January
+title: Promotion Counting
+author: Benjamin Qi, Timothy Gao, William Yuan
+contributors: Vaishnav Krishnan
+---
+
+[Official Editorial (Java)](http://www.usaco.org/current/data/sol_promote_platinum_jan17.html)
+
+## Solution 1: Euler Tour
+
+Recall from the [Euler tour module](/gold/tree-euler) that each subtree is represented as a contiguous interval in its Euler tour. With this knowledge, we can compress the tree into an array. Now, the problem is reduced the following: for each node $i$, we need to determine the number of elements that are less than $\texttt{tour}[i]$ from $i$ to $\texttt{tout}[i]$, where $\texttt{tout}[i]$ is the end of the subtree interval for node $i$. By processing the nodes in decreasing order, this is a problem we can solve in $\mathcal{O}(N \log N)$ time with a binary-indexed tree.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log N)$
+
+<LanguageSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class PromotionCounting {
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader("promote.in"));
+		PrintWriter pw =
+		    new PrintWriter(new BufferedWriter(new FileWriter("promote.out")));
+
+		int N = Integer.parseInt(br.readLine());
+		int[][] ratings = new int[N][2];
+		for (int i = 0; i < N; i++) {
+			ratings[i][0] = i;
+			ratings[i][1] = Integer.parseInt(br.readLine());
+		}
+		List<Integer>[] adj = new List[N];
+
+		for (int i = 0; i < adj.length; i++) { adj[i] = new ArrayList<>(); }
+
+		for (int i = 1; i < N; i++) {
+			int par = Integer.parseInt(br.readLine()) - 1;
+			adj[par].add(i);
+		}
+		int[] ret = new int[N];
+		int[] tout = new int[N];
+		int[] bac = new int[N];
+		dfs(adj, tout, bac, 0, 0, -1);
+		BIT bit = new BIT(N);
+		Arrays.sort(ratings, (int[] a, int[] b) -> b[1] - a[1]);
+
+		for (int i = 0; i < N;) {
+			int j = i;
+			while (j < N && ratings[i][1] == ratings[j][1]) {
+				int c = ratings[i][0];
+				ret[c] = bit.sum(tout[c]) - bit.sum(bac[c] - 1);
+				j++;
+			}
+			for (int k = i; k < j; k++) { bit.update(tout[ratings[k][0]], 1); }
+			i = j;
+		}
+
+		for (int i : ret) { pw.println(i); }
+
+		pw.close();
+		br.close();
+	}
+
+	static int dfs(List<Integer>[] adj, int[] tout, int[] left, int idx, int cur,
+	               int last) {
+		left[cur] = idx;
+		for (int n : adj[cur]) {
+			if (n == last) continue;
+			idx = dfs(adj, t, l, idx, n, cur);
+		}
+		tout[cur] = idx;
+		return idx + 1;
+	}
+
+	static class BIT {
+		public int[] bit;
+		public BIT(int N) { bit = new int[N + 1]; }
+
+		public int sum(int r) {
+			r++;
+			int ret = 0;
+			while (r > 0) {
+				ret += bit[r];
+				r -= r & -r;
+			}
+			return ret;
+		}
+
+		public void update(int idx, int v) {
+			idx++;
+			while (idx < bit.length) {
+				bit[idx] += v;
+				idx += idx & -idx;
+			}
+		}
+	}
+}
+```
+
+</JavaSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MAX_N = 1e5;
+int n, t = 0;
+vector<int> adj[MAX_N], out(MAX_N), in(MAX_N);
+
+// BeginCodeSnip{BIT}
+struct BIT {
+	vector<int> bit;
+	int n;
+
+	BIT(int n) : n(n + 1), bit(n + 1) {}
+
+	int sum(int r) {
+		r++;
+		int ret = 0;
+		while (r > 0) {
+			ret += bit[r];
+			r -= r & -r;
+		}
+		return ret;
+	}
+
+	void update(int idx, int v) {
+		idx++;
+		while (idx < n) {
+			bit[idx] += v;
+			idx += idx & -idx;
+		}
+	}
+};
+// EndCodeSnip
+
+void dfs(int cur, int prev) {
+	in[cur] = t;
+	for (int nxt : adj[cur]) {
+		if (nxt != prev) { dfs(nxt, cur); }
+	}
+	out[cur] = t++;
+}
+
+int main() {
+	freopen("promote.in", "r", stdin);
+	cin >> n;
+	vector<pair<int, int>> a(n);
+
+	for (int i = 0; i < n; i++) {
+		cin >> a[i].first;
+		a[i].second = i;
+	}
+
+	for (int i = 1; i < n; i++) {
+		int p;
+		cin >> p;
+		adj[--p].push_back(i);
+	}
+
+	dfs(0, -1);
+	sort(a.rbegin(), a.rend());
+	vector<int> ans(n + 1);
+	BIT bit(n);
+	for (int i = 0; i < n;) {
+		int r = i;
+
+		while (r < n && a[i].first == a[r].first) {
+			ans[a[r].second] = bit.sum(out[a[r].second]) - bit.sum(in[a[r].second] - 1);
+			r++;
+		}
+
+		for (int j = i; j < r; j++) bit.update(out[a[j].second], 1);
+
+		i = r;
+	}
+
+	freopen("promote.out", "w", stdout);
+	for (int i = 0; i < n; i++) cout << ans[i] << '\n';
+}
+```
+
+</CPPSection>
+</LanguageSection>
+
+## Solution 2 (Merging Indexed Sets)
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log ^2N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+
+template <class T>
+using Tree =
+    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+const int MX = 1e5 + 5;
+#define sz(x) (int)(x).size()
+
+int N, a[MX], ind[MX], ans[MX], ret;
+vector<int> child[MX];
+Tree<int> d[MX];
+
+void comb(int a, int b) {
+	if (sz(d[a]) < sz(d[b])) d[a].swap(d[b]);
+	for (int i : d[b]) d[a].insert(i);
+}
+
+void dfs(int x) {
+	ind[x] = x;
+	for (int i : child[x]) {
+		dfs(i);
+		comb(x, i);
+	}
+	ans[x] = sz(d[x]) - d[x].order_of_key(a[x]);
+	d[x].insert(a[x]);
+}
+
+int main() {
+	freopen("promote.in", "r", stdin);
+	freopen("promote.out", "w", stdout);
+	cin >> N;
+	for (int i = 1; i <= N; ++i) cin >> a[i];
+	for (int i = 2; i <= N; ++i) {
+		int p;
+		cin >> p;
+		child[p].push_back(i);
+	}
+	dfs(1);
+	for (int i = 1; i <= N; ++i) cout << ans[i] << "\n";
+}
+```
+
+</CPPSection>
+</LanguageSection>
+
+Recall from the module that `std::swap(d[a],d[b])` will be too slow. However,
+the following does (overloading `std::swap`):
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+
+using namespace std;
+using namespace __gnu_pbds;
+
+template <class T>
+using Tree =
+    tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+const int MX = 1e5 + 5;
+#define sz(x) (int)(x).size()
+
+int N, a[MX], ind[MX], ans[MX], ret;
+vector<int> child[MX];
+Tree<int> d[MX];
+
+namespace std {
+void swap(Tree<int> &a, Tree<int> &b) { a.swap(b); }
+}  // namespace std
+
+void comb(int a, int b) {
+	if (sz(d[a]) < sz(d[b])) std::swap(d[a], d[b]);
+	for (int i : d[b]) d[a].insert(i);
+}
+
+void dfs(int x) {
+	ind[x] = x;
+	for (int i : child[x]) {
+		dfs(i);
+		comb(x, i);
+	}
+	ans[x] = sz(d[x]) - d[x].order_of_key(a[x]);
+	d[x].insert(a[x]);
+}
+
+int main() {
+	freopen("promote.in", "r", stdin);
+	freopen("promote.out", "w", stdout);
+	cin >> N;
+	for (int i = 1; i <= N; ++i) cin >> a[i];
+	for (int i = 2; i <= N; ++i) {
+		int p;
+		cin >> p;
+		child[p].push_back(i);
+	}
+	dfs(1);
+	for (int i = 1; i <= N; ++i) cout << ans[i] << "\n";
+}
+```
+
+</CPPSection>
+</LanguageSection>
+
+## Solution 3: HLD
+
+Sort the cows from largest to smallest proficiency. For each cow, perform a path update that adds one to all cows from itself to the president.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log ^2N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+// BeginCodeSnip{Iterative Segment Tree from PURS}
+template <class T> class SumSegmentTree {
+  private:
+	T DEFAULT = 0;
+
+	vector<T> segtree;
+	int len;
+
+  public:
+	SumSegmentTree(int len) : len(len), segtree(len * 2, DEFAULT) {}
+
+	void set(int ind, T val) {
+		ind += len;
+		segtree[ind] = val;
+		for (; ind > 1; ind /= 2) {
+			segtree[ind / 2] = segtree[ind] + segtree[ind ^ 1];
+		}
+	}
+
+	T range_sum(int start, int end) {
+		T sum = DEFAULT;
+		for (start += len, end += len; start < end; start /= 2, end /= 2) {
+			if (start % 2 == 1) { sum += segtree[start++]; }
+			if (end % 2 == 1) { sum += segtree[--end]; }
+		}
+		return sum;
+	}
+};
+// EndCodeSnip
+
+int main() {
+	freopen("promote.in", "r", stdin);
+	freopen("promote.out", "w", stdout);
+	int n;
+	cin >> n;
+	vector<pair<int, int>> cow_proficiency(n);
+	for (int i = 0; i < n; ++i) {
+		cin >> cow_proficiency[i].first;
+		cow_proficiency[i].second = i;
+	}
+	vector edges(n, vector<int>());
+	vector heavy_paths(n, vector<int>());
+
+	vector<int> sizes(n);
+	vector<int> heavy_index(n, -1);
+	vector<int> path_index(n, -1);
+	vector<int> depth(n);
+	vector<int> parents(n, -1);
+	vector<int> ans(n);
+	vector<int> cur_ans(n);
+
+	for (int i = 1; i < n; ++i) {
+		cin >> parents[i];
+		edges[--parents[i]].push_back(i);
+	}
+
+	function<void(int)> dfs_hld = [&](int start) {
+		int heavy_child = -1;
+		++sizes[start];
+		for (int i : edges[start]) {
+			depth[i] = depth[start] + 1;
+			dfs_hld(i);
+			sizes[start] += sizes[i];
+			if (heavy_child == -1 || sizes[heavy_child] < sizes[i]) { heavy_child = i; }
+		}
+		if (heavy_child != -1) {
+			swap(heavy_paths[start], heavy_paths[heavy_child]);
+			heavy_paths[start].push_back(heavy_child);
+		}
+	};
+
+	dfs_hld(0);
+	vector segtrees(n, SumSegmentTree<int>(0));
+	for (int i = 0; i < n; ++i) {
+		reverse(heavy_paths[i].begin(), heavy_paths[i].end());
+		for (int j = 0; j < (int)heavy_paths[i].size(); ++j) {
+			heavy_index[heavy_paths[i][j]] = i;
+			path_index[heavy_paths[i][j]] = j;
+		}
+		segtrees[i] = SumSegmentTree<int>((int)heavy_paths[i].size());
+	}
+
+	sort(cow_proficiency.begin(), cow_proficiency.end(), greater<pair<int, int>>());
+	for (auto &[proficiency, cow] : cow_proficiency) {
+		if (heavy_index[cow] != -1) {
+			ans[cow] = segtrees[heavy_index[cow]].range_sum(0, path_index[cow] + 1);
+		} else {
+			ans[cow] = cur_ans[cow];
+		}
+		cow = parents[cow];
+		while (cow >= 0) {
+			if (heavy_index[cow] != -1) {
+				int current_value = segtrees[heavy_index[cow]].range_sum(0, 1);
+				segtrees[heavy_index[cow]].set(0, current_value + 1);
+				if (path_index[cow] + 1 < (int)heavy_paths[heavy_index[cow]].size()) {
+					current_value = segtrees[heavy_index[cow]].range_sum(
+					    path_index[cow] + 1, path_index[cow] + 2);
+					segtrees[heavy_index[cow]].set(path_index[cow] + 1,
+					                               --current_value);
+				}
+				cow = parents[heavy_paths[heavy_index[cow]][0]];
+			} else {
+				++cur_ans[cow];
+				// ans cannot be updated directly as this cow may have already
+				// been processed
+				cow = parents[cow];
+			}
+		}
+	}
+	for (int i = 0; i < n; ++i) { cout << ans[i] << '\n'; }
+}
+```
+
+</CPPSection>
+</LanguageSection>

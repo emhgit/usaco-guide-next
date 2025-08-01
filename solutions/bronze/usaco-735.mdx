@@ -1,0 +1,131 @@
+---
+id: usaco-735
+source: USACO Bronze 2017 Open
+title: The Lost Cow
+author: Jesse Choe, Ananth Kashyap, Brad Ma, Rameez Parwez
+---
+
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_lostcow_bronze_open17.html)
+
+## Explanation
+
+At each step, we check where Farmer John starts and where he's trying to go. If his path doesn't overlap with
+Bessie's path, we add the distance he covers to a running total and move him to his starting position.
+On the other hand, if his path somehow overlaps with Bessie's, we add only his distance from Bessie to the total.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(\log|x - y|)$
+
+<Spoiler title="Proof">
+
+Let's say the distance between Farmer John and Bessie is $D = |x - y|$.
+In each step, Farmer John travels double the distance he traveled in the previous step: $1, 2, 4, 8, 16, \cdots$.
+We can see how the the distance grows exponentially.
+
+Farmer John will find Bessie when the range of his movement includes her position.
+This happens when the distance he travels in a single step, $2^k$, becomes at least $D$.
+
+Mathematically, this means $2^k \ge D \implies k \ge \log_2 D$.
+
+Thus, the number of steps needed to find Bessie is proportional to $\log_2(D)$, making the overall time complexity what it is.
+
+</Spoiler>
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <fstream>
+#include <iostream>
+
+int main() {
+	std::ifstream read("lostcow.in");
+	int x, y;
+	read >> x >> y;
+
+	int dir = 1;
+	int total_distance = 0;
+	int dir_distance = 1;
+	while (true) {
+		if ((dir == 1 && x <= y && y <= (x + dir_distance)) ||
+		    (dir == -1 && y <= x && (x - dir_distance) <= y)) {
+			// found bessie
+			total_distance += std::abs(y - x);  // distance to her
+			std::ofstream("lostcow.out") << total_distance << std::endl;
+			break;
+		} else {
+			// didn't find bessie yet
+			total_distance += dir_distance * 2;
+			dir_distance *= 2;  // double the distance
+			dir *= -1;          // switch directions
+		}
+	}
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.StringTokenizer;
+
+public class TheLostCow {
+	public static void main(String[] args) throws IOException {
+		Kattio io = new Kattio("lostcow");
+		int x = io.nextInt();
+		int y = io.nextInt();
+
+		int dir = 1;
+		int totalDistance = 0;
+		int dirDistance = 1;
+		while (true) {
+			if ((dir == 1 && x <= y && y <= (x + dirDistance)) ||
+			    (dir == -1 && y <= x && (x - dirDistance <= y))) {
+				// found bessie
+				totalDistance += Math.abs(y - x);  // distance to her
+				io.println(totalDistance);
+				break;
+			} else {
+				// didn't find bessie yet
+				totalDistance += (dirDistance * 2);
+				dirDistance *= 2;  // double the distance
+				dir *= -1;         // switch directions
+			}
+		}
+
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<PySection>
+
+```py
+with open("lostcow.in") as read:
+	x, y = [int(i) for i in read.readline().split()]
+
+dir_ = 1
+total_distance = 0
+dir_distance = 1
+while True:
+	if (dir_ == 1 and x <= y and y <= (x + dir_distance)) or (
+		dir_ == -1 and y <= x and (x - dir_distance <= y)
+	):
+		# found bessie
+		total_distance += abs(y - x)  # distance to her
+		print(total_distance, file=open("lostcow.out", "w"))
+		break
+	else:
+		# didn't find bessie yet
+		total_distance += dir_distance * 2
+		dir_distance *= 2  # double the distance
+		dir_ *= -1  # switch directions
+```
+
+</PySection>
+</LanguageSection>

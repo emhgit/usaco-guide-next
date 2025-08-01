@@ -1,0 +1,131 @@
+---
+id: cses-1635
+source: CSES
+title: Coin Combinations I
+author: Michael Cao
+---
+
+## Explanation
+
+Let $\texttt{dp[w]}$ equal the number of ways to achieve
+the sum of values, $w$. Then, for some weight $w$, let's try to use each coin.
+For $\texttt{dp[w]}$, we'll transition from $\texttt{dp[w - coin[i]]}$ for all
+$i$, where $\texttt{coin[x]}$ defines the value of the $x$-th coin.
+
+So, the transition is
+$$
+dp[w] = \sum_{i=1}^n{(dp[w - coins[i]])}
+$$
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N \cdot X)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <iostream>
+#include <vector>
+
+using std::cout;
+
+const int MOD = 1e9 + 7;
+
+int main() {
+	int n, x;
+	std::cin >> n >> x;
+	std::vector<int> coins(n), dp(x + 1);
+	for (auto &x : coins) { std::cin >> x; }
+
+	dp[0] = 1;
+	for (int i = 1; i <= x; i++) {
+		for (int c : coins) {
+			if (i - c >= 0) { (dp[i] += dp[i - c]) %= MOD; }
+		}
+	}
+
+	cout << dp[x] << '\n';
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+<Info title="Note">
+
+An otherwise working solution that uses `dp[i] %= m;` instead of
+`if (dp[i] > M) dp[i] -= M;` may time out on CSES, but would work on USACO,
+which gives double time for Java (see line 32 of the solution).
+
+</Info>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class CountingCoins1 {
+	static BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+	static PrintWriter pw = new PrintWriter(System.out);
+
+	public static void main(String[] args) throws IOException {
+		StringTokenizer st = new StringTokenizer(r.readLine());
+		int n = Integer.parseInt(st.nextToken());
+		int x = Integer.parseInt(st.nextToken());
+		int M = 1000000007;
+		st = new StringTokenizer(r.readLine());
+		int[] coins = new int[n];
+		for (int i = 0; i < n; i++) { coins[i] = Integer.parseInt(st.nextToken()); }
+		Arrays.sort(coins);
+
+		int[] dp = new int[x + 1];
+		dp[0] = 1;
+		for (int i = 1; i < dp.length; i++) {
+			dp[i] = 0;
+			for (int j = 0; j < n; j++) {
+				if (coins[j] > i) { break; }
+				dp[i] += dp[i - coins[j]];
+
+				// need to use -= M to pass for Java instead of %= M (which
+				// works in c++) to save time this is the same thing as dp[i] %
+				// m within the constraints of this problem (dp[i] can never be
+				// > 2*M since we are only adding) This wouldn't be a problem in
+				// USACO contests since USACO gives 2x time for java, but CSES
+				// doesn't dp[i] %= m;
+				if (dp[i] > M) dp[i] -= M;
+			}
+		}
+
+		pw.println(dp[x]);
+		pw.close();
+	}
+}
+```
+
+</JavaSection>
+<PySection>
+
+<Warning>
+
+Due to Python's large constant factor, the solution below TLEs on a couple of test cases.
+
+</Warning>
+
+```py
+MOD = 10**9 + 7
+
+n, x = map(int, input().split())
+coins = list(map(int, input().split()))
+
+dp = [0] * (x + 1)
+dp[0] = 1
+for i in range(1, x + 1):
+	for c in coins:
+		if i - c >= 0:
+			dp[i] = (dp[i] + dp[i - c]) % MOD
+
+print(dp[x])
+```
+
+</PySection>
+</LanguageSection>

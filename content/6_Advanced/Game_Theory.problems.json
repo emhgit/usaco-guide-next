@@ -1,0 +1,210 @@
+{
+  "MODULE_ID": "game-theory",
+  "chessboard-games": [
+    {
+      "uniqueId": "chessboard-games-againe",
+      "name": "Chessboard Game, Again!",
+      "url": "https://www.hackerrank.com/contests/5-days-of-game-theory/challenges/a-chessboard-game/problem",
+      "source": "Hackerrank",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Game Theory", "NIM"],
+      "solutionMetadata": {
+        "kind": "in-module",
+        "moduleId": "game-theory"
+      }
+    }
+  ],
+  "nim": [
+    {
+      "uniqueId": "cses-1730",
+      "name": "NIM Game I",
+      "url": "https://cses.fi/problemset/task/1730",
+      "source": "CSES",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Game Theory", "NIM"],
+      "solutionMetadata": {
+        "kind": "in-module",
+        "moduleId": "game-theory"
+      }
+    }
+  ],
+  "snim": [
+    {
+      "uniqueId": "snim-kattis",
+      "name": "S-NIM",
+      "url": "https://open.kattis.com/problems/snim",
+      "source": "Kattis",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Game Theory", "NIM"],
+      "solutionMetadata": {
+        "kind": "in-module",
+        "moduleId": "game-theory"
+      }
+    }
+  ],
+  "general": [
+    {
+      "uniqueId": "apple-tree-cf-gt",
+      "name": "Apple Tree",
+      "url": "https://codeforces.com/contest/812/problem/E",
+      "source": "CF",
+      "difficulty": "Easy",
+      "isStarred": true,
+      "tags": ["Game Theory", "Nimbers"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "game-of-stones-gt",
+      "name": "Game Of Stones",
+      "url": "https://codeforces.com/problemset/problem/768/E",
+      "source": "CF",
+      "difficulty": "Easy",
+      "isStarred": true,
+      "tags": ["Game Theory", "DP", "Bitmasks", "Nimbers"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "arpa-and-game-gt",
+      "name": "Arpa & Game",
+      "url": "https://codeforces.com/contest/850/problem/C",
+      "source": "CF",
+      "difficulty": "Easy",
+      "isStarred": true,
+      "tags": ["Game Theory", "DP", "Bitmasks", "Nimbers"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "ioi-05-RectangleGame",
+      "name": "2005 - Rectangle Game",
+      "url": "https://contest.yandex.com/ioi/contest/566/problems/E/",
+      "source": "IOI",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": ["Game Theory"],
+      "solutionMetadata": {
+        "kind": "IOI",
+        "year": 2005
+      }
+    },
+    {
+      "uniqueId": "ioi-01-IoiwariGame",
+      "name": "2001 - Ioiwari Game",
+      "url": "https://ioinformatics.org/files/ioi2001problem2.pdf",
+      "source": "IOI",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Game Theory"],
+      "solutionMetadata": {
+        "kind": "IOI",
+        "year": 2001
+      }
+    },
+    {
+      "uniqueId": "baltic-14-CopAndRobber",
+      "name": "2014 - Cop and Robber",
+      "url": "https://oj.uz/problem/view/BOI14_coprobber",
+      "source": "Baltic OI",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Game Theory"],
+      "solutionMetadata": {
+        "kind": "link",
+        "url": "https://github.com/boi-2014/tasks/blob/master/solutions/analysis/coprobber.pdf"
+      }
+    },
+    {
+      "uniqueId": "ac-GameOnTree",
+      "name": "Game on Tree",
+      "url": "https://atcoder.jp/contests/agc017/tasks/agc017_d",
+      "source": "AC",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Nimbers", "Game Theory", "Tree"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "ac-IntervalGame2",
+      "name": "Interval Game 2",
+      "url": "https://atcoder.jp/contests/abc206/tasks/abc206_f",
+      "source": "AC",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Game Theory", "Nimbers"],
+      "solutionMetadata": {
+        "kind": "autogen-label-from-site",
+        "site": "AC"
+      }
+    },
+    {
+      "uniqueId": "GCJ-BacterialTactics",
+      "name": "Bacterial Tactics",
+      "url": "https://zibada.guru/gcj/2019r1c/problems/#C",
+      "source": "GCJ",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Nimbers", "Game Theory"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "strange-nim-atcoder",
+      "name": "Strange Nim",
+      "url": "https://atcoder.jp/contests/arc091/tasks/arc091_d",
+      "source": "AC",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Game Theory", "NIM"],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "poi-04-cave",
+      "name": "2004 - Cave",
+      "url": "https://szkopul.edu.pl/problemset/problem/5Z9PRRPP-R90WhmbSY_qHd-1/site/",
+      "source": "POI",
+      "difficulty": "Very Hard",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "poi-16-hydrocontest",
+      "name": "2016 - Hydrocontest",
+      "url": "https://szkopul.edu.pl/problemset/problem/y9HM1ctDU8V8xLMRUYACDIRs/site/",
+      "source": "POI",
+      "difficulty": "Very Hard",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    },
+    {
+      "uniqueId": "poi-16-NotNim",
+      "name": "2016 - Not Nim",
+      "url": "https://szkopul.edu.pl/problemset/problem/M5CruI5eCu8elnNFHuiXBrvV/site/",
+      "source": "POI",
+      "difficulty": "Insane",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "none"
+      }
+    }
+  ]
+}

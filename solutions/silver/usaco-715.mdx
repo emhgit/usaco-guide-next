@@ -1,0 +1,116 @@
+---
+id: usaco-715
+source: USACO Silver 2017 February
+title: Why Did the Cow Cross the Road II
+author: Albert Zhu, Juheon Rhee, Sachet Abeysinghe
+---
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_maxcross_silver_feb17.html)
+
+## Explanation
+
+We can represent this problem as an array $a$ of $N$ signals, such that the $i$-th signal is $0$ if it is working and $1$ if it is not working.
+Now we need to find a subarray of length $K$ with the least number of $1$s (i.e., the least sum).
+
+We can use prefix sums to find the number of $1$s (broken signals) across all subarrays of length $K$ and then take the minimum.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+int main() {
+	std::ifstream read("maxcross.in");
+	int n, k, b;
+	read >> n >> k >> b;
+
+	vector<int> signals(n);
+	for (int i = 0; i < b; i++) {
+		int index;
+		read >> index;
+		signals[index - 1] += 1;
+	}
+
+	// prefix sums precomputation
+	vector<int> pref_sum(n + 1);
+	for (int i = 0; i < n; i++) { pref_sum[i + 1] = signals[i] + pref_sum[i]; }
+
+	int min_repair = n;
+	for (int i = 0; i <= n - k; i++) {
+		min_repair = std::min(min_repair, pref_sum[i + k] - pref_sum[i]);
+	}
+
+	std::ofstream("maxcross.out") << min_repair << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class MaxCross {
+	public static void main(String[] args) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader("maxcross.in"));
+		StringTokenizer st = new StringTokenizer(br.readLine());
+		int n = Integer.parseInt(st.nextToken());
+		int k = Integer.parseInt(st.nextToken());
+		int b = Integer.parseInt(st.nextToken());
+
+		int[] signals = new int[n];
+		for (int i = 0; i < b; i++) { signals[Integer.parseInt(br.readLine()) - 1]++; }
+
+		// prefix sums precomputation
+		int[] prefSum = new int[n + 1];
+		for (int i = 0; i < n; i++) { prefSum[i + 1] = signals[i] + prefSum[i]; }
+
+		int minRepair = n;
+		for (int i = 0; i <= n - k; i++) {
+			minRepair = Math.min(minRepair, prefSum[i + k] - prefSum[i]);
+		}
+
+		PrintWriter pw = new PrintWriter("maxcross.out");
+		pw.println(minRepair);
+		pw.close();
+	}
+}
+```
+
+</JavaSection>
+<PySection>
+
+```py
+with open("maxcross.in") as read:
+	n, k, b = [int(i) for i in read.readline().split()]
+
+	signals = [0 for _ in range(n)]
+	for _ in range(b):
+		signals[int(read.readline()) - 1] += 1
+
+# prefix sums precomputation
+pref_sum = [0]
+for i in range(n):
+	pref_sum.append(signals[i] + pref_sum[-1])
+
+min_repair = n
+for i in range(n - k + 1):
+	min_repair = min(min_repair, pref_sum[i + k] - pref_sum[i])
+
+print(min_repair, file=open("maxcross.out", "w"))
+```
+
+</PySection>
+</LanguageSection>

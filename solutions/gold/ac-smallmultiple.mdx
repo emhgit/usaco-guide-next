@@ -1,0 +1,126 @@
+---
+id: ac-smallmultiple
+source: AC
+title: Small Multiple
+author: Chongtian Ma
+---
+
+[Official Analysis](https://img.atcoder.jp/arc084/editorial.pdf)
+
+## Explanation
+
+All positive integers can be created by starting from 1 and repeating the
+following two operations:
+
+1. Multiply the current number by 10. At this time, the sum of each digit does not change.
+2. Add 1 to the current number. At this time, the sum of each digit increases
+   by 1. (This does not apply when the ones place is 9, but we will show later
+   that you do not need to take this into account when solving this problem.)
+
+Now, let's consider a graph with all positive integers as vertices and an edge
+from the "current number" to the "new number" of the above operation. What we
+need to find is the shortest path length on this graph from 1 to any multiple of
+K plus 1.
+
+As it is, the number of vertices is infinite, but if you consider how the edges
+are drawn, you can see that the vertices corresponding to each positive integer
+can be equated with mod K.
+
+Therefore, we only need to find the shortest path from 1 to 0 on a graph of K
+vertices, where each vertex is equated with mod K, and this can be found in O(K)
+time using [0-1 BFS](https://codeforces.com/blog/entry/22276).
+
+A transition that adds 1 to an integer with a 1's digit of 9 does not need to be
+treated specially because if you recall the shortest path algorithm, you can see
+that the destination vertex has already been visited.
+For example, if we go from 9 to 10 using the second case we don't need to worry about vertex 10 since it will already be visited from the first case.
+
+Note that 0-1 BFS is a breadth-first search algorithm that prepares a deque
+(double-ended queue) and adds elements to the beginning of the deque for edge
+transitions with a cost of 0, and to the end of the deque for edge transitions
+of 1.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(K)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int INF = 1e9;
+
+int main() {
+	int k;
+	scanf("%d", &k);
+
+	// dist[i] = smallest digit sum to reach i % k
+	vector<int> dist(k, INF);
+
+	deque<int> q;
+
+	dist[1] = 1;
+	q.push_front(1);
+
+	while (!q.empty()) {
+		int cur = q.front();
+		q.pop_front();
+
+		// case 1: we append an extra 0 at the end (NO EXTRA COST)
+		int case1 = cur * 10 % k;
+		if (dist[cur] < dist[case1]) {
+			dist[case1] = dist[cur];
+			q.push_front(case1);
+		}
+
+		// case 2: we add one to cur but also increase the digit sum
+		int case2 = (cur + 1) % k;
+		if (dist[cur] + 1 < dist[case2]) {
+			dist[case2] = dist[cur] + 1;
+			q.push_back(case2);
+		}
+	}
+
+	// the answer must be 0 mod k
+	printf("%d\n", dist[0]);
+}
+```
+
+</CPPSection>
+<PySection>
+
+```py
+from collections import deque
+
+k = int(input())
+
+# dist[i] = smallest digit sum to reach i % k
+dist = [float("inf")] * k
+q = deque()
+
+dist[1] = 1
+q.appendleft(1)
+
+while q:
+	cur = q.popleft()
+
+	# case 1: append an extra 0 at the end (NO EXTRA COST)
+	case1 = cur * 10 % k
+	if dist[cur] < dist[case1]:
+		dist[case1] = dist[cur]
+		q.appendleft(case1)
+
+	# case 2: add one to cur but increase the digit sum
+	case2 = (cur + 1) % k
+	if dist[cur] + 1 < dist[case2]:
+		dist[case2] = dist[cur] + 1
+		q.append(case2)
+
+# the answer must be 0 mod k
+print(dist[0])
+```
+
+</PySection>
+</LanguageSection>

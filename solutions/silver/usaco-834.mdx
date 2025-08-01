@@ -1,0 +1,146 @@
+---
+id: usaco-834
+source: USACO Silver 2018 US Open
+title: Out of Sorts
+author: Brad Ma, Kevin Sheng, Juheon Rhee, David Guo
+---
+
+[Official Analysis (C++)](http://www.usaco.org/current/data/sol_sort_silver_open18.html)
+
+## Explanation
+
+For any $i$, the value $i - a_i$ represents a lower bound on the total number of bubble passes required to sort the array. If $i - a_i$ is positive, it indicates that the element needs to move left by at least that amount. If it is negative, it is still a valid lower bound since the element does not need to move further left.
+
+To understand why max($i - a_i$) is correct, consider any element $a_i$ where $i - a_i$ is positive (meaning it is to the right of its correct position). For this to happen, there must be some larger element to the left of $a_i$. Due to how bubble sort works, $a_i$ will necessarily move left in every pass until it reaches its correct position, and its $i - a_i$ value decreases by $1$ with each pass.
+
+Now consider an element $a_i$ where $i - a_i$ equals $0$ (the element is already in its correct position). Such an element may or may not move left, but it will not move right. For it to move right, the element immediately to its right would need to be smaller, which implies there is a larger element to its left, causing $a_i$ to move left instead. Thus, $i - a_i$ equals $0$ remains unchanged or decreases.
+
+As a result, max($i - a_i$), if positive, decreases by $1$ during each bubble sort iteration. After counting the number of iterations needed to sort the array, we add $1$ to account for the final iteration performed by the algorithm, as indicated in the pseudocode.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N \log N)$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+struct Entry {
+	int val;
+	int index;
+};
+
+int main() {
+	std::ifstream read("sort.in");
+	int n;
+	read >> n;
+	vector<Entry> entries(n);
+	for (int i = 0; i < n; i++) {
+		read >> entries[i].val;
+		entries[i].index = i;
+	}
+
+	std::sort(entries.begin(), entries.end(), [](const Entry &e1, const Entry &e2) {
+		return e1.val == e2.val ? e1.index < e2.index : e1.val < e2.val;
+	});
+
+	// count the # of bubbles needed to sort the array
+	int moo_amt = 1;
+	for (int i = 0; i < n; i++) {
+		// add 1 to account for the final iteration of the algorithm
+		moo_amt = std::max(moo_amt, 1 + entries[i].index - i);
+	}
+
+	std::ofstream("sort.out") << moo_amt << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class Sort {
+	// BeginCodeSnip{Array Element Class}
+	static class Entry implements Comparable<Entry> {
+		public int val;
+		public int index;
+
+		public Entry(int v, int i) {
+			val = v;
+			index = i;
+		}
+
+		public int compareTo(Entry other) {
+			if (this.val == other.val) { return this.index - other.index; }
+			return this.val - other.val;
+		}
+	}
+	// EndCodeSnip
+
+	public static void main(String[] args) throws Exception {
+		Kattio io = new Kattio("sort");
+		int n = io.nextInt();
+		Entry[] entries = new Entry[n];
+		for (int i = 0; i < n; i++) { entries[i] = new Entry(io.nextInt(), i); }
+
+		Arrays.sort(entries);
+
+		int mooAmt = 1;
+		// count the # of bubbles needed to sort the array
+		for (int i = 0; i < entries.length; i++) {
+			// add 1 to account for the final iteration of the algorithm
+			mooAmt = Math.max(mooAmt, 1 + entries[i].index - i);
+		}
+
+		io.println(mooAmt);
+		io.close();
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+</JavaSection>
+
+<PySection>
+
+```py
+from typing import NamedTuple
+from functools import cmp_to_key
+
+
+class Entry(NamedTuple):
+	val: int
+	index: int
+
+
+with open("sort.in") as read:
+	entries = []
+	for i in range(int(read.readline())):
+		entries.append(Entry(int(read.readline()), i))
+
+cmp = lambda e1, e2: e1.index - e2.index if e1.val == e2.val else e1.val - e2.val
+entries.sort(key=cmp_to_key(cmp))
+
+moo_amt = 1
+# count the # of bubbles needed to sort the array
+for i in range(len(entries)):
+	# add 1 to account for the final iteration of the algorithm
+	moo_amt = max(moo_amt, 1 + entries[i].index - i)
+
+print(moo_amt, file=open("sort.out", "w"))
+```
+
+</PySection>
+</LanguageSection>

@@ -1,0 +1,176 @@
+---
+id: cf-1879D
+source: CF 1879D
+title: Sum of XOR Functions
+author: Justin Ji
+---
+
+[Official Analysis (C++)](https://codeforces.com/blog/entry/120773)
+
+<Spoiler title = "Hint 1">
+
+Consider processing the expression bit by bit, and evaluating the contribution
+of each bit in the answer.
+
+</Spoiler>
+
+<Spoiler title = "Hint 2">
+
+The contribution of each bit is tied to the sum of lengths of all subarrays that
+have $f(l, r)$ include this bit. When would a subarray have its value of
+$f(l, r)$ include a given bit?
+
+</Spoiler>
+
+<Spoiler title = "Explanation">
+
+## Explanation
+
+If we perform xor on the same number an even number of times,
+the xor operations will evenly cancel out. Because of this, it becomes apparent
+that we need to find the sum of subarray lengths for all subarrays that have
+this current bit show up an odd amount of times.
+
+For an index $i$, we want to find the sum of subarray lengths for all relevant
+subarrays that end with $i$. This sum can be expressed as
+$ \sum_{l=1}^{y} i-v[l]+1$, where $v$ is the set of all valid left
+endpoints, and $y$ is the number of such endpoints. This expression can be
+turned into $i \cdot y - \sum_{l=1}^{y}v[l]-1$, which can be calculated in
+$\mathcal{O}(1)$ if we sweep from left to right.
+
+## Implementation
+
+**Time Complexity:** $\mathcal{O}(N\log{N})$
+
+<LanguageSection>
+<CPPSection>
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+const int MOD = 998244353;
+int main() {
+	int n;
+	cin >> n;
+	vector<int> a(n + 1);  // 1-indexing simplifies the math a bit
+	for (int i = 1; i <= n; i++) { cin >> a[i]; }
+
+	ll res = 0;
+	// sizeof(int) * 8 is the # of bits in an int
+	for (int bit = 0; bit < sizeof(int) * 8; bit++) {
+		ll len_sum = 0;                      // total subarray length sum
+		vector<array<ll, 2>> parity_sum(2);  // {index sum, # of this parity}
+		parity_sum[0] = {0, 1};
+		parity_sum[1] = {0, 0};
+		int parity = 0;
+
+		for (int i = 1; i <= n; i++) {
+			// checking if the parity of bit occurrences changed
+			if ((a[i] >> bit) & 1) { parity = (parity + 1) & 1; }
+			// all previous prefixes we use must have opposite endpoints
+			auto [dist, occ] = parity_sum[!parity];
+			// evaluating all subarrays ending at index i
+			len_sum = (len_sum + occ * i - dist) % MOD;
+			if (len_sum < 0) { len_sum += MOD; }
+			// updating the parity sums w/ this current index
+			parity_sum[parity][0] += i;
+			parity_sum[parity][1]++;
+		}
+
+		res = (res + len_sum * (1 << bit)) % MOD;
+	}
+
+	cout << res << endl;
+}
+```
+
+</CPPSection>
+<JavaSection>
+
+```java
+import java.io.*;
+import java.util.*;
+
+public class SumofXOR {
+	static final int MOD = 998244353;
+	public static void main(String[] args) {
+		Kattio io = new Kattio();
+
+		int n = io.nextInt();
+		int[] a = new int[n + 1];  // 1-indexing simplifies the math a bit
+		for (int i = 1; i <= n; i++) { a[i] = io.nextInt(); }
+
+		long res = 0;
+		// 32 is the number of bits in an int
+		for (int bit = 0; bit < 32; bit += 1) {
+			long len_sum = 0;                        // total subarray length sum
+			long parity_sum[][] = {{0, 1}, {0, 0}};  // {index sum, # of this parity}
+			int parity = 0;
+
+			for (int i = 1; i <= n; i++) {
+				// checking if the parity of bit occurrences changed
+				if (((a[i] >> bit) & 1) != 0) { parity = (parity + 1) & 1; }
+
+				// all previous prefixes we use must have opposite endpoints
+				long dist = parity_sum[1 - parity][0];
+				long occ = parity_sum[1 - parity][1];
+
+				// evaluating all subarrays ending at index i
+				len_sum = (len_sum + occ * i - dist) % MOD;
+				if (len_sum < 0) { len_sum += MOD; }
+
+				// updating the parity sums with this current index
+				parity_sum[parity][0] += i;
+				parity_sum[parity][1]++;
+			}
+			res = (res + len_sum * (1L << bit)) % MOD;
+		}
+		System.out.println(res);
+	}
+
+	// CodeSnip{Kattio}
+}
+```
+
+</JavaSection>
+<Pysection>
+
+```py
+MOD = 998244353
+n = int(input())
+a = [int(i) for i in input().split()]
+
+res = 0
+# 32 is the number of bits in an int
+for bit in range(32):
+	len_sum = 0  # total subarray length sum
+	parity_sum = [[0, 1], [0, 0]]  # {index sum, number of this parity}
+	parity = 0
+	for i in range(n):
+		if (a[i] >> bit) & 1:  # checking if the parity of bit occurrences changed
+			parity = (parity + 1) & 1
+
+		# all previous prefixes we use must have opposite endpoints
+		dist, occ = parity_sum[not parity][0], parity_sum[not parity][1]
+
+		# evaluating all subarrays ending at index i
+		len_sum = (len_sum + occ * (i + 1) - dist) % MOD
+		if len_sum < 0:
+			len_sum += MOD
+
+		# updating the parity sums w/ this current index
+		parity_sum[parity][0] += i + 1
+		parity_sum[parity][1] += 1
+
+	res = (res + len_sum * (1 << bit)) % MOD
+
+print(res)
+```
+
+</Pysection>
+
+</LanguageSection>
+
+</Spoiler>
