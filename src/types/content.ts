@@ -1,137 +1,103 @@
 export interface Heading {
+  depth: number;
 
-    depth: number;
+  value: string;
 
-    value: string;
-
-    slug: string;
-
+  slug: string;
 }
-
-
 
 export interface TableOfContents {
+  cpp?: Heading[];
 
-    cpp?: Heading[];
+  java?: Heading[];
 
-    java?: Heading[];
-
-    py?: Heading[];
-
+  py?: Heading[];
 }
-
-
 
 export interface MdxFrontmatter {
+  id: string;
 
-    id: string;
+  title: string;
 
-    title: string;
+  author?: string;
 
-    author?: string;
+  contributors?: string;
 
-    contributors?: string;
+  description?: string;
 
-    description?: string;
+  prerequisites?: string[];
 
-    prerequisites?: string[];
+  redirects?: string[];
 
-    redirects?: string[];
+  frequency?: number;
 
-    frequency?: number;
-
-    isIncomplete?: boolean;
-
+  isIncomplete?: boolean;
 }
-
-
 
 export interface MdxContent {
+  body: string;
 
-    body: string;
+  fileAbsolutePath: string;
 
-    fileAbsolutePath: string;
+  frontmatter: MdxFrontmatter;
 
-    frontmatter: MdxFrontmatter;
+  toc?: TableOfContents;
 
-    toc?: TableOfContents;
+  cppOc?: number;
 
-    cppOc?: number;
+  javaOc?: number;
 
-    javaOc?: number;
-
-    pyOc?: number;
-
+  pyOc?: number;
 }
-
-
 
 export interface ProblemSolutionInfo {
+  kind: string;
 
-    kind: string;
+  label?: string;
 
-    label?: string;
+  labelTooltip?: string;
 
-    labelTooltip?: string;
+  url?: string;
 
-    url?: string;
+  sketch?: string;
 
-    sketch?: string;
-
-    hasHints?: boolean;
-
+  hasHints?: boolean;
 }
-
-
 
 export interface ModuleProblemInfo {
+  uniqueId: string;
 
-    uniqueId: string;
+  name: string;
 
-    name: string;
+  url: string;
 
-    url: string;
+  source: string;
 
-    source: string;
+  sourceDescription?: string;
 
-    sourceDescription?: string;
+  isStarred: boolean;
 
-    isStarred: boolean;
+  difficulty?: string;
 
-    difficulty?: string;
+  tags: string[];
 
-    tags: string[];
-
-    solution?: ProblemSolutionInfo;
-
+  solution?: ProblemSolutionInfo;
 }
-
-
 
 export interface ProblemInfo extends ModuleProblemInfo {
+  inModule: boolean;
 
-    inModule: boolean;
-
-    module?: MdxContent; // Reference to parent module
-
+  module?: MdxContent; // Reference to parent module
 }
-
-
 
 export interface ModuleProblemList {
+  listId: string;
 
-    listId: string;
-
-    problems: ModuleProblemInfo[];
-
+  problems: ModuleProblemInfo[];
 }
 
-
-
 export interface ModuleProblemLists {
+  moduleId: string;
 
-    moduleId: string;
-
-    problemLists: ModuleProblemList[];
-
-}       
+  problemLists: ModuleProblemList[];
+}
