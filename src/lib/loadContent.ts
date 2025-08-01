@@ -12,7 +12,7 @@ import { moduleIDToSectionMap } from '../../content/ordering';
 async function loadAllSolutions(): Promise<MdxContent[]> {
     const solutionsDir = path.join(process.cwd(), 'solutions');
     try {
-        const solutionFiles = await fs.readdir(solutionsDir);
+        const solutionFiles = await fs.readdir(solutionsDir, { recursive: true });
         const solutions: MdxContent[] = [];
 
         for (const file of solutionFiles) {
@@ -43,7 +43,7 @@ async function loadAllSolutions(): Promise<MdxContent[]> {
 async function loadAllProblems(): Promise<ProblemInfo[]> {
     const problemsDir = path.join(process.cwd(), 'problems');
     try {
-        const problemFiles = await fs.readdir(problemsDir);
+        const problemFiles = await fs.readdir(problemsDir, { recursive: true });
         const problems: ProblemInfo[] = [];
 
         for (const file of problemFiles) {
