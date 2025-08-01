@@ -22,7 +22,7 @@ export interface TableOfContents {
 
 
 
-export interface XdmFrontmatter {
+export interface MdxFrontmatter {
 
     id: string;
 
@@ -46,13 +46,13 @@ export interface XdmFrontmatter {
 
 
 
-export interface XdmContent {
+export interface MdxContent {
 
     body: string;
 
     fileAbsolutePath: string;
 
-    frontmatter: XdmFrontmatter;
+    frontmatter: MdxFrontmatter;
 
     toc?: TableOfContents;
 
@@ -112,7 +112,7 @@ export interface ProblemInfo extends ModuleProblemInfo {
 
     inModule: boolean;
 
-    module?: XdmContent; // Reference to parent module
+    module?: MdxContent; // Reference to parent module
 
 }
 
