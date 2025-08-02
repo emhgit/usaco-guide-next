@@ -9,13 +9,12 @@ import {
 import {
   MdxContent,
   ProblemInfo,
-  ProblemSolutionInfo,
-  ModuleProblemInfo,
   ModuleProblemList,
   ModuleProblemLists,
 } from "../types/content";
+import * as freshOrdering from '../../content/ordering';
 import { moduleIDToSectionMap } from "../../content/ordering";
-import { checkInvalidUsacoMetadata, ProblemMetadata } from "@/models/problem";
+import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../models/problem";
 
 /**
  * Loads all problem solutions from the solutions directory
@@ -49,54 +48,6 @@ async function loadAllSolutions(): Promise<MdxContent[]> {
 }
 
 /**
- * Validates problem metadata and returns a ProblemInfo object
- */
-function createProblemInfo(metadata: ProblemMetadata, moduleId?: string): ProblemInfo {
-  // Basic validation
-  if (!metadata.uniqueId) {
-    throw new Error("Problem is missing required field: uniqueId");
-  }
-  if (!metadata.name) {
-    throw new Error(
-      `Problem ${metadata.uniqueId} is missing required field: name`
-    );
-  }
-  if (!metadata.url) {
-    throw new Error(
-      `Problem ${metadata.uniqueId} is missing required field: url`
-    );
-  }
-
-  // Convert solution to the correct type if it exists
-  let solution: ProblemSolutionInfo | undefined;
-  if (metadata.solutionMetadata) {
-    if (typeof metadata.solutionMetadata === "string") {
-      solution = {
-        kind: "internal",
-        url: metadata.solutionMetadata,
-      };
-    } else if (metadata.solutionMetadata.kind) {
-      solution = metadata.solutionMetadata as ProblemSolutionInfo;
-    }
-  }
-
-  const problemInfo: ProblemInfo = {
-    uniqueId: metadata.uniqueId,
-    name: metadata.name,
-    url: metadata.url,
-    source: metadata.source || "Unknown",
-    sourceDescription: metadata.sourceDescription,
-    isStarred: metadata.isStarred || false,
-    difficulty: metadata.difficulty || "Normal",
-    tags: metadata.tags || [],
-    inModule: !!moduleId,
-    solution,
-  };
-
-  return problemInfo;
-}
-
-/**
  * Loads all problems from JSON files matching *.problems.json or extraProblems.json
  */
 async function loadAllProblems(): Promise<{
@@ -107,7 +58,7 @@ async function loadAllProblems(): Promise<{
   const allFiles = await fs.readdir(contentDir, { recursive: true });
 
   const problems: ProblemInfo[] = [];
-  const moduleProblemListsMap: Record<string, ModuleProblemList[]> = {};
+  const moduleProblemLists: ModuleProblemLists[] = [];
 
   // Find all relevant JSON files
   const problemFiles = allFiles.filter(
@@ -128,7 +79,8 @@ async function loadAllProblems(): Promise<{
       try {
         parsedContent = JSON.parse(content);
       } catch (error) {
-        throw new Error(`Unable to parse JSON: ${filePath}`);
+        const hint = filePath ? `file in ${filePath}` : '';
+        throw new Error(`Unable to parse JSON: ${hint}`);
       }
 
       const moduleId = parsedContent["MODULE_ID"];
@@ -144,65 +96,45 @@ async function loadAllProblems(): Promise<{
         );
       }
 
-      // Process each table in the JSON file
-      for (const [tableId, tableData] of Object.entries(parsedContent)) {
-        if (tableId === "MODULE_ID") continue;
-
-        const problemsList = tableData as any[];
-        if (!Array.isArray(problemsList)) {
-          console.warn(`Skipping non-array table ${tableId} in ${filePath}`);
-          continue;
-        }
-
-        const moduleProblems: ModuleProblemInfo[] = [];
-
-        for (const problemData of problemsList) {
-          try {
-            // Special handling for USACO problems
-            if (problemData.uniqueId?.startsWith?.("usaco-")) {
-              // Skip USACO problems as they'll be handled separately
-              continue;
-            }
-
-            const problemInfo = createProblemInfo(problemData, moduleId);
+      Object.keys(parsedContent).forEach((tableId) => {
+        if (tableId == "MODULE_ID") return;
+        try {
+          parsedContent[tableId].forEach((metadata: ProblemMetadata) => {
+            checkInvalidUsacoMetadata(metadata);
+            // if (process.env.CI) stream.write(metadata.uniqueId + "\n");
+            const problemInfo = getProblemInfo(metadata);
             problems.push(problemInfo);
-
-            if (!isExtraProblems) {
-              moduleProblems.push(problemInfo);
-            }
-          } catch (error) {
-            console.error(
-              `Error processing problem in ${filePath}, table ${tableId}:`,
-              error
-            );
-            throw error; // Re-throw to fail fast during development
-          }
-        }
-
-        // Add problems to module's problem list if not extraProblems
-        if (!isExtraProblems && moduleId) {
-          if (!moduleProblemListsMap[moduleId]) {
-            moduleProblemListsMap[moduleId] = [];
-          }
-          moduleProblemListsMap[moduleId].push({
-            listId: tableId,
-            problems: moduleProblems,
           });
+        } catch (e) {
+          console.error(
+            "Failed to create problem info for",
+            parsedContent[tableId]
+          );
+          throw new Error(e.toString());
         }
+      });
+
+      if (moduleId) {
+        const problemLists: ModuleProblemList[] = Object.keys(parsedContent)
+          .filter((x) => x !== "MODULE_ID")
+          .map((listId) => ({
+            listId,
+            problems: parsedContent[listId].map(x => {
+              return {
+                ...getProblemInfo(x, freshOrdering)
+              };
+            }),
+          }));
+        moduleProblemLists.push({
+          problemLists,
+          moduleId,
+        });
       }
     } catch (error) {
       console.error(`Error processing problem file ${filePath}:`, error);
       throw error; // Re-throw to fail fast during development
     }
   }
-
-  // Convert the module problem lists map to the expected array format
-  const moduleProblemLists: ModuleProblemLists[] = Object.entries(
-    moduleProblemListsMap
-  ).map(([moduleId, problemLists]) => ({
-    moduleId,
-    problemLists,
-  }));
 
   return { problems, moduleProblemLists };
 }
