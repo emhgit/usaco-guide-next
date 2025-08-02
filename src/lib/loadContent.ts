@@ -51,7 +51,7 @@ async function loadAllSolutions(): Promise<MdxContent[]> {
 /**
  * Validates problem metadata and returns a ProblemInfo object
  */
-function createProblemInfo(metadata: any, moduleId?: string): ProblemInfo {
+function createProblemInfo(metadata: ProblemMetadata, moduleId?: string): ProblemInfo {
   // Basic validation
   if (!metadata.uniqueId) {
     throw new Error("Problem is missing required field: uniqueId");
@@ -69,14 +69,14 @@ function createProblemInfo(metadata: any, moduleId?: string): ProblemInfo {
 
   // Convert solution to the correct type if it exists
   let solution: ProblemSolutionInfo | undefined;
-  if (metadata.solution) {
-    if (typeof metadata.solution === "string") {
+  if (metadata.solutionMetadata) {
+    if (typeof metadata.solutionMetadata === "string") {
       solution = {
         kind: "internal",
-        url: metadata.solution,
+        url: metadata.solutionMetadata,
       };
-    } else if (metadata.solution.kind) {
-      solution = metadata.solution as ProblemSolutionInfo;
+    } else if (metadata.solutionMetadata.kind) {
+      solution = metadata.solutionMetadata as ProblemSolutionInfo;
     }
   }
 
