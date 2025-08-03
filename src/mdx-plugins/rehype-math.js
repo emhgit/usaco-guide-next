@@ -9,7 +9,7 @@ const { renderToString: katex } = katexPkg;
 
 const assign = Object.assign;
 
-const parseHtml = unified().use(parse, { fragment: true, position: false });
+// const parseHtml = unified().use(parse, { fragment: true, position: false });
 
 const source = 'rehype-katex';
 
@@ -60,12 +60,16 @@ const customRehypeKatex = options => {
         );
       }
 
-      if (element.tagName === 'div') element.tagName = 'MATHDIV';
-      else if (element.tagName === 'span') element.tagName = 'MATHSPAN';
-      else
-        throw new Error(
-          'Unknown tag encountered in rehype-math.js: ' + element.tagName
-        );
+      // Only process elements that have math-related classes
+      // and don't throw errors for other elements
+      if (element.tagName === 'div') {
+        element.tagName = 'MATHDIV';
+      } else if (element.tagName === 'span') {
+        element.tagName = 'MATHSPAN';
+      } else {
+        // For any other tag, just return without processing
+        return;
+      }
 
       element.children = [
         {

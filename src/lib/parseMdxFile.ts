@@ -12,32 +12,9 @@ import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
 import remarkExtractAST from '../mdx-plugins/extract-mdast';
 import remarkToC from '../mdx-plugins/remark-toc';
+import customRehypeKatex from '../mdx-plugins/rehype-math';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
-
-// Custom rehype plugin for KaTeX with custom error handling
-const customRehypeKatex = () => {
-    return (tree: any, file: any) => {
-        try {
-            // Apply the rehypeKatex plugin to the tree
-            const katexPlugin = rehypeKatex();
-            return katexPlugin(tree, file);
-        } catch (error) {
-            console.error('KaTeX error:', error);
-            return tree;
-        }
-    };
-};
-
-/* Custom plugin for table of contents
-const remarkToC = (options: { tableOfContents: any }) => {
-    return (tree: any) => {
-        if (options) {
-            options.tableOfContents = [];
-            // Implementation for TOC generation would go here
-        }
-    };
-};*/
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const fileContent = await fs.readFile(filePath, 'utf-8');
