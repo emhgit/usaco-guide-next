@@ -22,7 +22,7 @@ interface ModulePageProps {
 export default function ModuleTemplate({ moduleData, moduleProblemLists, modules }: ModulePageProps): JSX.Element {
   const router = useRouter();
   const { division, slug } = router.query;
-  const module = React.useMemo(() => graphqlToModuleInfo(moduleData), [moduleData]);
+  const moduleInfo = React.useMemo(() => graphqlToModuleInfo(moduleData), [moduleData]);
   const isLoaded = useIsUserDataLoaded();
 
   useEffect(() => {
@@ -48,12 +48,12 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
   }
 
   return (
-    <Layout setLastViewedModule={module.id}>
-      <SEO title={`${module.title}`} description={module.description} />
+    <Layout setLastViewedModule={moduleInfo.id}>
+      <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
       
       <ConfettiProvider>
         <MarkdownProblemListsProvider value={moduleProblemLists || []}>
-          <MarkdownLayout markdownData={module} modules={modules}>
+          <MarkdownLayout markdownData={moduleInfo} modules={modules}>
             <div className="py-4">
               <Markdown body={moduleData.body} />
             </div>
@@ -88,13 +88,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   
   // Load the specific module data
   const modules = await loadAllModules();
-  const module = modules.find(
+  const moduleData = modules.find(
     ({ frontmatter }) => 
       frontmatter.division === division && 
       frontmatter.id === slug
   );
 
-  if (!module) {
+  if (!moduleData) {
     return {
       notFound: true,
     };
@@ -105,7 +105,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: {
-      moduleData: module,
+      moduleData,
       moduleProblemLists: moduleProblemLists?.problemLists || [],
       modules, // Add the modules array to props
     },
