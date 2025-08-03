@@ -11,7 +11,7 @@ export function validateProblemConsistency(problems: ProblemInfo[]): void {
   const usacoIds: string[] = [];
 
   problems.forEach((problem) => {
-    let slug = getProblemURL(problem);
+    const slug = getProblemURL(problem);
     if (problemSlugs.has(slug) && problemSlugs.get(slug) !== problem.uniqueId) {
       throw new Error(
         `The problems ${problemSlugs.get(slug)} and ${problem.uniqueId} have the same slugs!`
