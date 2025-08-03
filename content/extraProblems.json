@@ -1358,18 +1358,6 @@
       }
     },
     {
-      "uniqueId": "usaco-1326",
-      "name": "Milk Sum",
-      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1326",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": ["Sorting", "Prefix Sums"],
-      "solutionMetadata": {
-        "kind": "internal"
-      }
-    },
-    {
       "uniqueId": "usaco-1328",
       "name": "Pareidolia",
       "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1328",
