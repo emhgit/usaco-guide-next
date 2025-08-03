@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useLastVisitInfo } from '../../context/UserDataContext/properties/lastVisit';
 import { Image } from '../../components/markdown/HTMLComponents';
 import { GetStaticProps } from 'next';
+import Link from 'next/link';
 
 // note: cows will be unlocked in lexicographical order
 
@@ -146,12 +147,9 @@ export default function DailyStreak({ streak, cowImages }: DailyStreakProps) {
                 <div className="dark:text-dark-med-emphasis mt-3 space-y-1 text-sm leading-5 text-gray-500">
                   Seeing that you're addicted to USACO Guide, you should
                   definitely reach out to us regarding{' '}
-                  <a
-                    href="/general/contributing"
-                    className="font-bold text-blue-500"
-                  >
+                  <Link href="/general/contributing" className="font-bold text-blue-500">
                     contributing
-                  </a>
+                  </Link>
                   !
                 </div>
               </div>
