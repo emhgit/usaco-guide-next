@@ -9,6 +9,7 @@ import { UserGroupsProvider } from "../hooks/groups/useUserGroups";
 import { EditorContext } from "../context/EditorContext";
 import { Toaster } from "react-hot-toast";
 import { BlindModeProvider } from "../context/BlindModeContext";
+import Layout from "../components/layout";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -21,7 +22,9 @@ export default function App({ Component, pageProps }: AppProps) {
               <UserGroupsProvider>
                 <BlindModeProvider>
                   <EditorContext.Provider value={{ inEditor: false }}>
-                    <Component {...pageProps} />
+                    <Layout>
+                      <Component {...pageProps} />
+                    </Layout>
                   </EditorContext.Provider>
                 </BlindModeProvider>
               </UserGroupsProvider>
