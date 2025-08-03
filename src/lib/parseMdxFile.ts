@@ -70,6 +70,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
                 ],
             ],
             outputFormat: 'function-body',
+            jsxImportSource: 'react',
         });
     } catch (error) {
         console.error(`Error compiling MDX for ${filePath}:`, error);
