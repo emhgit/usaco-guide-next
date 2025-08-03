@@ -1,10 +1,10 @@
 import path from "path";
 import fs from "fs/promises";
 import { parseMdxFile } from "./parseMdxFile";
-import { linkProblemsToModules } from "./buildRelationships";
+// import { linkProblemsToModules } from "./buildRelationships";
 import {
   validateProblemConsistency,
-  validateModuleProblems,
+  validateSolutionRelationships,
 } from "./validateData";
 import {
   MdxContent,
@@ -182,7 +182,7 @@ export async function loadContent() {
   const { problems: loadedProblems, moduleProblemLists } =
     await loadAllProblems();
 
-  // Ensure problems have the required inModule property before passing to linkProblemsToModules
+  /* Ensure problems have the required inModule property before passing to linkProblemsToModules
   const problemsWithModuleFlag: ProblemInfo[] = loadedProblems.map(
     (problem) => ({
       ...problem,
@@ -195,17 +195,18 @@ export async function loadContent() {
     modules,
     moduleProblemLists
   );
+  */
 
   // Load solutions
   const solutions = await loadAllSolutions();
 
   // Run validations
-  validateProblemConsistency(enhancedProblems);
-  validateModuleProblems(modules, moduleProblemLists);
+  validateProblemConsistency(loadedProblems);
+  validateSolutionRelationships(solutions, loadedProblems);
 
   return {
     modules,
-    problems: enhancedProblems,
+    problems: loadedProblems,
     moduleProblemLists,
     solutions,
   };
