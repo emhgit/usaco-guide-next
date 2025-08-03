@@ -22,19 +22,6 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const mdast: any = { data: null };
     const tableOfContents: any = {};
 
-    // Count language section occurrences
-    const langSecOc = (content.match(/<LanguageSection/g) || []).length;
-    const cppOc = (content.match(/<CPPSection/g) || []).length;
-    const javaOc = (content.match(/<JavaSection/g) || []).length;
-    const pyOc = (content.match(/<PySection/g) || []).length;
-
-    // Validate language sections
-    if (langSecOc < Math.max(cppOc, javaOc, pyOc)) {
-        throw new Error(
-            `${filePath}: # lang sections = ${langSecOc} < max(${cppOc},${javaOc},${pyOc})`
-        );
-    }
-
     let compiledResult;
     try {
         const processedContent = content.replace(/<!--/g, '{/* ').replace(/-->/g, '*/}');
@@ -86,6 +73,19 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     } catch (error) {
         console.error(`Error compiling MDX for ${filePath}:`, error);
         throw new Error(`Error compiling MDX for ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    // Count language section occurrences
+    const langSecOc = (content.match(/<LanguageSection/g) || []).length;
+    const cppOc = (content.match(/<CPPSection/g) || []).length;
+    const javaOc = (content.match(/<JavaSection/g) || []).length;
+    const pyOc = (content.match(/<PySection/g) || []).length;
+
+    // Validate language sections
+    if (langSecOc < Math.max(cppOc, javaOc, pyOc)) {
+        throw new Error(
+            `${filePath}: # lang sections = ${langSecOc} < max(${cppOc},${javaOc},${pyOc})`
+        );
     }
 
     // Get last updated timestamp from git
