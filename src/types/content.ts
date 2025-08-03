@@ -82,7 +82,7 @@ export interface ModuleProblemInfo {
 
   sourceDescription?: string;
 
-  isStarred: boolean;
+  isStarred?: boolean;
 
   difficulty?: string;
 
