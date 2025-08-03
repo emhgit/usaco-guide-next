@@ -186,21 +186,6 @@ export async function loadContent() {
   const { problems: loadedProblems, moduleProblemLists } =
     await loadAllProblems();
 
-  /* Ensure problems have the required inModule property before passing to linkProblemsToModules
-  const problemsWithModuleFlag: ProblemInfo[] = loadedProblems.map(
-    (problem) => ({
-      ...problem,
-      inModule: false, // Will be updated by linkProblemsToModules
-    })
-  );
-
-  const enhancedProblems = linkProblemsToModules(
-    problemsWithModuleFlag,
-    modules,
-    moduleProblemLists
-  );
-  */
-
   // Load solutions
   const solutions = await loadAllSolutions();
 
