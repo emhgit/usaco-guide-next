@@ -102,8 +102,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
     };
   }
 
+  // Helper function to load problem lists (implement this based on your data source)
+  const loadProblemListsForModule = async (moduleId: string) => {
+  // Implement based on how you fetch problem lists in your system
+  // This should return data in the same format as your Gatsby query
+  const { moduleProblemLists } = await loadAllProblems();
+  const problemLists = moduleProblemLists.find(
+    (moduleProblemList) => moduleProblemList.moduleId === moduleId
+  );
+    return { problemLists };
+  }
   // Load problem lists - you'll need to implement this in loadContent
-  const moduleProblemLists = await loadProblemListsForModule(slug, loadAllProblems);
+  const moduleProblemLists = await loadProblemListsForModule(slug);
 
   return {
     props: {
@@ -114,16 +124,3 @@ export const getStaticProps: GetStaticProps = async (context) => {
   };
 };
 
-// Helper function to load problem lists (implement this based on your data source)
-async function loadProblemListsForModule(moduleId: string, loadAllProblems: () =>Promise<{
-  problems: ProblemInfo[];
-  moduleProblemLists: ModuleProblemLists[];
-}> ) {
-  // Implement based on how you fetch problem lists in your system
-  // This should return data in the same format as your Gatsby query
-  const { moduleProblemLists } = await loadAllProblems();
-  const problemLists = moduleProblemLists.find(
-    (moduleProblemList) => moduleProblemList.moduleId === moduleId
-  );
-  return { problemLists };
-}
