@@ -144,11 +144,7 @@ export async function loadAllProblems(): Promise<{
   return { problems, moduleProblemLists };
 }
 
-/**
- * Main function to load all content (modules, problems, solutions) and their relationships
- */
-export async function loadContent() {
-  // Load all MDX modules
+export async function loadAllModules(): Promise<MdxContent[]> {
   const contentDir = path.join(process.cwd(), "content");
   const moduleFiles = (
     await fs.readdir(contentDir, { recursive: true })
@@ -183,6 +179,15 @@ export async function loadContent() {
     }
   }
 
+  return modules;
+}
+
+/**
+ * Main function to load all content (modules, problems, solutions) and their relationships
+ */
+export async function loadContent() {
+  // Load all MDX modules
+  const modules = await loadAllModules();
   // Load and validate problems
   const { problems: loadedProblems, moduleProblemLists } =
     await loadAllProblems();
@@ -217,15 +222,15 @@ export async function loadCowImages() {
     // Recursively find all image files in the assets directory
     const findImages = async (dir: string, basePath: string = '') => {
       const entries = await fs.readdir(dir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);
         const relativePath = path.join(basePath, entry.name);
-        
+
         if (entry.isDirectory()) {
           await findImages(fullPath, relativePath);
         } else if (
-          entry.isFile() && 
+          entry.isFile() &&
           /cows/i.test(fullPath) && // Check if path contains 'cows' (case insensitive)
           /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
         ) {
