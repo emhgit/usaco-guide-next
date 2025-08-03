@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:load-content": "ts-node scripts/testLoadContent.ts"
+    "test:load-content": "ts-node scripts/testLoadContent.ts",
+    "test:parse-mdx": "ts-node scripts/testParseMdx.ts"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",
