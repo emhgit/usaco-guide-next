@@ -75,23 +75,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
                 remarkFrontmatter,
                 [remarkMdxFrontmatter, { name: 'frontmatter' }],
                 [remarkExtractAST, { mdast }],
-                [rehypeExternalLinks, { target: '_blank', rel: ['nofollow'] }],
                 [remarkToC, { tableOfContents }],
-                rehypeSlug,
-                [
-                    rehypeAutolinkHeadings,
-                    {
-                        linkProperties: {
-                            ariaHidden: 'true',
-                            tabIndex: -1,
-                            className: 'anchor before',
-                        },
-                        content: {
-                            type: 'mdxJsxFlowElement',
-                            name: 'HeaderLink',
-                        },
-                    },
-                ],
             ],
             rehypePlugins: [
                 [
@@ -107,6 +91,22 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
                     },
                 ],
                 customRehypeKatex,
+                rehypeSlug,
+                [rehypeExternalLinks, { target: '_blank', rel: ['nofollow'] }],
+                [
+                    rehypeAutolinkHeadings,
+                    {
+                        linkProperties: {
+                            ariaHidden: 'true',
+                            tabIndex: -1,
+                            className: 'anchor before',
+                        },
+                        content: {
+                            type: 'mdxJsxFlowElement',
+                            name: 'HeaderLink',
+                        },
+                    },
+                ],
             ],
             outputFormat: 'function-body',
         });
