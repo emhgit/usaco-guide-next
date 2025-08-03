@@ -9,7 +9,6 @@ import { UserGroupsProvider } from "../hooks/groups/useUserGroups";
 import { EditorContext } from "../context/EditorContext";
 import { Toaster } from "react-hot-toast";
 import { BlindModeProvider } from "../context/BlindModeContext";
-import Layout from "../components/layout";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
