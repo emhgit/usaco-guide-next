@@ -54,6 +54,12 @@ export interface MdxContent {
 
   mdast?: string;
 
+  fields?: Fields;
+}
+
+export interface Fields {
+  gitAuthorTime?: string;
+
   division?: string;
 }
 

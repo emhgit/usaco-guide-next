@@ -109,6 +109,9 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         javaOc,
         pyOc,
         mdast: mdast.data,
-        division,
+        fields: {
+            division,
+            gitAuthorTime: lastUpdated,
+        },
     };
 }
