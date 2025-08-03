@@ -1,3 +1,6 @@
+import { SectionID } from "../../content/ordering";
+import { ModuleFrequency } from "../models/module";
+
 export interface Heading {
   depth: number;
 
@@ -7,11 +10,11 @@ export interface Heading {
 }
 
 export interface TableOfContents {
-  cpp?: Heading[];
+  cpp: Heading[];
 
-  java?: Heading[];
+  java: Heading[];
 
-  py?: Heading[];
+  py: Heading[];
 }
 
 export interface MdxFrontmatter {
@@ -22,10 +25,10 @@ export interface MdxFrontmatter {
   description?: string;
   prerequisites?: string[];
   redirects?: string[];
-  frequency?: number;
+  frequency?: ModuleFrequency;
   isIncomplete?: boolean;
   lastUpdated?: string;
-  division?: string;
+  division?: SectionID;
 
   // Problem-specific fields
   source?: string;
@@ -44,7 +47,7 @@ export interface MdxContent {
 
   frontmatter: MdxFrontmatter;
 
-  toc?: TableOfContents;
+  toc: TableOfContents;
 
   cppOc: number;
 
@@ -60,7 +63,7 @@ export interface MdxContent {
 export interface Fields {
   gitAuthorTime?: string;
 
-  division?: string;
+  division?: SectionID;
 }
 
 export interface ProblemSolutionInfo {
