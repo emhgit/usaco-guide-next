@@ -53,6 +53,8 @@ export interface MdxContent {
   pyOc?: number;
 
   mdast?: string;
+
+  division?: string;
 }
 
 export interface ProblemSolutionInfo {

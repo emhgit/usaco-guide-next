@@ -15,6 +15,7 @@ import customRehypeKatex from '../mdx-plugins/rehype-math';
 import rehypeSnippets from '../mdx-plugins/rehype-snippets';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
+import { moduleIDToSectionMap } from '../../content/ordering';
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const fileContent = await fs.readFile(filePath, 'utf-8');
@@ -91,6 +92,11 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     // Get last updated timestamp from git
     const lastUpdated = await getLastUpdated(filePath);
 
+    let division: string | undefined;
+    if (filePath.includes('content')) {
+        division = moduleIDToSectionMap[frontmatter.id];
+    }
+
     return {
         body: String(compiledResult),
         fileAbsolutePath: filePath,
@@ -102,5 +108,6 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         javaOc,
         pyOc,
         mdast: mdast.data,
+        division,
     };
 }
