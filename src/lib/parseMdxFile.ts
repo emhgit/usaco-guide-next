@@ -9,10 +9,10 @@ import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
-import rehypeKatex from 'rehype-katex';
 import remarkExtractAST from '../mdx-plugins/extract-mdast';
 import remarkToC from '../mdx-plugins/remark-toc';
 import customRehypeKatex from '../mdx-plugins/rehype-math';
+import rehypeSnippets from '../mdx-plugins/rehype-snippets';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
 
@@ -64,6 +64,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
                 ],
                 customRehypeKatex,
                 rehypeSlug,
+                rehypeSnippets,
                 [rehypeExternalLinks, { target: '_blank', rel: ['nofollow'] }],
                 [
                     rehypeAutolinkHeadings,
