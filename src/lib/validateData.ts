@@ -1,38 +1,59 @@
+import { getProblemURL } from "../models/problem";
 import { MdxContent, ProblemInfo, ModuleProblemLists } from "../types/content";
 
 export function validateProblemConsistency(problems: ProblemInfo[]): void {
-  const uniqueIdMap = new Map<string, ProblemInfo>();
-  const urlMap = new Map<string, string>();
+  // Check to make sure problems with the same unique ID have consistent information, and that there aren't duplicate slugs
+  // Also creates user solution pages for each problem
+  const problemSlugs = new Map<string, string>(); // maps slug to problem unique ID
+  const problemInfo = new Map<string, ProblemInfo>(); // maps unique problem ID to problem info
+  const problemURLToUniqueID = new Map<string, string>(); // maps problem URL to problem unique ID
   const urlsThatCanHaveMultipleUniqueIDs = ["https://cses.fi/107/list/"];
+  const usacoIds: string[] = [];
 
-  for (const problem of problems) {
-    // Validate uniqueId uniqueness
-    if (uniqueIdMap.has(problem.uniqueId)) {
-      throw new Error(`Duplicate problem uniqueId: ${problem.uniqueId}`);
-    }
-    uniqueIdMap.set(problem.uniqueId, problem);
-
-    // Validate URL uniqueness (with exceptions)
-    if (
-      urlMap.has(problem.url) &&
-      urlMap.get(problem.url) !== problem.uniqueId &&
-      !urlsThatCanHaveMultipleUniqueIDs.includes(problem.url)
-    ) {
+  problems.forEach((problem) => {
+    let slug = getProblemURL(problem);
+    if (problemSlugs.has(slug) && problemSlugs[slug] !== problem.uniqueId) {
       throw new Error(
-        `URL ${problem.url} is associated with multiple problems: ` +
-          `${urlMap.get(problem.url)} and ${problem.uniqueId}`
+        `The problems ${problemSlugs[slug]} and ${problem.uniqueId} have the same slugs!`
+      );
+    }
+    if (problemInfo.has(problem.uniqueId)) {
+      const a = problem, b = problemInfo[problem.uniqueId];
+      // Some problems with no corresponding module gets put into extraProblems.json.
+      // If a problem has a module, then it should be removed from extraProblems.json.
+      if (!a.module || !b.module) {
+        throw new Error(
+          `The problem ${problem.uniqueId} is in both extraProblems.json and in another module at the same time. Remove this problem from extraProblems.json.`
+        );
+      }
+      if (a.name !== b.name || a.url !== b.url || a.source !== b.source) {
+        throw new Error(
+          `The problem ${problem.uniqueId} appears in both ${problem.module.frontmatter.id
+          } - ${problem.module.frontmatter.title} and ${problemInfo[problem.uniqueId].module.frontmatter.id
+          } - ${problemInfo[problem.uniqueId].module.frontmatter.title
+          } but has different information! They need to have the same name / url / source.`
+        );
+      }
+    }
+
+    if (problemURLToUniqueID.has(problem.url) && problemURLToUniqueID[problem.url] !== problem.uniqueId &&
+      !urlsThatCanHaveMultipleUniqueIDs.includes(problem.url)) {
+      throw new Error(
+        `The URL ${problem.url} is assigned to both problem unique ID ${problemURLToUniqueID[problem.url]
+        } and ${problem.uniqueId
+        }. Is this correct? (If this is correct, add the URL to \`urlsThatCanHaveMultipleUniqueIDs\` in gatsby-node.ts)`
       );
     }
 
-    urlMap.set(problem.url, problem.uniqueId);
-
-    // Validate inModule consistency
-    if (problem.inModule && !problem.module) {
-      throw new Error(
-        `Problem ${problem.uniqueId} is marked inModule but has no module reference`
-      );
+    // skipping usaco problems to be created with div_to_probs
+    if (problem.uniqueId.startsWith("usaco")) {
+      usacoIds.push(problem.uniqueId);
     }
-  }
+
+    problemSlugs.set(slug, problem.uniqueId);
+    problemInfo.set(problem.uniqueId, problem);
+    problemURLToUniqueID.set(problem.url, problem.uniqueId);
+  });
 }
 
 export function validateModuleProblems(
@@ -63,32 +84,45 @@ export function validateSolutionRelationships(
   solutions: MdxContent[],
   problems: ProblemInfo[]
 ): void {
-  const problemIds = new Set(problems.map((p) => p.uniqueId));
-  const problemIdToSolution = new Map<string, MdxContent>();
+  const problemsWithInternalSolutions = new Set<string>();
+  solutions.forEach((solution) => {
+    try {
+      // we want to find all problems that this solution can be an internal solution for
+      const problemsForThisSolution = problems.filter((p) => p.uniqueId === solution.frontmatter.id);
+      problemsWithInternalSolutions.add(solution.frontmatter.id);
+      if (problemsForThisSolution.length === 0) {
+        throw new Error(
+          `Couldn't find corresponding problem for internal solution with frontmatter ID ${solution.frontmatter.id}. 
+          If this problem is no longer in any module, add it to content/extraProblems.json.`
+        );
+      }
+      // let's also check that every problem has this as its internal solution -- if an internal solution exists, we should always use it
+      const problemsThatAreMissingInternalSolution = problems.filter((p) => p.solution?.kind === 'internal');
+      if (problemsThatAreMissingInternalSolution.length > 0) {
+        problemsThatAreMissingInternalSolution.forEach((problem) => {
+          throw new Error(
+            `Problem ${problem.uniqueId} isn't linked to its corresponding internal solution in module
+             ${problem.module.frontmatter.id} - ${problem.module.frontmatter.title}`
+          );
+        })
+        throw new Error(
+          `Internal solution ${solution.frontmatter.id} isn't linked to all of its problems (see above). Did you forget to update the solution metadata of a module after adding an internal solution?`
+        );
+      }
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  });
 
-  for (const solution of solutions) {
-    const problemId = solution.frontmatter.id;
-    if (!problemId) {
+  let hasProblemMissingInternalSolution = false;
+  const internalProblems = problems.filter(x => x.solution?.kind === 'internal');
+  internalProblems.forEach((problem) => {
+    if (!problemsWithInternalSolutions.has(problem.uniqueId)) {
+      hasProblemMissingInternalSolution = true;
       throw new Error(
-        `Solution at ${solution.fileAbsolutePath} missing problemId in frontmatter`
+        `Problem ${problem.uniqueId} claims to have an internal solution but doesn't`
       );
     }
-
-    if (!problemIds.has(problemId)) {
-      throw new Error(`Solution references non-existent problem: ${problemId}`);
-    }
-    problemIdToSolution.set(problemId, solution);
-  }
-
-  // Check problems that claim to have solutions
-  for (const problem of problems) {
-    if (
-      problem.solution?.kind === "internal" &&
-      !problemIdToSolution.has(problem.uniqueId)
-    ) {
-      throw new Error(
-        `Problem ${problem.uniqueId} claims to have internal solution but none exists`
-      );
-    }
-  }
+  });
 }
