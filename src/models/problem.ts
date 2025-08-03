@@ -127,7 +127,7 @@ export type ProblemInfo = {
   /**
    * In the context of a module, true if the problem is starred. False otherwise.
    */
-  isStarred: boolean;
+  isStarred?: boolean;
   tags: string[];
   solution: ProblemSolutionInfo;
 };
