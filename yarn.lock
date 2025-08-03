@@ -5280,6 +5280,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"child_process@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "child_process@npm:1.0.2"
+  checksum: 10c0/6e45dff224c704dc5c5edc14532e6c0c5c23a7c5f823574349246082d94a29780a68a46155d8a6989ffa986cb12ed0b01fbfc6c713b6655959fabb6b8cd52e4a
+  languageName: node
+  linkType: hard
+
 "chokidar@npm:^3.5.1, chokidar@npm:^3.5.3":
   version: 3.6.0
   resolution: "chokidar@npm:3.6.0"
@@ -13749,6 +13756,7 @@ __metadata:
     "@types/react-calendar-heatmap": "npm:^1"
     "@types/react-dom": "npm:^19"
     "@types/throttle-debounce": "npm:^5"
+    child_process: "npm:^1.0.2"
     classnames: "npm:^2.5.1"
     cssnano: "npm:^7.1.0"
     dayjs: "npm:^1.11.13"
