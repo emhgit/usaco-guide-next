@@ -3801,6 +3801,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/prismjs@npm:^1.26.0":
+  version: 1.26.5
+  resolution: "@types/prismjs@npm:1.26.5"
+  checksum: 10c0/5619cb449e0d8df098c8759d6f47bf8fdd510abf5dbdfa999e55c6a2545efbd1e209cc85a33d8d9f4ff2898089a1a6d9a70737c9baffaae635c46852c40d384a
+  languageName: node
+  linkType: hard
+
 "@types/qs@npm:^6.5.3":
   version: 6.14.0
   resolution: "@types/qs@npm:6.14.0"
@@ -11272,6 +11279,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prism-react-renderer@npm:^2.4.1":
+  version: 2.4.1
+  resolution: "prism-react-renderer@npm:2.4.1"
+  dependencies:
+    "@types/prismjs": "npm:^1.26.0"
+    clsx: "npm:^2.0.0"
+  peerDependencies:
+    react: ">=16.0.0"
+  checksum: 10c0/ebbe8feb975224344bbdd046b3a937d121592dbe4b8f22ba0be31f5af37b9a8219f441138ef6cab1c5b96f2aa6b529015200959f7e5e85b60ca69c81d35edcd4
+  languageName: node
+  linkType: hard
+
 "proc-log@npm:^5.0.0":
   version: 5.0.0
   resolution: "proc-log@npm:5.0.0"
@@ -13747,6 +13766,7 @@ __metadata:
     mdast-util-to-string: "npm:^4.0.0"
     next: "npm:15.4.5"
     postcss: "npm:^8.5.6"
+    prism-react-renderer: "npm:^2.4.1"
     react: "npm:19.1.0"
     react-calendar-heatmap: "npm:^1.10.0"
     react-dom: "npm:19.1.0"

@@ -73,6 +73,7 @@
     "cssnano": "^7.1.0",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "prism-react-renderer": "^2.4.1",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
