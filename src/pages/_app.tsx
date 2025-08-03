@@ -22,9 +22,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <UserGroupsProvider>
                 <BlindModeProvider>
                   <EditorContext.Provider value={{ inEditor: false }}>
-                    <Layout>
                       <Component {...pageProps} />
-                    </Layout>
                   </EditorContext.Provider>
                 </BlindModeProvider>
               </UserGroupsProvider>
