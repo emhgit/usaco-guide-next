@@ -46,11 +46,11 @@ export interface MdxContent {
 
   toc?: TableOfContents;
 
-  cppOc?: number;
+  cppOc: number;
 
-  javaOc?: number;
+  javaOc: number;
 
-  pyOc?: number;
+  pyOc: number;
 
   mdast?: string;
 
