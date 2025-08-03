@@ -10,8 +10,8 @@ import SEO from '../../../components/seo';
 import { ConfettiProvider } from '../../../context/ConfettiContext';
 import { MarkdownProblemListsProvider } from '../../../context/MarkdownProblemListsContext';
 import { useIsUserDataLoaded } from '../../../context/UserDataContext/UserDataContext';
-import { loadAllModules, loadAllProblems, loadContent } from '../../../lib/loadContent';
 import { graphqlToModuleInfo } from '../../../utils/utils';
+import { ModuleProblemList, ModuleProblemLists, ProblemInfo } from '../../../types/content';
 
 interface ModulePageProps {
   moduleData: any; // Replace with your actual module data type
@@ -66,6 +66,7 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Load all modules to generate paths
+  const { loadAllModules } = await import('../../../lib/loadContent');
   const modules = await loadAllModules();
   
   const paths = modules
@@ -84,6 +85,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
+  const { loadAllModules, loadAllProblems } = await import('../../../lib/loadContent');
   const { division, slug } = context.params as { division: string; slug: string };
   
   // Load the specific module data
@@ -101,7 +103,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 
   // Load problem lists - you'll need to implement this in loadContent
-  const moduleProblemLists = await loadProblemListsForModule(slug);
+  const moduleProblemLists = await loadProblemListsForModule(slug, loadAllProblems);
 
   return {
     props: {
@@ -113,7 +115,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 // Helper function to load problem lists (implement this based on your data source)
-async function loadProblemListsForModule(moduleId: string) {
+async function loadProblemListsForModule(moduleId: string, loadAllProblems: () =>Promise<{
+  problems: ProblemInfo[];
+  moduleProblemLists: ModuleProblemLists[];
+}> ) {
   // Implement based on how you fetch problem lists in your system
   // This should return data in the same format as your Gatsby query
   const { moduleProblemLists } = await loadAllProblems();

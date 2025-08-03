@@ -1,6 +1,5 @@
 import { Transition } from '@headlessui/react';
 import { GetStaticProps } from 'next';
-import { loadAllProblems, ProblemInfo } from '../../../../lib/loadContent';
 import React, { Fragment, useEffect } from 'react';
 import { moduleIDToURLMap } from '../../../../../content/ordering';
 import {
@@ -16,6 +15,7 @@ import contestToPoints from './contest_to_points.json';
 import divToProbs from './div_to_probs.json';
 import { DivisionProblemInfo } from './DivisionProblemInfo';
 import idToSol from './id_to_sol.json';
+import { ProblemInfo } from '../../../../types/content';
 
 const startYear = 2016;
 const endYear = 2025; // manually increment this for a new season
@@ -166,6 +166,7 @@ interface DivisionListProps {
 export const getStaticProps: GetStaticProps<DivisionListProps> = async () => {
   try {
     // Load all problems
+    const { loadAllProblems } = await import('../../../../lib/loadContent');
     const { problems: allProblems } = await loadAllProblems();
     
     // Filter problems to only include USACO divisions
