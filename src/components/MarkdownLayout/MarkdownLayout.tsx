@@ -26,7 +26,6 @@ import NavBar from './NavBar';
 import NotSignedInWarning from './NotSignedInWarning';
 import TableOfContentsBlock from './TableOfContents/TableOfContentsBlock';
 import TableOfContentsSidebar from './TableOfContents/TableOfContentsSidebar';
-import { GetStaticProps } from 'next';
 import { MdxContent } from '../../lib/loadContent';
 
 
@@ -63,27 +62,6 @@ const ContentContainer = ({ children, tableOfContents }) => (
     </div>
   </main>
 );
-
-export const getStaticProps: GetStaticProps = async () => {
-  try {
-    const { loadAllModules } = await import('../../lib/loadContent');
-    const modules = await loadAllModules();
-    return {
-      props: {
-        modules,
-      },
-      // Re-generate the page at most once per hour
-      revalidate: 3600,
-    };
-  } catch (error) {
-    console.error('Failed to load modules:', error);
-    return {
-      props: {
-        modules: [],
-      },
-    };
-  }
-};
 
 interface MarkdownLayoutProps {
   modules: MdxContent[];
