@@ -1,0 +1,506 @@
+import * as React from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { SECTION_LABELS } from '../../../content/ordering';
+import MarkdownLayoutContext from '../../context/MarkdownLayoutContext';
+import { useUserLangSetting } from '../../context/UserDataContext/properties/simpleProperties';
+import { useFirebaseUser } from '../../context/UserDataContext/UserDataContext';
+import useContactFormAction from '../../hooks/useContactFormAction';
+import useStickyState from '../../hooks/useStickyState';
+import { ModuleInfo } from '../../models/module';
+import { SolutionInfo } from '../../models/solution';
+import SlideoverForm from './SlideoverForm';
+
+// Warning: this file is insanely messy. This should be rewritten soon :)
+
+const Field = ({
+  label,
+  id,
+  value,
+  onChange,
+  errorMsg = null as string | null,
+}) => {
+  return (
+    <div className="space-y-1">
+      <label
+        htmlFor={id}
+        className="dark:text-dark-high-emphasis block text-sm leading-5 font-medium text-gray-900"
+      >
+        {label}
+      </label>
+      <div className="relative rounded-md shadow-sm">
+        <input
+          type="text"
+          id={id}
+          className={
+            'input' +
+            (errorMsg
+              ? ' border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red-300 dark:border-red-300 dark:text-red-300 dark:focus:border-red-300 dark:focus:ring-red-300'
+              : '')
+          }
+          value={value}
+          onChange={onChange}
+        />
+        {errorMsg && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <svg
+              className="h-5 w-5 text-red-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        )}
+      </div>
+      {errorMsg && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+          {errorMsg}
+        </p>
+      )}
+    </div>
+  );
+};
+
+export function validateEmail(email) {
+  const re =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
+
+export default function ContactUsSlideover({
+  isOpen,
+  onClose,
+  defaultLocation = '',
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultLocation?: string;
+}): JSX.Element {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [location, setLocation] = useState(defaultLocation);
+  const [topic, setTopic] = useStickyState('', 'contact_form_topic');
+  const topics = [
+    ['Mistake', 'typo, broken link, wrong time complexity, wrong code'],
+    ['Unclear Explanation'],
+    ['Website Bug'],
+    ['Suggestion'],
+    ['Request - Missing Section or Solution'],
+    ['Other'],
+  ];
+  const [message, setMessage] = useStickyState('', 'contact_form_message');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [issueLink, setIssueLink] = useState('');
+  const [submitEnabled, setSubmitEnabled] = useState(true);
+  const [showErrors, setShowErrors] = useState(false);
+
+  const markdownContext = useContext(MarkdownLayoutContext);
+  const userLang = useUserLangSetting();
+  const submitForm = useContactFormAction();
+
+  React.useEffect(() => {
+    if (!defaultLocation) {
+      const activeModule = markdownContext?.markdownLayoutInfo;
+      if (activeModule && activeModule instanceof ModuleInfo) {
+        setLocation(
+          `${SECTION_LABELS[activeModule.section]} - ${activeModule.title}`
+        );
+      } else if (activeModule && activeModule instanceof SolutionInfo) {
+        setLocation(`Solution: ${activeModule.title}`);
+      } else setLocation('');
+    }
+  }, [markdownContext?.markdownLayoutInfo]);
+
+  const firebaseUser = useFirebaseUser();
+  useEffect(() => {
+    if (!firebaseUser) return;
+    if (email === '') {
+      setEmail(firebaseUser.email!);
+    }
+    if (name === '') {
+      setName(firebaseUser.displayName!);
+    }
+  }, [firebaseUser]);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setShowSuccess(false);
+      setShowErrors(false);
+      setSubmitEnabled(true);
+    }
+  }, [isOpen]);
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+
+    setShowErrors(true);
+    if (
+      name === '' ||
+      email === '' ||
+      !validateEmail(email) ||
+      topic === '' ||
+      message.length < 10
+    ) {
+      return;
+    }
+    setSubmitEnabled(false);
+    try {
+      const response = await submitForm({
+        name,
+        email,
+        moduleName: location,
+        url: window.location.href,
+        lang: userLang,
+        topic,
+        message,
+      });
+      setTopic('');
+      setMessage('');
+      setShowSuccess(true);
+      setIssueLink(response.data as string);
+    } catch (e: any) {
+      setSubmitEnabled(true);
+      alert('Form submission failed: ' + e.message);
+    } finally {
+      setShowErrors(false);
+    }
+  };
+
+  return (
+    <SlideoverForm
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Contact Us"
+      subtitle={
+        <>
+          Contact us about anything: suggestions, bugs, assistance, and more!
+          This will be submitted as a public{' '}
+          <a
+            href="https://github.com/cpinitiative/usaco-guide/issues"
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Github issue
+          </a>
+          .
+        </>
+      }
+      footerButtons={
+        <>
+          <span className="inline-flex rounded-md shadow-sm">
+            <button type="button" className="btn" onClick={onClose}>
+              Cancel
+            </button>
+          </span>
+          <span className="inline-flex rounded-md shadow-sm">
+            <button
+              type="submit"
+              disabled={!submitEnabled}
+              className={`btn-primary`}
+            >
+              Contact Us
+            </button>
+          </span>
+        </>
+      }
+      onSubmit={handleSubmit}
+    >
+      {/* <div className="bg-gray-50 dark:bg-gray-900 mb-4">
+        <div className="px-4 py-5 sm:p-6">
+          <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-200">
+            Ask on the USACO Forum!
+          </h3>
+          <div className="mt-2 max-w-xl text-sm leading-5 text-gray-500 dark:text-gray-400">
+            <p>
+              Get a faster response by reaching out on the USACO Forum instead.
+            </p>
+          </div>
+          <div className="mt-5">
+            <span className="inline-flex rounded-md shadow-sm">
+              <a
+                href="https://forum.usaco.guide/"
+                target="_blank"
+                rel="noreferrer"
+                className="btn"
+              >
+                Join Forum
+              </a>
+            </span>
+          </div>
+        </div>
+      </div> */}
+      <div className="mt-4 px-4 sm:px-6">
+        {showSuccess && (
+          <div className="rounded-md bg-green-50 p-4 dark:bg-green-800">
+            <div className="flex">
+              <div className="grow-0">
+                <svg
+                  className="h-5 w-5 text-green-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="dark:text-dark-high-emphasis text-sm leading-5 font-medium text-green-800">
+                  Message received!
+                </h3>
+                <div className="dark:text-dark-high-emphasis mt-2 text-sm leading-5 text-green-700">
+                  <p>
+                    Your message has been submitted as an issue in our GitHub
+                    repository. You can track the issue here:{' '}
+                    <a
+                      href={issueLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold hover:underline"
+                    >
+                      {issueLink}
+                    </a>
+                  </p>
+                  {/* <p className="pt-2">
+                    For urgent requests, please feel free to email{' '}
+                    <a
+                      href="mailto:nathan.r.wang@gmail.com"
+                      className="underline text-blue-600"
+                    >
+                      nathan.r.wang@gmail.com
+                    </a>
+                    .
+                  </p> */}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {!showSuccess && (
+          <div className="space-y-6 pb-5">
+            <Field
+              label="Name (will not be shown publicly)"
+              id="contact_name"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              errorMsg={
+                showErrors && name === '' ? 'This field is required.' : null
+              }
+            />
+            <Field
+              label="Email (will not be shown publicly)"
+              id="contact_email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              errorMsg={
+                showErrors
+                  ? email === ''
+                    ? 'This field is required.'
+                    : !validateEmail(email)
+                      ? 'Please enter a valid email address.'
+                      : null
+                  : null
+              }
+            />
+            <Field
+              label="Module or Solution (if applicable)"
+              id="contact_module"
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+            />
+            <fieldset className="space-y-2">
+              <legend className="dark:text-dark-high-emphasis text-sm leading-5 font-medium text-gray-900">
+                Topic
+              </legend>
+              <div className="text-sm">
+                The USACO Guide is not affiliated with the USACO. If you
+                encounter any issues with{' '}
+                <a
+                  className="text-blue-600 hover:underline dark:text-blue-300"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="http://usaco.org"
+                >
+                  usaco.org
+                </a>{' '}
+                (e.g., trouble{' '}
+                <a
+                  className="text-blue-600 hover:underline dark:text-blue-300"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="https://github.com/cpinitiative/usaco-guide/issues/2854"
+                >
+                  registering for an account
+                </a>
+                ), contact the USACO contest director (
+                <a
+                  className="text-blue-600 hover:underline dark:text-blue-300"
+                  target="_blank"
+                  rel="noreferrer"
+                  href="mailto:bcdean@clemson.edu"
+                >
+                  Brian Dean
+                </a>
+                ) rather than submitting this form.
+              </div>
+              <div className="text-sm">
+                <strong>
+                  If you have any questions about{' '}
+                  <a
+                    className="text-blue-600 hover:underline dark:text-blue-300"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="https://joincpi.org/classes"
+                  >
+                    CPI classes
+                  </a>
+                  , please email{' '}
+                  <a
+                    className="text-blue-600 hover:underline dark:text-blue-300"
+                    target="_blank"
+                    rel="noreferrer"
+                    href="mailto:classes@joincpi.org"
+                  >
+                    classes@joincpi.org
+                  </a>{' '}
+                  rather than submitting this form.
+                </strong>
+              </div>
+              <div className="space-y-3">
+                {topics.map((t, idx) => (
+                  <div key={idx}>
+                    <div className="relative flex items-start">
+                      <div className="absolute flex h-5 items-center">
+                        <input
+                          id={`contact_topic_${idx}`}
+                          type="radio"
+                          name="type"
+                          className="form-radio dark:focus:ring-offset-dark-surface h-4 w-4 text-blue-600 dark:bg-gray-600"
+                          checked={topic === t[0]}
+                          onChange={() => setTopic(t[0])}
+                        />
+                      </div>
+                      <div className="pl-7 text-sm leading-5">
+                        <label
+                          htmlFor={`contact_topic_${idx}`}
+                          className="dark:text-dark-high-emphasis font-medium text-gray-900"
+                        >
+                          {t[0]} {t.length > 1 ? `(e.g., ${t[1]})` : ''}
+                        </label>
+                        {topic === t[0] && t[0].includes('Mistake') && (
+                          <div>
+                            Submitting a pull request{' '}
+                            <a
+                              className="text-blue-600 hover:underline dark:text-blue-300"
+                              target="_blank"
+                              rel="noreferrer"
+                              href="https://github.com/cpinitiative/usaco-guide/pulls"
+                            >
+                              here
+                            </a>{' '}
+                            is the preferred way to fix a mistake. See{' '}
+                            <a
+                              className="text-blue-600 hover:underline dark:text-blue-300"
+                              target="_blank"
+                              rel="noreferrer"
+                              href="/general/contributing"
+                            >
+                              this module
+                            </a>{' '}
+                            for how to contribute.
+                          </div>
+                        )}
+                        {topic === t[0] && t[0].startsWith('Unclear') && (
+                          <div>
+                            You may get a faster response by reaching out on the{' '}
+                            <a
+                              className="text-blue-600 hover:underline dark:text-blue-300"
+                              href="https://forum.usaco.guide/"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              USACO Guide forum
+                            </a>{' '}
+                            instead.
+                          </div>
+                        )}
+                        {topic === t[0] && t[0].includes('Website Bug') && (
+                          <div>
+                            If you are reporting a loss of user data, please
+                            include the information listed{' '}
+                            <a
+                              className="text-blue-600 hover:underline dark:text-blue-300"
+                              href="https://github.com/cpinitiative/usaco-guide/issues/3396#issuecomment-1414102550"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              here.
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {showErrors && topic === '' && (
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                    This field is required.
+                  </p>
+                )}
+              </div>
+            </fieldset>
+            <div className="space-y-1">
+              <label
+                htmlFor="contact_message"
+                className="dark:text-dark-high-emphasis block text-sm leading-5 font-medium text-gray-900"
+              >
+                Message (markdown is supported)
+              </label>
+              <div className="relative rounded-md shadow-sm">
+                <textarea
+                  id="contact_message"
+                  rows={4}
+                  className={
+                    'textarea ' +
+                    (showErrors && message.length < 10
+                      ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red-300 dark:border-red-300 dark:text-red-300 dark:focus:border-red-300 dark:focus:ring-red-300'
+                      : '')
+                  }
+                  value={message}
+                  onChange={e => setMessage(e.target.value)}
+                />
+                {showErrors && message.length < 10 && (
+                  <div className="pointer-events-none absolute top-0 right-0 flex items-center pt-2 pr-3">
+                    <svg
+                      className="h-5 w-5 text-red-500"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              {showErrors && message.length < 10 && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                  Message must be at least 10 chars.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </SlideoverForm>
+  );
+}
