@@ -15,7 +15,7 @@ import customRehypeKatex from '../mdx-plugins/rehype-math';
 import rehypeSnippets from '../mdx-plugins/rehype-snippets';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
-import { moduleIDToSectionMap } from '../../content/ordering';
+import { moduleIDToSectionMap, SectionID } from '../../content/ordering';
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const fileContent = await fs.readFile(filePath, 'utf-8');
@@ -108,9 +108,10 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         cppOc,
         javaOc,
         pyOc,
+        toc: tableOfContents,
         mdast: mdast.data,
         fields: {
-            division,
+            division: division as SectionID,
             gitAuthorTime: lastUpdated,
         },
     };
