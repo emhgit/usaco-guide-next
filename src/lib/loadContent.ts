@@ -16,6 +16,7 @@ import * as freshOrdering from '../../content/ordering';
 import { moduleIDToSectionMap } from "../../content/ordering";
 import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../models/problem";
 
+
 /**
  * Loads all problem solutions from the solutions directory
  */
@@ -199,6 +200,53 @@ export async function loadContent() {
     moduleProblemLists,
     solutions,
   };
+}
+
+/**
+ * Loads and processes cow images from the assets directory
+ * @returns Array of objects containing image data
+ */
+export async function loadCowImages() {
+  const assetsDir = path.join(process.cwd(), 'src', 'assets');
+  const cowImages: Array<{
+    name: string;
+    src: string;
+  }> = [];
+
+  try {
+    // Recursively find all image files in the assets directory
+    const findImages = async (dir: string, basePath: string = '') => {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relativePath = path.join(basePath, entry.name);
+        
+        if (entry.isDirectory()) {
+          await findImages(fullPath, relativePath);
+        } else if (
+          entry.isFile() && 
+          /cows/i.test(fullPath) && // Check if path contains 'cows' (case insensitive)
+          /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
+        ) {
+          cowImages.push({
+            name: path.parse(entry.name).name,
+            src: `/${path.relative(process.cwd(), fullPath).replace(/\\/g, '/')}`,
+          });
+        }
+      }
+    };
+
+    await findImages(assetsDir);
+
+    // Sort images by name
+    cowImages.sort((a, b) => a.name.localeCompare(b.name));
+
+    return cowImages;
+  } catch (error) {
+    console.error('Error loading cow images:', error);
+    return [];
+  }
 }
 
 export type { MdxContent, ProblemInfo } from "../types/content";
