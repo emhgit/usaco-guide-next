@@ -11,6 +11,7 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
 import remarkExtractAST from '../mdx-plugins/extract-mdast';
+import remarkToC from '../mdx-plugins/remark-toc';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
 
@@ -28,7 +29,7 @@ const customRehypeKatex = () => {
     };
 };
 
-// Custom plugin for table of contents
+/* Custom plugin for table of contents
 const remarkToC = (options: { tableOfContents: any }) => {
     return (tree: any) => {
         if (options) {
@@ -36,7 +37,7 @@ const remarkToC = (options: { tableOfContents: any }) => {
             // Implementation for TOC generation would go here
         }
     };
-};
+};*/
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const fileContent = await fs.readFile(filePath, 'utf-8');

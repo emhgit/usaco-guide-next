@@ -1,21 +1,20 @@
 /*eslint-disable */
 
 const mdastToStringWithKatex = require('./mdast-to-string');
-const mdastToString = require('mdast-util-to-string');
-const Slugger = require('github-slugger');
+const GithubSlugger = require('github-slugger').default;
 
 module.exports = ({ tableOfContents }) => {
   tableOfContents['cpp'] = [];
   tableOfContents['java'] = [];
   tableOfContents['py'] = [];
-  const slugger = new Slugger();
+  const slugger = new GithubSlugger();
 
   function process(node, curLang = null) {
     if (node.type === 'heading') {
       const val = {
         depth: node.depth,
         value: mdastToStringWithKatex(node),
-        slug: slugger.slug(mdastToString(node), false),
+        slug: slugger.slug(mdastToStringWithKatex(node), false),
       };
       if (curLang !== null) {
         tableOfContents[curLang].push(val);
