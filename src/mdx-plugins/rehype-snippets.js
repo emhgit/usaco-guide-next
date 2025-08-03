@@ -1,8 +1,7 @@
 /*eslint-disable */
 'use strict';
 
-const { visit } = require('unist-util-visit');
-const nodeToString = require('hast-util-to-string');
+import { visit } from 'unist-util-visit';
 
 const replacements = {
   'Benq Template': `//BeginCodeSnip{Benq Template}
