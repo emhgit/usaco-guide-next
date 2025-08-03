@@ -19,7 +19,7 @@ import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../m
 /**
  * Loads all problem solutions from the solutions directory
  */
-async function loadAllSolutions(): Promise<MdxContent[]> {
+export async function loadAllSolutions(): Promise<MdxContent[]> {
   const solutionsDir = path.join(process.cwd(), "solutions");
   try {
     const solutionFiles = await fs.readdir(solutionsDir, { recursive: true });
@@ -50,7 +50,7 @@ async function loadAllSolutions(): Promise<MdxContent[]> {
 /**
  * Loads all problems from JSON files matching *.problems.json or extraProblems.json
  */
-async function loadAllProblems(): Promise<{
+export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
