@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useLastVisitInfo } from '../../context/UserDataContext/properties/lastVisit';
-import { Image } from '../../../mdx-components';
+import { Image } from '../../components/markdown/HTMLComponents';
 import { GetStaticProps } from 'next';
 
 // note: cows will be unlocked in lexicographical order

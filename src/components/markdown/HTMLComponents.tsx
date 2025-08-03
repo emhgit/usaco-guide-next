@@ -1,9 +1,40 @@
 import * as React from 'react';
 import { useDarkMode } from '../../context/DarkModeContext';
 import CodeBlock from './CodeBlock/CodeBlock';
-
+import ImageBase from 'next/image';
 // Note: try to avoid adding inline styles here; rather, use css selectors to target them.
 // Otherwise it's really hard to override some of these styles
+
+export const Image = (props: {
+  src: string;
+  alt: string;
+  title?: string;
+  style?: React.CSSProperties;
+}) => {
+  if (!props.src) return null;
+  
+  // Handle external images
+  if (props.src.startsWith('http')) {
+    return <img src={props.src} alt={props.alt} title={props.title} className="max-w-full h-auto" style={props.style} />;
+  }
+  
+  // Handle local images with Next.js Image
+  return (
+    <ImageBase
+      src={props.src}
+      alt={props.alt}
+      title={props.title}
+      fill
+      className="object-cover"
+      style={props.style}
+      sizes="(max-width: 768px) 100vw, 768px"
+      placeholder="blur"
+      blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+        `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/>`
+      ).toString('base64')}`}
+    />
+  );
+};
 
 export const OffsetAnchor = ({ id, ...props }): JSX.Element => (
   <span
@@ -107,6 +138,11 @@ const HTMLComponents = {
   pre,
   a,
   HeaderLink,
+  img: ({ src, alt, title }) => (
+      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+        <Image src={src || ''} alt={alt || ''} title={title} />
+      </div>
+    ),
 };
 
 export default HTMLComponents;
