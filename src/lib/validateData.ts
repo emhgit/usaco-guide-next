@@ -12,13 +12,13 @@ export function validateProblemConsistency(problems: ProblemInfo[]): void {
 
   problems.forEach((problem) => {
     let slug = getProblemURL(problem);
-    if (problemSlugs.has(slug) && problemSlugs[slug] !== problem.uniqueId) {
+    if (problemSlugs.has(slug) && problemSlugs.get(slug) !== problem.uniqueId) {
       throw new Error(
-        `The problems ${problemSlugs[slug]} and ${problem.uniqueId} have the same slugs!`
+        `The problems ${problemSlugs.get(slug)} and ${problem.uniqueId} have the same slugs!`
       );
     }
     if (problemInfo.has(problem.uniqueId)) {
-      const a = problem, b = problemInfo[problem.uniqueId];
+      const a = problem, b = problemInfo.get(problem.uniqueId);
       // Some problems with no corresponding module gets put into extraProblems.json.
       // If a problem has a module, then it should be removed from extraProblems.json.
       if (!a.module || !b.module) {
@@ -29,17 +29,17 @@ export function validateProblemConsistency(problems: ProblemInfo[]): void {
       if (a.name !== b.name || a.url !== b.url || a.source !== b.source) {
         throw new Error(
           `The problem ${problem.uniqueId} appears in both ${problem.module.frontmatter.id
-          } - ${problem.module.frontmatter.title} and ${problemInfo[problem.uniqueId].module.frontmatter.id
-          } - ${problemInfo[problem.uniqueId].module.frontmatter.title
+          } - ${problem.module.frontmatter.title} and ${problemInfo.get(problem.uniqueId).module.frontmatter.id
+          } - ${problemInfo.get(problem.uniqueId).module.frontmatter.title
           } but has different information! They need to have the same name / url / source.`
         );
       }
     }
 
-    if (problemURLToUniqueID.has(problem.url) && problemURLToUniqueID[problem.url] !== problem.uniqueId &&
+    if (problemURLToUniqueID.has(problem.url) && problemURLToUniqueID.get(problem.url) !== problem.uniqueId &&
       !urlsThatCanHaveMultipleUniqueIDs.includes(problem.url)) {
       throw new Error(
-        `The URL ${problem.url} is assigned to both problem unique ID ${problemURLToUniqueID[problem.url]
+        `The URL ${problem.url} is assigned to both problem unique ID ${problemURLToUniqueID.get(problem.url)
         } and ${problem.uniqueId
         }. Is this correct? (If this is correct, add the URL to \`urlsThatCanHaveMultipleUniqueIDs\` in gatsby-node.ts)`
       );
@@ -115,11 +115,11 @@ export function validateSolutionRelationships(
     }
   });
 
-  let hasProblemMissingInternalSolution = false;
+  // let hasProblemMissingInternalSolution = false;
   const internalProblems = problems.filter(x => x.solution?.kind === 'internal');
   internalProblems.forEach((problem) => {
     if (!problemsWithInternalSolutions.has(problem.uniqueId)) {
-      hasProblemMissingInternalSolution = true;
+      // hasProblemMissingInternalSolution = true;
       throw new Error(
         `Problem ${problem.uniqueId} claims to have an internal solution but doesn't`
       );
