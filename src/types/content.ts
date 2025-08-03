@@ -51,6 +51,8 @@ export interface MdxContent {
   javaOc?: number;
 
   pyOc?: number;
+
+  mdast?: string;
 }
 
 export interface ProblemSolutionInfo {

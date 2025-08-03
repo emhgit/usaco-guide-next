@@ -10,6 +10,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
 import rehypeKatex from 'rehype-katex';
+import remarkExtractAST from '../mdx-plugins/extract-mdast';
 import { MdxContent } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
 
@@ -27,13 +28,6 @@ const customRehypeKatex = () => {
     };
 };
 
-// Custom plugin to extract AST for analysis
-const remarkExtractAST = (options: { mdast: any }) => {
-    return (tree: any) => {
-        if (options) options.mdast = tree;
-    };
-};
-
 // Custom plugin for table of contents
 const remarkToC = (options: { tableOfContents: any }) => {
     return (tree: any) => {
@@ -47,7 +41,7 @@ const remarkToC = (options: { tableOfContents: any }) => {
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const fileContent = await fs.readFile(filePath, 'utf-8');
     const { content, data: frontmatter } = matter(fileContent);
-    const mdast: any = {};
+    const mdast: any = { data: null };
     const tableOfContents: any = {};
 
     // Count language section occurrences
@@ -128,5 +122,6 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         cppOc,
         javaOc,
         pyOc,
+        mdast: mdast.data,
     };
 }
