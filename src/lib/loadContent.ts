@@ -84,7 +84,7 @@ async function loadAllProblems(): Promise<{
       }
 
       const moduleId = parsedContent["MODULE_ID"];
-      if (!moduleId) {
+      if (!moduleId && !isExtraProblems) {
         throw new Error(
           `MODULE_ID not found in problem JSON file: ${filePath}`
         );
@@ -103,7 +103,11 @@ async function loadAllProblems(): Promise<{
             checkInvalidUsacoMetadata(metadata);
             // if (process.env.CI) stream.write(metadata.uniqueId + "\n");
             const problemInfo = getProblemInfo(metadata);
-            problems.push(problemInfo);
+            problems.push({
+              ...problemInfo,
+              module: moduleId,
+              inModule: true,
+            });
           });
         } catch (e) {
           console.error(
