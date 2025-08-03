@@ -50,16 +50,9 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
   return (
     <Layout setLastViewedModule={moduleInfo.id}>
       <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
-      
-      <ConfettiProvider>
-        <MarkdownProblemListsProvider value={moduleProblemLists || []}>
-          <MarkdownLayout markdownData={moduleInfo} modules={modules}>
-            <div className="py-4">
-              <Markdown body={moduleData.body} />
-            </div>
-          </MarkdownLayout>
-        </MarkdownProblemListsProvider>
-      </ConfettiProvider>
+      <div className="py-4">
+        <Markdown body={moduleData.body} />
+      </div>
     </Layout>
   );
 }
