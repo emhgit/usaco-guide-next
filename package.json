@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check-ts-errors": "tsc --noEmit",
     "test:load-content": "ts-node src/lib/__tests__/testLoadContent.ts",
     "test:parse-mdx": "ts-node src/lib/__tests__/testParseMdx.ts",
     "test:load-problems": "ts-node src/lib/__tests__/testLoadProblems.ts"
@@ -36,6 +37,7 @@
     "postcss": "^8.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-hot-toast": "^2.5.2",
     "react-select": "^5.10.2",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-external-links": "^3.0.0",
