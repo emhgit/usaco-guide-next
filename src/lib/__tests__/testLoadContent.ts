@@ -1,6 +1,5 @@
-import { loadContent } from '../src/lib/loadContent';
+import { loadContent } from '../loadContent';
 
-// set `module: commonjs` and `moduleResolution: Node` in in `tsconfig.json`
 async function testLoadContent() {
     try {
         console.log('Starting to load content...');

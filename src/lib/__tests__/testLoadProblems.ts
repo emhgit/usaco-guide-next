@@ -1,18 +1,19 @@
-import path from 'path';
-import { loadAllProblems } from '../src/lib/loadContent';
+import { loadAllProblems } from '../loadContent';
 
-// set `module: commonjs` and `moduleResolution: Node` in in `tsconfig.json`
 async function test() {
     try {
         console.log('Starting to load problems...');
         const startTime = Date.now();
-        const problems = await loadAllProblems();
+        const { problems, moduleProblemLists } = await loadAllProblems();
         const endTime = Date.now();
 
         console.log(`Took ${(endTime - startTime) / 1000} seconds`);
 
-        problems.problems.slice(0, 3).forEach((problem, i) => {
+        problems.slice(0, 3).forEach((problem, i) => {
             console.log(JSON.stringify(problem, null, 2));
+        });
+        moduleProblemLists.slice(0, 3).forEach((moduleProblemList, i) => {
+            console.log(JSON.stringify(moduleProblemList, null, 2));
         });
     } catch (error) {
         console.error('Error loading problems:');

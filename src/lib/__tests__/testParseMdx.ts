@@ -1,5 +1,5 @@
 import path from 'path';
-import { parseMdxFile } from '../src/lib/parseMdxFile';
+import { parseMdxFile } from '../parseMdxFile';
 
 // set `module: commonjs` and `moduleResolution: Node` in in `tsconfig.json`
 async function test() {
