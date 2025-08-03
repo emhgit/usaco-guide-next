@@ -97,7 +97,7 @@ export function validateSolutionRelationships(
         );
       }
       // let's also check that every problem has this as its internal solution -- if an internal solution exists, we should always use it
-      const problemsThatAreMissingInternalSolution = problems.filter((p) => p.solution?.kind === 'internal');
+      const problemsThatAreMissingInternalSolution = problemsForThisSolution.filter((p) => p.solution?.kind !== 'internal');
       if (problemsThatAreMissingInternalSolution.length > 0) {
         problemsThatAreMissingInternalSolution.forEach((problem) => {
           throw new Error(
