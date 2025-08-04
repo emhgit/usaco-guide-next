@@ -1,6 +1,6 @@
-import { execSync } from 'child_process';
 
-export function getLastUpdated(filepath: string): string | null {
+export async function getLastUpdated(filepath: string): Promise<string | null> {
+    const { execSync } = await import('child_process');
     try {
         const result = execSync(`git log -1 --format=%ct "${filepath}"`, {
             encoding: 'utf-8',

@@ -1,6 +1,4 @@
 import path from "path";
-import fs from "fs/promises";
-import { parseMdxFile } from "./parseMdxFile";
 // import { linkProblemsToModules } from "./buildRelationships";
 import {
   validateProblemConsistency,
@@ -21,9 +19,11 @@ import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../m
  * Loads all problem solutions from the solutions directory
  */
 export async function loadAllSolutions(): Promise<MdxContent[]> {
+  const { parseMdxFile } = await import('./parseMdxFile');
+  const { readdir } = await import('fs/promises');
   const solutionsDir = path.join(process.cwd(), "solutions");
   try {
-    const solutionFiles = await fs.readdir(solutionsDir, { recursive: true });
+    const solutionFiles = await readdir(solutionsDir, { recursive: true });
     const solutions: MdxContent[] = [];
 
     for (const file of solutionFiles) {
@@ -55,8 +55,9 @@ export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
+  const { readdir, readFile } = await import('fs/promises');
   const contentDir = path.join(process.cwd(), "content");
-  const allFiles = await fs.readdir(contentDir, { recursive: true });
+  const allFiles = await readdir(contentDir, { recursive: true });
 
   const problems: ProblemInfo[] = [];
   const moduleProblemLists: ModuleProblemLists[] = [];
@@ -74,7 +75,7 @@ export async function loadAllProblems(): Promise<{
     const isExtraProblems = fileName === "extraProblems.json";
 
     try {
-      const content = await fs.readFile(filePath, "utf-8");
+      const content = await readFile(filePath, "utf-8");
       let parsedContent;
 
       try {
@@ -145,9 +146,11 @@ export async function loadAllProblems(): Promise<{
 }
 
 export async function loadAllModules(): Promise<MdxContent[]> {
+  const { parseMdxFile } = await import('./parseMdxFile');
+  const { readdir } = await import('fs/promises');
   const contentDir = path.join(process.cwd(), "content");
   const moduleFiles = (
-    await fs.readdir(contentDir, { recursive: true })
+    await readdir(contentDir, { recursive: true })
   ).filter((file: string) => typeof file === "string" && file.endsWith(".mdx"));
 
   const modules: MdxContent[] = [];
@@ -212,6 +215,7 @@ export async function loadContent() {
  * @returns Array of objects containing image data
  */
 export async function loadCowImages() {
+  const { readdir } = await import('fs/promises');
   const assetsDir = path.join(process.cwd(), 'src', 'assets');
   const cowImages: Array<{
     name: string;
@@ -221,7 +225,7 @@ export async function loadCowImages() {
   try {
     // Recursively find all image files in the assets directory
     const findImages = async (dir: string, basePath: string = '') => {
-      const entries = await fs.readdir(dir, { withFileTypes: true });
+      const entries = await readdir(dir, { withFileTypes: true });
 
       for (const entry of entries) {
         const fullPath = path.join(dir, entry.name);

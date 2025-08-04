@@ -1,4 +1,3 @@
-import fs from 'fs/promises';
 import matter from 'gray-matter';
 import { compile } from '@mdx-js/mdx';
 import remarkGfm from 'remark-gfm';
@@ -18,7 +17,8 @@ import { getLastUpdated } from './getGitAuthorTimestamp';
 import { moduleIDToSectionMap, SectionID } from '../../content/ordering';
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
-    const fileContent = await fs.readFile(filePath, 'utf-8');
+    const { readFile } = await import('fs/promises');
+    const fileContent = await readFile(filePath, 'utf-8');
     const { content, data: frontmatter } = matter(fileContent);
     const mdast: any = { data: null };
     const tableOfContents: any = {};
