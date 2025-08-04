@@ -17,6 +17,6 @@
     "incremental": true,
     "outDir": "./dist", // Output directory for compiled files
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.d.ts"],
   "exclude": ["node_modules"]
 }
