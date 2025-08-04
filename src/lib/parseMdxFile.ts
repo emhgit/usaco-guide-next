@@ -12,7 +12,7 @@ import remarkExtractAST from '../mdx-plugins/extract-mdast';
 import remarkToC from '../mdx-plugins/remark-toc';
 import customRehypeKatex from '../mdx-plugins/rehype-math';
 import rehypeSnippets from '../mdx-plugins/rehype-snippets';
-import { MdxContent } from '../types/content';
+import { MdxContent, MdxFrontmatter } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
 import { moduleIDToSectionMap, SectionID } from '../../content/ordering';
 
@@ -101,10 +101,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     return {
         body: String(compiledResult),
         fileAbsolutePath: filePath,
-        frontmatter: {
-            ...frontmatter,
-            lastUpdated,
-        } as MdxContent['frontmatter'],
+        frontmatter: frontmatter as MdxFrontmatter,
         cppOc,
         javaOc,
         pyOc,
