@@ -1,9 +1,9 @@
 /*eslint-disable */
 
-const mdastToStringWithKatex = require('./mdast-to-string');
-const GithubSlugger = require('github-slugger').default;
+import mdastToStringWithKatex from './mdast-to-string.js';
+import GithubSlugger from 'github-slugger';
 
-module.exports = ({ tableOfContents }) => {
+export default ({ tableOfContents }) => {
   tableOfContents['cpp'] = [];
   tableOfContents['java'] = [];
   tableOfContents['py'] = [];
