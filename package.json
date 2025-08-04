@@ -10,7 +10,7 @@
     "clean": "rm -rf dist .next",
     "check-ts-errors": "tsc --noEmit",
     "test:load-content": "ts-node src/lib/__tests__/testLoadContent.ts",
-    "test:parse-mdx": "ts-node src/lib/__tests__/testParseMdx.ts",
+    "test:parse-mdx": "tsc && node dist/src/lib/__tests__/testParseMdx.js",
     "test:load-problems": "ts-node src/lib/__tests__/testLoadProblems.ts"
   },
   "dependencies": {
