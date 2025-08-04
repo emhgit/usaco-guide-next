@@ -1,7 +1,7 @@
 /*eslint-disable */
 'use strict';
 
-const { visit } = require('unist-util-visit');
+const visit = require('unist-util-visit');
 const nodeToString = require('hast-util-to-string');
 
 const replacements = {
