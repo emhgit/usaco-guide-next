@@ -1,1 +1,0 @@
-Inside `tsconfig.json`, set `module: commonjs` and `moduleResolution: Node` to allow `ts-node` to work.

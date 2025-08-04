@@ -14,11 +14,16 @@ import * as freshOrdering from '../../content/ordering';
 import { moduleIDToSectionMap } from "../../content/ordering";
 import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../models/problem";
 
-
+let cachedModules: MdxContent[] | null = null;
+let cachedProblems: ProblemInfo[] | null = null;
+let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
+let cachedSolutions: MdxContent[] | null = null;
+let cachedCowImages: Array<{ name: string; src: string }> | null = null;
 /**
  * Loads all problem solutions from the solutions directory
  */
 export async function loadAllSolutions(): Promise<MdxContent[]> {
+  if (cachedSolutions) return cachedSolutions;
   const { parseMdxFile } = await import('./parseMdxFile');
   const { readdir } = await import('fs/promises');
   const solutionsDir = path.join(process.cwd(), "solutions");
@@ -37,7 +42,7 @@ export async function loadAllSolutions(): Promise<MdxContent[]> {
         console.error(`Error loading solution ${file}:`, error);
       }
     }
-
+    cachedSolutions = solutions;
     return solutions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -55,6 +60,7 @@ export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
+  if (cachedProblems && cachedModuleProblemLists) return { problems: cachedProblems, moduleProblemLists: cachedModuleProblemLists };
   const { readdir, readFile } = await import('fs/promises');
   const contentDir = path.join(process.cwd(), "content");
   const allFiles = await readdir(contentDir, { recursive: true });
@@ -142,10 +148,13 @@ export async function loadAllProblems(): Promise<{
     }
   }
 
+  cachedProblems = problems;
+  cachedModuleProblemLists = moduleProblemLists;
   return { problems, moduleProblemLists };
 }
 
 export async function loadAllModules(): Promise<MdxContent[]> {
+  if (cachedModules) return cachedModules;
   const { parseMdxFile } = await import('./parseMdxFile');
   const { readdir } = await import('fs/promises');
   const contentDir = path.join(process.cwd(), "content");
@@ -182,6 +191,7 @@ export async function loadAllModules(): Promise<MdxContent[]> {
     }
   }
 
+  cachedModules = modules;
   return modules;
 }
 
@@ -189,6 +199,14 @@ export async function loadAllModules(): Promise<MdxContent[]> {
  * Main function to load all content (modules, problems, solutions) and their relationships
  */
 export async function loadContent() {
+  if (cachedModules && cachedProblems && cachedModuleProblemLists && cachedSolutions) {
+    return {
+      modules: cachedModules,
+      problems: cachedProblems,
+      moduleProblemLists: cachedModuleProblemLists,
+      solutions: cachedSolutions,
+    };
+  }
   // Load all MDX modules
   const modules = await loadAllModules();
   // Load and validate problems
@@ -215,6 +233,7 @@ export async function loadContent() {
  * @returns Array of objects containing image data
  */
 export async function loadCowImages() {
+  if (cachedCowImages) return cachedCowImages;
   const { readdir } = await import('fs/promises');
   const assetsDir = path.join(process.cwd(), 'src', 'assets');
   const cowImages: Array<{
@@ -251,6 +270,7 @@ export async function loadCowImages() {
     // Sort images by name
     cowImages.sort((a, b) => a.name.localeCompare(b.name));
 
+    cachedCowImages = cowImages;
     return cowImages;
   } catch (error) {
     console.error('Error loading cow images:', error);
