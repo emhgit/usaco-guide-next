@@ -12,7 +12,8 @@
     "check-ts-errors": "tsc --noEmit",
     "test:load-content": "tsx src/lib/__tests__/testLoadContent.ts",
     "test:parse-mdx": "tsx src/lib/__tests__/testParseMdx.ts",
-    "test:load-problems": "tsx src/lib/__tests__/testLoadProblems.ts"
+    "test:load-problems": "tsx src/lib/__tests__/testLoadProblems.ts",
+    "test:load-all-module-frontmatter": "tsx src/lib/__tests__/testLoadAllModuleFrontmatter.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.7",

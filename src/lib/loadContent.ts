@@ -19,6 +19,7 @@ let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: MdxContent[] | null = null;
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
+let cachedModuleFrontmatter: { division: string; id: string }[] | null = null;
 /**
  * Loads all problem solutions from the solutions directory
  */
@@ -278,4 +279,43 @@ export async function loadCowImages() {
   }
 }
 
+export async function loadAllModuleFrontmatter(): Promise<
+  { division: string; id: string }[]
+> {
+  if (cachedModuleFrontmatter) return cachedModuleFrontmatter;
+  const { readdir, readFile } = await import('fs/promises');
+  const matter = (await import('gray-matter')).default;
+  const contentDir = path.join(process.cwd(), "content");
+  const moduleFiles = (
+    await readdir(contentDir, { recursive: true })
+  ).filter((file: string) => typeof file === "string" && file.endsWith(".mdx"));
+
+  const frontmatter: { division: string; id: string }[] = [];
+
+  for (const file of moduleFiles) {
+    const filePath = path.join(contentDir, file);
+    try {
+      const fileContent = await readFile(filePath, 'utf-8');
+      const { data } = matter(fileContent);
+
+      if (!(data.id in moduleIDToSectionMap)) {
+        throw new Error(
+          `Module ID does not show up in moduleIDToSectionMap: ${data.id}, path: ${filePath}`
+        );
+      }
+
+      const division = moduleIDToSectionMap[data.id];
+
+      frontmatter.push({
+        division: division ?? "",
+        id: data.id,
+      });
+    } catch (error) {
+      console.error(`Error loading module ${file}:`, error);
+    }
+  }
+
+  cachedModuleFrontmatter = frontmatter;
+  return frontmatter;
+}
 export type { MdxContent, ProblemInfo } from "../types/content";
