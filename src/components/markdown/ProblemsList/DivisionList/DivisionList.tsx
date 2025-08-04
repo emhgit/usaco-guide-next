@@ -1,6 +1,5 @@
 import { Transition } from '@headlessui/react';
-import { GetStaticProps } from 'next';
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { moduleIDToURLMap } from '../../../../../content/ordering';
 import {
   useDivisionTableQuery,
@@ -159,40 +158,39 @@ const DivisionButton = ({
   );
 };
 
-interface DivisionListProps {
-  problems: ProblemInfo[];
-}
+// No props needed anymore as we fetch data directly in the component
 
-export const getStaticProps: GetStaticProps<DivisionListProps> = async () => {
-  try {
-    // Load all problems
-    const { loadAllProblems } = await import('../../../../lib/loadContent');
-    const { problems: allProblems } = await loadAllProblems();
-    
-    // Filter problems to only include USACO divisions
-    const filteredProblems = allProblems.filter(problem => 
-      problem.source && ['Bronze', 'Silver', 'Gold', 'Platinum'].includes(problem.source)
-    );
-
-    return {
-      props: {
-        problems: JSON.parse(JSON.stringify(filteredProblems)) // Ensure serialization
-      },
-      // Revalidate at most once per hour
-      revalidate: 3600,
+export default function DivisionList(): JSX.Element {
+  const [problems, setProblems] = useState<ProblemInfo[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  // Move all hooks to the top
+  const divisionTableQuery = useDivisionTableQuery();
+  const setDivisionTableQuery = useSetDivisionTableQuery();
+  const [divisionHash, setDivisionHash] = React.useState('');
+  const [seasonHash, setSeasonHash] = React.useState('');
+  
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        const response = await fetch('/api/problems/usaco-divisions');
+        if (!response.ok) {
+          throw new Error('Failed to fetch problems');
+        }
+        const data = await response.json();
+        setProblems(data.problems);
+      } catch (err) {
+        console.error('Error loading problems:', err);
+        setError('Failed to load problems. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
     };
-  } catch (error) {
-    console.error('Error in getStaticProps:', error);
-    return {
-      props: {
-        problems: []
-      },
-      revalidate: 60, // Retry in 1 minute if there was an error
-    };
-  }
-};
 
-export default function DivisionList({ problems }: DivisionListProps): JSX.Element {
+    fetchProblems();
+  }, []);
+
+
   const probToLink: { [key: string]: string } = {};
   const probToURL: { [key: string]: string } = {};
   const probToTags: { [key: string]: string[] } = {};
@@ -276,18 +274,16 @@ export default function DivisionList({ problems }: DivisionListProps): JSX.Eleme
     }
   }
 
-  const divisionTableQuery = useDivisionTableQuery();
-  const setDivisionTableQuery = useSetDivisionTableQuery();
 
-  const [divisionHash, setDivisionHash] = React.useState('');
-  const [seasonHash, setSeasonHash] = React.useState('');
-  let curDivision =
-    divisionHash || (divisionTableQuery && divisionTableQuery.division);
-  if (!divisions.includes(curDivision)) curDivision = divisions[0];
-
-  let curSeason =
-    seasonHash || (divisionTableQuery && divisionTableQuery.season);
-  if (!seasons.includes(curSeason)) curSeason = seasons[seasons.length - 1];
+  
+  // Calculate derived state after hooks
+  const curDivision = divisions.includes(divisionHash || (divisionTableQuery?.division || '')) 
+    ? (divisionHash || divisionTableQuery?.division || divisions[0])
+    : divisions[0];
+    
+  const curSeason = seasons.includes(seasonHash || (divisionTableQuery?.season || ''))
+    ? (seasonHash || divisionTableQuery?.season || seasons[seasons.length - 1])
+    : seasons[seasons.length - 1];
 
   useEffect(() => {
     // https://dev.to/vvo/how-to-solve-window-is-not-defined-errors-in-react-and-next-js-5f97
@@ -321,15 +317,27 @@ export default function DivisionList({ problems }: DivisionListProps): JSX.Eleme
     );
   }, [filteredProblems]);
 
+  if (isLoading) {
+    return <div className="text-center py-4">Loading problems...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-4 text-red-600">{error}</div>;
+  }
+
   return (
     <>
-      <div className="mb-4 flex items-center space-x-4">
-        <DivisionButton
-          options={divisions}
-          state={curDivision}
-          onChange={newDivision => {
-            if (curDivision === newDivision) return;
-            setDivisionHash('');
+    {isLoading ? <div className="text-center py-4">Loading problems...</div> : error ? (
+      <div className="text-center py-4 text-red-600">{error}</div>
+    ) : (
+      <div>
+        <div className="mb-4 flex items-center space-x-4">
+          <DivisionButton
+            options={divisions}
+            state={curDivision}
+            onChange={newDivision => {
+              if (curDivision === newDivision) return;
+              setDivisionHash('');
             setSeasonHash('');
             setDivisionTableQuery({
               division: newDivision,
@@ -366,6 +374,8 @@ export default function DivisionList({ problems }: DivisionListProps): JSX.Eleme
         division={curDivision}
         modules={true}
       />
+      </div>
+    )}
     </>
   );
 }
