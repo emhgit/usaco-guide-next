@@ -10,23 +10,29 @@ import {
   ModuleProblemList,
   ModuleProblemLists,
 } from "../types/content";
-import * as freshOrdering from '../../content/ordering';
+import * as freshOrdering from "../../content/ordering";
 import { moduleIDToSectionMap } from "../../content/ordering";
-import { checkInvalidUsacoMetadata, getProblemInfo, ProblemMetadata } from "../models/problem";
+import {
+  checkInvalidUsacoMetadata,
+  getProblemInfo,
+  ProblemMetadata,
+} from "../models/problem";
 
 let cachedModules: MdxContent[] | null = null;
 let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: MdxContent[] | null = null;
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
-let cachedModuleFrontmatter: { division: string; id: string }[] | null = null;
+let cachedFilePaths:
+  | { filePath: string; division: string; slug: string }[]
+  | null = null;
 /**
  * Loads all problem solutions from the solutions directory
  */
 export async function loadAllSolutions(): Promise<MdxContent[]> {
   if (cachedSolutions) return cachedSolutions;
-  const { parseMdxFile } = await import('./parseMdxFile');
-  const { readdir } = await import('fs/promises');
+  const { parseMdxFile } = await import("./parseMdxFile");
+  const { readdir } = await import("fs/promises");
   const solutionsDir = path.join(process.cwd(), "solutions");
   try {
     const solutionFiles = await readdir(solutionsDir, { recursive: true });
@@ -61,8 +67,12 @@ export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
-  if (cachedProblems && cachedModuleProblemLists) return { problems: cachedProblems, moduleProblemLists: cachedModuleProblemLists };
-  const { readdir, readFile } = await import('fs/promises');
+  if (cachedProblems && cachedModuleProblemLists)
+    return {
+      problems: cachedProblems,
+      moduleProblemLists: cachedModuleProblemLists,
+    };
+  const { readdir, readFile } = await import("fs/promises");
   const contentDir = path.join(process.cwd(), "content");
   const allFiles = await readdir(contentDir, { recursive: true });
 
@@ -88,7 +98,7 @@ export async function loadAllProblems(): Promise<{
       try {
         parsedContent = JSON.parse(content);
       } catch (error) {
-        const hint = filePath ? `file in ${filePath}` : '';
+        const hint = filePath ? `file in ${filePath}` : "";
         throw new Error(`Unable to parse JSON: ${hint}`);
       }
 
@@ -132,9 +142,9 @@ export async function loadAllProblems(): Promise<{
           .filter((x) => x !== "MODULE_ID")
           .map((listId) => ({
             listId,
-            problems: parsedContent[listId].map(x => {
+            problems: parsedContent[listId].map((x) => {
               return {
-                ...getProblemInfo(x, freshOrdering)
+                ...getProblemInfo(x, freshOrdering),
               };
             }),
           }));
@@ -154,14 +164,25 @@ export async function loadAllProblems(): Promise<{
   return { problems, moduleProblemLists };
 }
 
+export async function loadModule(slug: string): Promise<MdxContent> {
+  const { parseMdxFile } = await import("./parseMdxFile");
+
+  const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
+  const parsed = await parseMdxFile(filePath);
+  return {
+    ...parsed,
+    slug,
+  };
+}
+
 export async function loadAllModules(): Promise<MdxContent[]> {
   if (cachedModules) return cachedModules;
-  const { parseMdxFile } = await import('./parseMdxFile');
-  const { readdir } = await import('fs/promises');
+  const { parseMdxFile } = await import("./parseMdxFile");
+  const { readdir } = await import("fs/promises");
   const contentDir = path.join(process.cwd(), "content");
-  const moduleFiles = (
-    await readdir(contentDir, { recursive: true })
-  ).filter((file: string) => typeof file === "string" && file.endsWith(".mdx"));
+  const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
+    (file: string) => typeof file === "string" && file.endsWith(".mdx")
+  );
 
   const modules: MdxContent[] = [];
 
@@ -177,15 +198,9 @@ export async function loadAllModules(): Promise<MdxContent[]> {
         );
       }
 
-      const division = moduleIDToSectionMap[moduleId];
-
       modules.push({
         ...parsed,
-        frontmatter: {
-          ...parsed.frontmatter,
-          division,
-        },
-        slug: file.replace(/\.mdx$/, ""),
+        slug: parsed.frontmatter.id,
       });
     } catch (error) {
       console.error(`Error loading module ${file}:`, error);
@@ -200,7 +215,12 @@ export async function loadAllModules(): Promise<MdxContent[]> {
  * Main function to load all content (modules, problems, solutions) and their relationships
  */
 export async function loadContent() {
-  if (cachedModules && cachedProblems && cachedModuleProblemLists && cachedSolutions) {
+  if (
+    cachedModules &&
+    cachedProblems &&
+    cachedModuleProblemLists &&
+    cachedSolutions
+  ) {
     return {
       modules: cachedModules,
       problems: cachedProblems,
@@ -235,8 +255,8 @@ export async function loadContent() {
  */
 export async function loadCowImages() {
   if (cachedCowImages) return cachedCowImages;
-  const { readdir } = await import('fs/promises');
-  const assetsDir = path.join(process.cwd(), 'src', 'assets');
+  const { readdir } = await import("fs/promises");
+  const assetsDir = path.join(process.cwd(), "src", "assets");
   const cowImages: Array<{
     name: string;
     src: string;
@@ -244,7 +264,7 @@ export async function loadCowImages() {
 
   try {
     // Recursively find all image files in the assets directory
-    const findImages = async (dir: string, basePath: string = '') => {
+    const findImages = async (dir: string, basePath: string = "") => {
       const entries = await readdir(dir, { withFileTypes: true });
 
       for (const entry of entries) {
@@ -260,7 +280,9 @@ export async function loadCowImages() {
         ) {
           cowImages.push({
             name: path.parse(entry.name).name,
-            src: `/${path.relative(process.cwd(), fullPath).replace(/\\/g, '/')}`,
+            src: `/${path
+              .relative(process.cwd(), fullPath)
+              .replace(/\\/g, "/")}`,
           });
         }
       }
@@ -274,28 +296,27 @@ export async function loadCowImages() {
     cachedCowImages = cowImages;
     return cowImages;
   } catch (error) {
-    console.error('Error loading cow images:', error);
+    console.error("Error loading cow images:", error);
     return [];
   }
 }
 
-export async function loadAllModuleFrontmatter(): Promise<
-  { division: string; id: string }[]
+export async function loadAllModuleFilePaths(): Promise<
+  { filePath: string; division: string; slug: string }[]
 > {
-  if (cachedModuleFrontmatter) return cachedModuleFrontmatter;
-  const { readdir, readFile } = await import('fs/promises');
-  const matter = (await import('gray-matter')).default;
+  if (cachedFilePaths) return cachedFilePaths;
+  const { readdir, readFile } = await import("fs/promises");
+  const matter = (await import("gray-matter")).default;
   const contentDir = path.join(process.cwd(), "content");
-  const moduleFiles = (
-    await readdir(contentDir, { recursive: true })
-  ).filter((file: string) => typeof file === "string" && file.endsWith(".mdx"));
-
-  const frontmatter: { division: string; id: string }[] = [];
+  const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
+    (file: string) => typeof file === "string" && file.endsWith(".mdx")
+  );
+  const filePaths: { filePath: string; division: string; slug: string }[] = [];
 
   for (const file of moduleFiles) {
     const filePath = path.join(contentDir, file);
     try {
-      const fileContent = await readFile(filePath, 'utf-8');
+      const fileContent = await readFile(filePath, "utf-8");
       const { data } = matter(fileContent);
 
       if (!(data.id in moduleIDToSectionMap)) {
@@ -306,16 +327,17 @@ export async function loadAllModuleFrontmatter(): Promise<
 
       const division = moduleIDToSectionMap[data.id];
 
-      frontmatter.push({
-        division: division ?? "",
-        id: data.id,
+      filePaths.push({
+        filePath: file.replace(/\.mdx$/, ""),
+        division,
+        slug: data.id,
       });
     } catch (error) {
       console.error(`Error loading module ${file}:`, error);
     }
   }
 
-  cachedModuleFrontmatter = frontmatter;
-  return frontmatter;
+  cachedFilePaths = filePaths;
+  return filePaths;
 }
 export type { MdxContent, ProblemInfo } from "../types/content";
