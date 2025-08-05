@@ -8,17 +8,24 @@ import SEO from "../../../components/seo";
 import { useIsUserDataLoaded } from "../../../context/UserDataContext/UserDataContext";
 import { graphqlToModuleInfo } from "../../../utils/utils";
 import { MarkdownProblemListsProvider } from "../../../context/MarkdownProblemListsContext";
-import { MdxContent, ModuleProblemLists } from "../../../types/content";
+import {
+  MdxContent,
+  MdxFrontmatter,
+  ModuleProblemLists,
+} from "../../../types/content";
 import { ProblemInfo } from "../../../models/problem";
+import MarkdownLayout from "../../../components/MarkdownLayout/MarkdownLayout";
 
 interface ModulePageProps {
   moduleData: MdxContent; // Replace with your actual module data type
   moduleProblemLists?: ModuleProblemLists;
+  frontmatter: MdxFrontmatter[];
 }
 
 export default function ModuleTemplate({
   moduleData,
   moduleProblemLists,
+  frontmatter,
 }: ModulePageProps): JSX.Element {
   const moduleInfo = React.useMemo(
     () => graphqlToModuleInfo(moduleData),
@@ -53,7 +60,9 @@ export default function ModuleTemplate({
       <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
       <div className="py-4">
         <MarkdownProblemListsProvider value={moduleProblemLists?.problemLists}>
-          <Markdown body={moduleData.body} />
+          <MarkdownLayout markdownData={moduleInfo} frontmatter={frontmatter}>
+            <Markdown body={moduleData.body} />
+          </MarkdownLayout>
         </MarkdownProblemListsProvider>
       </div>
     </Layout>
@@ -62,14 +71,14 @@ export default function ModuleTemplate({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Load all modules to generate paths
-  const { loadAllModuleFilePaths } = await import("../../../lib/loadContent");
-  const data = await loadAllModuleFilePaths();
+  const { loadAllModuleFrontmatter } = await import("../../../lib/loadContent");
+  const data = await loadAllModuleFrontmatter();
   const paths = data
-    .map(({ division, slug }) => {
+    .map(({ division, frontmatter }) => {
       return {
         params: {
           division,
-          slug, // Handle nested paths in slug
+          slug: frontmatter.id, // Handle nested paths in slug
         },
       };
     })
@@ -83,7 +92,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { loadModule, loadAllModuleFilePaths, loadAllProblems } =
+    const { loadModule, loadAllModuleFrontmatter, loadAllProblems } =
       await import("../../../lib/loadContent");
     const { division, slug } = context.params as {
       division: string;
@@ -95,9 +104,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
       return { notFound: true };
     }
 
-    let data;
+    let data: {
+      filePath: string;
+      frontmatter: MdxFrontmatter;
+      division: string;
+    }[];
     try {
-      data = await loadAllModuleFilePaths();
+      data = await loadAllModuleFrontmatter();
       if (
         !data ||
         !Array.isArray(data) ||
@@ -109,21 +122,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
         );
         return { notFound: true };
       }
-      console.log(
-        `Found ${data.length} modules, looking for ${division}/${slug}`
-      );
     } catch (error) {
       console.error("Error loading module file paths:", error);
       return { notFound: true };
     }
 
     const moduleInfo = data.find(
-      (item) => item.division === division && item.slug === slug
-    );
-    console.log(
-      moduleInfo
-        ? `found: ${moduleInfo.filePath} for ${division}/${slug}`
-        : "No module info"
+      (item) => item.division === division && item.frontmatter.id === slug
     );
 
     if (!moduleInfo?.filePath) {
@@ -142,7 +147,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
         );
         return { notFound: true };
       }
-      // const { moduleProblemLists } = await loadAllProblems();
       const loadProblemListsForModule = async (moduleId: string) => {
         const { moduleProblemLists } = await loadAllProblems();
         const problemLists = moduleProblemLists.find(
@@ -155,6 +159,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         props: {
           moduleData,
           moduleProblemLists: moduleProblemLists ?? null,
+          frontmatter: data.map((x) => x.frontmatter),
         },
       };
     } catch (error) {

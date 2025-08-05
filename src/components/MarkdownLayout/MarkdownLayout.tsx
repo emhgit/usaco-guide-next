@@ -27,6 +27,7 @@ import NotSignedInWarning from './NotSignedInWarning';
 import TableOfContentsBlock from './TableOfContents/TableOfContentsBlock';
 import TableOfContentsSidebar from './TableOfContents/TableOfContentsSidebar';
 import { MdxContent } from '../../lib/loadContent';
+import { MdxFrontmatter } from '../../types/content';
 
 
 const ContentContainer = ({ children, tableOfContents }) => (
@@ -64,7 +65,7 @@ const ContentContainer = ({ children, tableOfContents }) => (
 );
 
 interface MarkdownLayoutProps {
-  modules: MdxContent[];
+  frontmatter: MdxFrontmatter[];
   children: React.ReactNode;
   markdownData: ModuleInfo | SolutionInfo;
 }
@@ -72,7 +73,7 @@ interface MarkdownLayoutProps {
 export default function MarkdownLayout({
   markdownData,
   children,
-  modules,
+  frontmatter,
 }: MarkdownLayoutProps) {
   const userProgressOnModules = useUserProgressOnModules();
   const setModuleProgress = useSetProgressOnModule();
@@ -87,16 +88,16 @@ export default function MarkdownLayout({
     lang in markdownData.toc ? markdownData.toc[lang] : markdownData.toc['cpp'];
 
   const moduleLinks = React.useMemo(() => {
-    return modules.map(cur => ({
-      id: cur.frontmatter.id,
-      title: cur.frontmatter.title,
-      section: moduleIDToSectionMap[cur.frontmatter.id],
-      url: moduleIDToURLMap[cur.frontmatter.id],
-      cppOc: cur.cppOc,
-      javaOc: cur.javaOc,
-      pyOc: cur.pyOc,
+    return frontmatter.map(cur => ({
+      id: cur.id,
+      title: cur.title,
+      section: moduleIDToSectionMap[cur.id],
+      url: moduleIDToURLMap[cur.id],
+      cppOc: null,
+      javaOc: null,
+      pyOc: null,
     }));
-  }, [modules]);
+  }, [frontmatter]);
   const showConfetti = useContext(ConfettiContext);
   const handleCompletionChange = progress => {
     if (moduleProgress === progress) return;

@@ -21,9 +21,9 @@ export interface TableOfContents {
 export interface MdxFrontmatter {
   id: string;
   title: string;
+  description?: string | null;
   author?: string;
   contributors?: string;
-  description?: string;
   prerequisites?: string[];
   redirects?: string[];
   frequency?: ModuleFrequency;

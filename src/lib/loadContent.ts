@@ -9,6 +9,7 @@ import {
   ProblemInfo,
   ModuleProblemList,
   ModuleProblemLists,
+  MdxFrontmatter,
 } from "../types/content";
 import * as freshOrdering from "../../content/ordering";
 import { moduleIDToSectionMap } from "../../content/ordering";
@@ -23,8 +24,8 @@ let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: MdxContent[] | null = null;
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
-let cachedFilePaths:
-  | { filePath: string; division: string; slug: string }[]
+let cachedFrontmatter:
+  | { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
   | null = null;
 /**
  * Loads all problem solutions from the solutions directory
@@ -301,43 +302,45 @@ export async function loadCowImages() {
   }
 }
 
-export async function loadAllModuleFilePaths(): Promise<
-  { filePath: string; division: string; slug: string }[]
+export async function loadAllModuleFrontmatter(): Promise<
+  { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
 > {
-  if (cachedFilePaths) return cachedFilePaths;
+  if (cachedFrontmatter) return cachedFrontmatter;
   const { readdir, readFile } = await import("fs/promises");
   const matter = (await import("gray-matter")).default;
   const contentDir = path.join(process.cwd(), "content");
   const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
     (file: string) => typeof file === "string" && file.endsWith(".mdx")
   );
-  const filePaths: { filePath: string; division: string; slug: string }[] = [];
+  const data: { filePath: string; frontmatter: MdxFrontmatter; division: string }[] = [];
 
   for (const file of moduleFiles) {
     const filePath = path.join(contentDir, file);
     try {
       const fileContent = await readFile(filePath, "utf-8");
-      const { data } = matter(fileContent);
+      const { data: frontmatter } = matter(fileContent);
 
-      if (!(data.id in moduleIDToSectionMap)) {
+      if (!(frontmatter.id in moduleIDToSectionMap)) {
         throw new Error(
-          `Module ID does not show up in moduleIDToSectionMap: ${data.id}, path: ${filePath}`
+          `Module ID does not show up in moduleIDToSectionMap: ${frontmatter.id}, path: ${filePath}`
         );
       }
 
-      const division = moduleIDToSectionMap[data.id];
+      const division = moduleIDToSectionMap[frontmatter.id];
 
-      filePaths.push({
+      data.push({
         filePath: file.replace(/\.mdx$/, ""),
-        division,
-        slug: data.id,
+        frontmatter: frontmatter as MdxFrontmatter,
+        division
       });
     } catch (error) {
       console.error(`Error loading module ${file}:`, error);
     }
   }
 
-  cachedFilePaths = filePaths;
-  return filePaths;
+  cachedFrontmatter = data;
+  return data;
 }
+
+
 export type { MdxContent, ProblemInfo } from "../types/content";
