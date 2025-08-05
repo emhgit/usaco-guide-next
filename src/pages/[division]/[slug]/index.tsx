@@ -1,28 +1,29 @@
-import * as React from 'react';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { GetStaticProps, GetStaticPaths } from 'next';
-import { SECTION_LABELS } from '../../../../content/ordering';
-import Layout from '../../../components/layout';
-import Markdown from '../../../components/markdown/Markdown';
-import MarkdownLayout from '../../../components/MarkdownLayout/MarkdownLayout';
-import SEO from '../../../components/seo';
-import { ConfettiProvider } from '../../../context/ConfettiContext';
-import { MarkdownProblemListsProvider } from '../../../context/MarkdownProblemListsContext';
-import { useIsUserDataLoaded } from '../../../context/UserDataContext/UserDataContext';
-import { graphqlToModuleInfo } from '../../../utils/utils';
-import { ModuleProblemList, ModuleProblemLists, ProblemInfo } from '../../../types/content';
+import * as React from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { GetStaticProps, GetStaticPaths } from "next";
+import Layout from "../../../components/layout";
+import Markdown from "../../../components/markdown/Markdown";
+import SEO from "../../../components/seo";
+import { useIsUserDataLoaded } from "../../../context/UserDataContext/UserDataContext";
+import { graphqlToModuleInfo } from "../../../utils/utils";
+import { MarkdownProblemListsProvider } from "../../../context/MarkdownProblemListsContext";
+import { MdxContent, ModuleProblemLists } from "../../../types/content";
+import { ProblemInfo } from "../../../models/problem";
 
 interface ModulePageProps {
-  moduleData: any; // Replace with your actual module data type
-  moduleProblemLists: any[]; // Replace with your actual problem lists type
-  modules: any[]; // Add modules array to props
+  moduleData: MdxContent; // Replace with your actual module data type
+  moduleProblemLists?: ModuleProblemLists;
 }
 
-export default function ModuleTemplate({ moduleData, moduleProblemLists, modules }: ModulePageProps): JSX.Element {
-  const router = useRouter();
-  const { division, slug } = router.query;
-  const moduleInfo = React.useMemo(() => graphqlToModuleInfo(moduleData), [moduleData]);
+export default function ModuleTemplate({
+  moduleData,
+  moduleProblemLists,
+}: ModulePageProps): JSX.Element {
+  const moduleInfo = React.useMemo(
+    () => graphqlToModuleInfo(moduleData),
+    [moduleData]
+  );
   const isLoaded = useIsUserDataLoaded();
 
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
     const { hash } = window.location;
     if (!hash) return;
     if (!isLoaded) return;
-    
+
     window.requestAnimationFrame(() => {
       try {
         const anchor = document.getElementById(hash.substring(1));
@@ -51,7 +52,9 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
     <Layout setLastViewedModule={moduleInfo.id}>
       <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
       <div className="py-4">
-        <Markdown body={moduleData.body} />
+        <MarkdownProblemListsProvider value={moduleProblemLists?.problemLists}>
+          <Markdown body={moduleData.body} />
+        </MarkdownProblemListsProvider>
       </div>
     </Layout>
   );
@@ -59,17 +62,18 @@ export default function ModuleTemplate({ moduleData, moduleProblemLists, modules
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Load all modules to generate paths
-  const { loadAllModules } = await import('../../../lib/loadContent');
-  const modules = await loadAllModules();
-  
-  const paths = modules
-    .filter(({ frontmatter }) => frontmatter.division)
-    .map(({ frontmatter }) => ({
-      params: {
-        division: frontmatter.division,
-        slug: frontmatter.id,
-      },
-    }));
+  const { loadAllModuleFilePaths } = await import("../../../lib/loadContent");
+  const data = await loadAllModuleFilePaths();
+  const paths = data
+    .map(({ division, slug }) => {
+      return {
+        params: {
+          division,
+          slug, // Handle nested paths in slug
+        },
+      };
+    })
+    .filter(Boolean); // Remove any null entries
 
   return {
     paths,
@@ -78,42 +82,87 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  const { loadAllModules, loadAllProblems } = await import('../../../lib/loadContent');
-  const { division, slug } = context.params as { division: string; slug: string };
-  
-  // Load the specific module data
-  const modules = await loadAllModules();
-  const moduleData = modules.find(
-    ({ frontmatter }) => 
-      frontmatter.division === division && 
-      frontmatter.id === slug
-  );
-
-  if (!moduleData) {
-    return {
-      notFound: true,
+  try {
+    const { loadModule, loadAllModuleFilePaths, loadAllProblems } =
+      await import("../../../lib/loadContent");
+    const { division, slug } = context.params as {
+      division: string;
+      slug: string;
     };
-  }
 
-  // Helper function to load problem lists (implement this based on your data source)
-  const loadProblemListsForModule = async (moduleId: string) => {
-  // Implement based on how you fetch problem lists in your system
-  // This should return data in the same format as your Gatsby query
-  const { moduleProblemLists } = await loadAllProblems();
-  const problemLists = moduleProblemLists.find(
-    (moduleProblemList) => moduleProblemList.moduleId === moduleId
-  );
-    return { problemLists };
-  }
-  // Load problem lists - you'll need to implement this in loadContent
-  const moduleProblemLists = await loadProblemListsForModule(slug);
+    if (!division || !slug) {
+      console.error("Missing division or slug in params");
+      return { notFound: true };
+    }
 
-  return {
-    props: {
-      moduleData,
-      moduleProblemLists: moduleProblemLists?.problemLists || [],
-      modules, // Add the modules array to props
-    },
-  };
+    let data;
+    try {
+      data = await loadAllModuleFilePaths();
+      if (
+        !data ||
+        !Array.isArray(data) ||
+        data === null ||
+        data === undefined
+      ) {
+        console.error(
+          "Failed to load module file paths or invalid data format"
+        );
+        return { notFound: true };
+      }
+      console.log(
+        `Found ${data.length} modules, looking for ${division}/${slug}`
+      );
+    } catch (error) {
+      console.error("Error loading module file paths:", error);
+      return { notFound: true };
+    }
+
+    const moduleInfo = data.find(
+      (item) => item.division === division && item.slug === slug
+    );
+    console.log(
+      moduleInfo
+        ? `found: ${moduleInfo.filePath} for ${division}/${slug}`
+        : "No module info"
+    );
+
+    if (!moduleInfo?.filePath) {
+      console.error(
+        `Module not found for division: ${division}, slug: ${slug}`
+      );
+      return { notFound: true };
+    }
+
+    // Load the specific module data
+    try {
+      const moduleData = await loadModule(moduleInfo.filePath);
+      if (!moduleData) {
+        console.error(
+          `Failed to load module data for path: ${moduleInfo.filePath}`
+        );
+        return { notFound: true };
+      }
+      // const { moduleProblemLists } = await loadAllProblems();
+      const loadProblemListsForModule = async (moduleId: string) => {
+        const { moduleProblemLists } = await loadAllProblems();
+        const problemLists = moduleProblemLists.find(
+          (moduleProblemList) => moduleProblemList.moduleId === moduleId
+        );
+        return problemLists;
+      };
+      const moduleProblemLists = await loadProblemListsForModule(slug);
+      return {
+        props: {
+          moduleData,
+          moduleProblemLists: moduleProblemLists ?? null,
+        },
+      };
+    } catch (error) {
+      console.error(`Error loading module ${moduleInfo.filePath}:`, error);
+      return { notFound: true };
+    }
+  } catch (error) {
+    console.error("Unexpected error in getStaticProps:", error);
+    return { notFound: true };
+  }
 };
-

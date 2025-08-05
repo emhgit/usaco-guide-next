@@ -1,5 +1,6 @@
 import { SectionID } from "../../content/ordering";
 import { ModuleFrequency } from "../models/module";
+import { ProblemDifficulty, ProblemSolutionInfo } from "../models/problem";
 
 export interface Heading {
   depth: number;
@@ -35,7 +36,7 @@ export interface MdxFrontmatter {
   difficulty?: string;
   tags?: string[];
   isStarred?: boolean;
-  solution?: string | ProblemSolutionInfo;
+  solution?: ProblemSolutionInfo;
 }
 
 export interface MdxContent {
@@ -66,12 +67,13 @@ export interface Fields {
   division?: SectionID;
 }
 
+/*
 export interface ProblemSolutionInfo {
-  kind: string;
+  kind: 'internal' | 'link' | 'label' | 'sketch';
 
   label?: string;
 
-  labelTooltip?: string;
+  labelTooltip?: string | null;
 
   url?: string;
 
@@ -79,6 +81,7 @@ export interface ProblemSolutionInfo {
 
   hasHints?: boolean;
 }
+*/
 
 export interface ModuleProblemInfo {
   uniqueId: string;
@@ -93,12 +96,13 @@ export interface ModuleProblemInfo {
 
   isStarred?: boolean;
 
-  difficulty?: string;
+  difficulty: ProblemDifficulty;
 
   tags: string[];
 
-  solution?: ProblemSolutionInfo;
+  solution: ProblemSolutionInfo;
 }
+
 
 export interface ProblemInfo extends ModuleProblemInfo {
   inModule?: boolean;
@@ -109,7 +113,7 @@ export interface ProblemInfo extends ModuleProblemInfo {
 export interface ModuleProblemList {
   listId: string;
 
-  problems: ModuleProblemInfo[];
+  problems: ProblemInfo[];
 }
 
 export interface ModuleProblemLists {
