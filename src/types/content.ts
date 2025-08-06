@@ -1,4 +1,5 @@
 import { SectionID } from "../../content/ordering";
+import { ExtractedImage } from "../lib/parseMdxFile";
 import { ModuleFrequency } from "../models/module";
 import { ProblemDifficulty, ProblemSolutionInfo } from "../models/problem";
 
@@ -30,7 +31,6 @@ export interface MdxFrontmatter {
   isIncomplete?: boolean;
   lastUpdated?: string;
   division?: SectionID;
-
   // Problem-specific fields
   source?: string;
   difficulty?: string;
@@ -59,6 +59,8 @@ export interface MdxContent {
   mdast?: string;
 
   fields?: Fields;
+
+  images?: ExtractedImage[];
 }
 
 export interface Fields {

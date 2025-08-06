@@ -6,7 +6,7 @@ async function test() {
     try {
         console.log('Starting to load content...');
         const startTime = Date.now();
-        const filePath = path.join(process.cwd(), 'solutions/advanced/Ligatures.mdx');
+        const filePath = path.join(process.cwd(), 'content\\1_General\\Input_Output.mdx');
         const content = await parseMdxFile(filePath);
         const endTime = Date.now();
 

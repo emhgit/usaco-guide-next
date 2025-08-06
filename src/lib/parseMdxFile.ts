@@ -12,9 +12,16 @@ import remarkExtractAST from '../mdx-plugins/extract-mdast';
 import remarkToC from '../mdx-plugins/remark-toc';
 import customRehypeKatex from '../mdx-plugins/rehype-math';
 import rehypeSnippets from '../mdx-plugins/rehype-snippets';
+import remarkExtractImages from '../mdx-plugins/remark-extract-images';
 import { MdxContent, MdxFrontmatter } from '../types/content';
 import { getLastUpdated } from './getGitAuthorTimestamp';
 import { moduleIDToSectionMap, SectionID } from '../../content/ordering';
+
+export interface ExtractedImage {
+    src: string;
+    caption?: string;
+    originalImageLink?: string;
+}
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const { readFile } = await import('fs/promises');
@@ -22,6 +29,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     const { content, data: frontmatter } = matter(fileContent);
     const mdast: any = { data: null };
     const tableOfContents: any = {};
+    const extractedImages: ExtractedImage[] = [];
 
     let compiledResult;
     try {
@@ -36,6 +44,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
                 [remarkMdxFrontmatter, { name: 'frontmatter' }],
                 [remarkExtractAST, { mdast }],
                 [remarkToC, { tableOfContents }],
+                [remarkExtractImages, { images: extractedImages }],
             ],
             rehypePlugins: [
                 [
@@ -107,6 +116,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         pyOc,
         toc: tableOfContents,
         mdast: mdast.data,
+        images: extractedImages,
         fields: {
             division: division as SectionID,
             gitAuthorTime: lastUpdated,
