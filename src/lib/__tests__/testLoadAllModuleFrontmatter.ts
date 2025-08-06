@@ -1,19 +1,19 @@
-import { loadAllModuleFilePaths } from '../loadContent';
+import { loadAllModuleFrontmatter } from '../loadContent';
 
 async function test() {
     try {
-        console.log('Starting to load module file paths...');
+        console.log('Starting to load module frontmatter...');
         const startTime = Date.now();
-        const moduleFilePaths = await loadAllModuleFilePaths();
+        const moduleFrontmatter = await loadAllModuleFrontmatter();
         const endTime = Date.now();
 
         console.log(`Took ${(endTime - startTime) / 1000} seconds`);
 
-        moduleFilePaths.slice(0, 3).forEach((moduleFilePath, i) => {
-            console.log(JSON.stringify(moduleFilePath, null, 2));
+        moduleFrontmatter.slice(0, 3).forEach((moduleFrontmatter, i) => {
+            console.log(JSON.stringify(moduleFrontmatter, null, 2));
         });
     } catch (error) {
-        console.error('Error loading module file paths:');
+        console.error('Error loading module frontmatter:');
         console.error(error);
     } finally {
         // Ensure the process exits, but give time for logs to flush
