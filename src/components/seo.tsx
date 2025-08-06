@@ -1,30 +1,88 @@
-import Head from 'next/head';
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { siteMetadata } from "../../next.config";
 
 interface SEOProps {
-  title: string;
   description?: string;
-  image?: { src: string; width: number; height: number };
-  pathname?: string;
+  lang?: string;
+  meta?: any[];
+  title: string;
+  image?: {
+    src: string;
+    height: number;
+    width: number;
+  };
 }
 
-export default function SEO({ title, description, image, pathname }: SEOProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://usaco.guide';
-  const fullUrl = pathname ? `${siteUrl}${pathname}` : siteUrl;
+const SEO: React.FC<SEOProps> = ({
+  description,
+  lang = "en",
+  meta = [],
+  title,
+  image,
+}) => {
+  const { asPath } = useRouter();
+  const siteUrl = siteMetadata.siteUrl;
+  const siteTitle = siteMetadata.title; // Replace with your site title
+  const metaDescription = description || siteMetadata.description; // Replace with your site description
+  const canonicalUrl = `${siteUrl}${asPath}`;
+  const defaultImage = "/assets/social-media-image.jpg"; // Path to your default social media image in the public folder
+
+  const metaImage = image || {
+    src: defaultImage,
+    height: 675, // Adjust dimensions as needed
+    width: 1200,
+  };
+
+  const fullImageUrl = `${siteUrl}${metaImage.src}`;
+
+  const metaTags = [
+    {
+      name: "description",
+      content: metaDescription,
+    },
+    {
+      name: "keywords",
+      content: siteMetadata.keywords.join(","),
+    },
+    {
+      property: "og:title",
+      content: title || "USACO Guide",
+    },
+    {
+      property: "og:type",
+      content: "website",
+    },
+    {
+      property: "og:image",
+      content: fullImageUrl,
+    },
+    {
+      property: "og:image:width",
+      content: metaImage.width.toString(),
+    },
+    {
+      property: "og:image:height",
+      content: metaImage.height.toString(),
+    },
+    {
+      name: "twitter:card",
+      content: "summary",
+    },
+  ];
 
   return (
     <Head>
-      <title>{title}</title>
-      {description && <meta name="description" content={description} />}
-      {image && (
-        <>
-          <meta property="og:image" content={`${siteUrl}${image.src}`} />
-          <meta property="og:image:width" content={image.width.toString()} />
-          <meta property="og:image:height" content={image.height.toString()} />
-        </>
-      )}
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:title" content={title} />
-      <meta name="twitter:card" content="summary_large_image" />
+      <html lang={lang} />
+      <title>{`${title} · ${siteTitle}`}</title>
+      <meta name="description" content={metaDescription} />
+      <link rel="canonical" href={canonicalUrl} />
+      {metaTags.concat(meta).map((meta) => (
+        <meta key={meta.name || meta.property} {...meta} />
+      ))}
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
     </Head>
   );
-}
+};
+
+export default SEO;
