@@ -15,6 +15,8 @@ import {
 } from "../../../types/content";
 import MarkdownLayout from "../../../components/MarkdownLayout/MarkdownLayout";
 import { ExtractedImage } from "../../../lib/parseMdxFile";
+import Head from "next/head";
+import { SECTION_LABELS } from "../../../../content/ordering";
 
 interface ModulePageProps {
   moduleData: MdxContent;
@@ -64,6 +66,32 @@ export default function ModuleTemplate({
           title={`${moduleInfo.title}`}
           description={moduleInfo.description}
         />
+        <Head>
+          <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [{
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://usaco.guide/"
+            },{
+              "@type": "ListItem",
+              "position": 2,
+              "name": "${SECTION_LABELS[moduleInfo.section]}",
+              "item": "https://usaco.guide/${moduleInfo.section}"
+            },{
+              "@type": "ListItem",
+              "position": 3,
+              "name": "${moduleInfo.title}",
+              "item": "https://usaco.guide/${moduleInfo.section}/${
+            moduleInfo.id
+          }"
+            }]
+          }
+        `}</script>
+        </Head>
         <div className="py-4">
           <MarkdownProblemListsProvider
             value={moduleProblemLists?.problemLists}
