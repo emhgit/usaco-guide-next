@@ -150,7 +150,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     // Load the specific module data
     try {
-      const moduleData = await loadModule(moduleInfo.filePath);
+      const moduleData = await loadModule(moduleInfo.filePath, slug);
       if (!moduleData) {
         console.error(
           `Failed to load module data for path: ${moduleInfo.filePath}`

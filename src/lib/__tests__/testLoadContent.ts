@@ -13,13 +13,11 @@ async function testLoadContent() {
 
         // Log summary of loaded content
         console.log('\n=== Modules ===');
-        console.log(`Loaded ${content.modules.length} modules`);
-        content.modules.slice(0, 3).forEach((module, i) => {
-            console.log(`  ${i + 1}. ${module.frontmatter.title} (${module.frontmatter.division})`);
-        });
-        if (content.modules.length > 3) {
-            console.log(`  ... and ${content.modules.length - 3} more`);
+        console.log(`Loaded ${content.modules.size} modules`);
+        for (let i = 0; i < 2; i++) {
+            console.log(content.modules.values()[i]);
         }
+        console.log(`  ... and ${content.modules.size - 3} more`);
 
         console.log('\n=== Problems ===');
         console.log(`Loaded ${content.problems.length} problems`);
@@ -41,12 +39,12 @@ async function testLoadContent() {
         }
 
         console.log('\n=== Solutions ===');
-        console.log(`Loaded ${content.solutions.length} solutions`);
-        content.solutions.slice(0, 3).forEach((solution, i) => {
-            console.log(`  ${i + 1}. ${solution.frontmatter.title} (${solution.frontmatter.division}) (${solution.frontmatter.source})`);
-        });
-        if (content.solutions.length > 3) {
-            console.log(`  ... and ${content.solutions.length - 3} more`);
+        console.log(`Loaded ${content.solutions.size} solutions`);
+        for (let i = 0; i < 2; i++) {
+            console.log(content.solutions.values()[i]);
+        }
+        if (content.solutions.size > 3) {
+            console.log(`  ... and ${content.solutions.size - 3} more`);
         }
     } catch (error) {
         console.error('Error loading content:');

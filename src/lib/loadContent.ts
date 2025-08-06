@@ -23,7 +23,7 @@ import { ExtractedImage } from "./parseMdxFile";
 let cachedModules: Map<string, MdxContent> = new Map();
 let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
-let cachedSolutions: MdxContent[] | null = null;
+let cachedSolutions: Map<string, MdxContent> = new Map();
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
 let cachedFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
@@ -32,35 +32,41 @@ let cachedImages: Map<string, ExtractedImage> = new Map();
 /**
  * Loads all problem solutions from the solutions directory
  */
-export async function loadAllSolutions(): Promise<MdxContent[]> {
-  if (cachedSolutions) return cachedSolutions;
-  const { parseMdxFile } = await import("./parseMdxFile");
+export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
   const { readdir } = await import("fs/promises");
   const solutionsDir = path.join(process.cwd(), "solutions");
   try {
-    const solutionFiles = await readdir(solutionsDir, { recursive: true });
-    const solutions: MdxContent[] = [];
-
+    const solutionFiles = (await readdir(solutionsDir, { recursive: true })).filter((file) => file.endsWith(".mdx"));
+    if (solutionFiles.length === cachedSolutions.size) return cachedSolutions;
     for (const file of solutionFiles) {
-      if (!file.endsWith(".mdx")) continue;
-
-      const filePath = path.join(solutionsDir, file);
       try {
-        const solution = await parseMdxFile(filePath);
-        solutions.push(solution);
+        await loadSolution(file);
       } catch (error) {
         console.error(`Error loading solution ${file}:`, error);
       }
     }
-    cachedSolutions = solutions;
-    return solutions;
+    return cachedSolutions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       console.warn("Solutions directory not found, skipping solutions loading");
-      return [];
+      return new Map();
     }
     throw error;
   }
+}
+
+export async function loadSolution(fileName: string, id?: string): Promise<MdxContent> {
+  if (id && cachedSolutions.has(id)) return cachedSolutions.get(id);
+  const { parseMdxFile } = await import("./parseMdxFile");
+
+  const filePath = path.join(process.cwd(), "solutions", fileName);
+  const parsed = await parseMdxFile(filePath);
+
+  cachedSolutions.set(parsed.frontmatter.id, parsed);
+  parsed.images?.forEach((image) => {
+    cachedImages.set(image.src, image);
+  });
+  return parsed;
 }
 
 /**
@@ -167,13 +173,19 @@ export async function loadAllProblems(): Promise<{
   return { problems, moduleProblemLists };
 }
 
-export async function loadModule(slug: string): Promise<MdxContent> {
-  if (cachedModules.has(slug)) return cachedModules.get(slug);
+export async function loadModule(fileName: string, id?: string): Promise<MdxContent> {
+  if (id && cachedModules.has(id)) return cachedModules.get(id);
   const { parseMdxFile } = await import("./parseMdxFile");
 
-  const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
+  const filePath = path.join(process.cwd(), "content", fileName);
   const parsed = await parseMdxFile(filePath);
-  cachedModules.set(slug, parsed);
+
+  if (!(parsed.frontmatter.id in moduleIDToSectionMap)) {
+    throw new Error(
+      `Module ID does not show up in moduleIDToSectionMap: ${parsed.frontmatter.id}, path: ${filePath}`
+    );
+  }
+  cachedModules.set(parsed.frontmatter.id, parsed);
   parsed.images?.forEach((image) => {
     cachedImages.set(image.src, image);
   });
@@ -185,61 +197,28 @@ export async function getCachedImages(): Promise<Map<string, ExtractedImage>> {
 }
 
 export async function loadAllModules(): Promise<Map<string, MdxContent>> {
-  if (cachedModules) return cachedModules;
-  const { parseMdxFile } = await import("./parseMdxFile");
   const { readdir } = await import("fs/promises");
   const contentDir = path.join(process.cwd(), "content");
   const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
     (file: string) => typeof file === "string" && file.endsWith(".mdx")
   );
-
-  const modules: Map<string, MdxContent> = new Map();
+  if (moduleFiles.length === cachedModules.size) return cachedModules;
 
   for (const file of moduleFiles) {
-    const filePath = path.join(contentDir, file);
     try {
-      const parsed = await parseMdxFile(filePath);
-      const moduleId = parsed.frontmatter.id;
-
-      if (!(moduleId in moduleIDToSectionMap)) {
-        throw new Error(
-          `Module ID does not show up in moduleIDToSectionMap: ${moduleId}, path: ${filePath}`
-        );
-      }
-
-      modules.set(moduleId, {
-        ...parsed,
-        slug: parsed.frontmatter.id,
-      });
-      parsed.images?.forEach((image) => {
-        cachedImages.set(image.src, image);
-      });
+      await loadModule(file);
     } catch (error) {
       console.error(`Error loading module ${file}:`, error);
     }
   }
 
-  cachedModules = modules;
-  return modules;
+  return cachedModules;
 }
 
 /**
  * Main function to load all content (modules, problems, solutions) and their relationships
  */
 export async function loadContent() {
-  if (
-    cachedModules &&
-    cachedProblems &&
-    cachedModuleProblemLists &&
-    cachedSolutions
-  ) {
-    return {
-      modules: cachedModules,
-      problems: cachedProblems,
-      moduleProblemLists: cachedModuleProblemLists,
-      solutions: cachedSolutions,
-    };
-  }
   // Load all MDX modules
   const modules = await loadAllModules();
   // Load and validate problems
@@ -340,7 +319,7 @@ export async function loadAllModuleFrontmatter(): Promise<
       const division = moduleIDToSectionMap[frontmatter.id];
 
       data.push({
-        filePath: file.replace(/\.mdx$/, ""),
+        filePath: file,
         frontmatter: frontmatter as MdxFrontmatter,
         division
       });

@@ -81,12 +81,15 @@ export function validateModuleProblems(
 }
 
 export function validateSolutionRelationships(
-  solutions: MdxContent[],
+  solutions: Map<string, MdxContent>,
   problems: ProblemInfo[]
 ): void {
   const problemsWithInternalSolutions = new Set<string>();
   solutions.forEach((solution) => {
     try {
+      if (solution.frontmatter.id === "cses-1625") {
+        console.log("Found cses-1625");
+      }
       // we want to find all problems that this solution can be an internal solution for
       const problemsForThisSolution = problems.filter((p) => p.uniqueId === solution.frontmatter.id);
       problemsWithInternalSolutions.add(solution.frontmatter.id);

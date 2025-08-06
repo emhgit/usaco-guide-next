@@ -51,8 +51,8 @@ export default async function processImage(
             buffer = Buffer.from(await response.arrayBuffer());
         } else {
             try {
-                await fs.access(imagePath);
-                buffer = await fs.readFile(imagePath);
+                await fs.access("public" + imagePath);
+                buffer = await fs.readFile("public" + imagePath);
             } catch (error) {
                 throw new Error(`Image not found at path: ${imagePath}`);
             }
