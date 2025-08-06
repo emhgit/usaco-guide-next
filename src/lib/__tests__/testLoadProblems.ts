@@ -9,17 +9,14 @@ async function test() {
 
     console.log(`Took ${(endTime - startTime) / 1000} seconds`);
 
-    /*problems.slice(0, 3).forEach((problem, i) => {
-            console.log(JSON.stringify(problem, null, 2));
-        });
-        moduleProblemLists.slice(0, 3).forEach((moduleProblemList, i) => {
-            console.log(JSON.stringify(moduleProblemList, null, 2));
-        });*/
+    problems.slice(0, 3).forEach((problem, i) => {
+      console.log(JSON.stringify(problem, null, 2));
+    });
+    moduleProblemLists.slice(0, 3).forEach((moduleProblemList, i) => {
+      console.log(JSON.stringify(moduleProblemList, null, 2));
+    });
 
-    const combSubProblems = moduleProblemLists.find(
-      (moduleProblemList) => moduleProblemList.moduleId === "comb-sub"
-    );
-    console.log(combSubProblems);
+
   } catch (error) {
     console.error("Error loading problems:");
     console.error(error);
