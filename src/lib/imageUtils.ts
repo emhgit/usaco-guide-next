@@ -5,18 +5,19 @@ import path from 'path';
 import generateRandomId from '../utils/generateRandomId';
 
 // Types
-interface ImageMetadata {
+export interface ImageMetadata {
     width: number;
     height: number;
     hasAlpha: boolean;
 }
 
-interface ProcessedImage {
+export interface ProcessedImage {
     base64: string;
     imageMetadata: ImageMetadata;
+    src: string;
 }
 
-interface OptimizeImageOptions {
+export interface OptimizeImageOptions {
     maxWidth?: number;
     quality?: number;
 }
@@ -30,7 +31,7 @@ const DEFAULT_OPTIONS: Required<OptimizeImageOptions> = {
 export default async function processImage(
     imagePath: string,
     options: OptimizeImageOptions = {}
-): Promise<{ image: ProcessedImage, src: string }> {
+): Promise<ProcessedImage> {
     const { maxWidth, quality } = { ...DEFAULT_OPTIONS, ...options };
     let buffer: Buffer;
     let external = false;
@@ -42,10 +43,8 @@ export default async function processImage(
                 // Return a fallback response instead of throwing an error
                 console.warn(`Failed to fetch image (${response.status}): ${imagePath}`);
                 return {
-                    image: {
-                        base64: '',
-                        imageMetadata: { width: 0, height: 0, hasAlpha: false }
-                    },
+                    base64: '',
+                    imageMetadata: { width: 0, height: 0, hasAlpha: false },
                     src: ''
                 };
             }
@@ -61,15 +60,13 @@ export default async function processImage(
 
         // Process image and get metadata in one pass
         const processed = await optimizeImage(buffer, { maxWidth, quality });
+        const publicUrl = external ? imagePath : await saveOptimizedImage(processed.buffer, generateRandomId() + '.webp');
         const image: ProcessedImage = {
             base64: processed.src,
             imageMetadata: processed.imageMetadata,
+            src: publicUrl
         };
-        const publicUrl = external ? imagePath : await saveOptimizedImage(processed.buffer, generateRandomId() + '.webp');
-        return {
-            image,
-            src: publicUrl,
-        };
+        return image;
     } catch (error) {
         console.error('Error processing image:', error);
         throw error;
@@ -130,11 +127,3 @@ export async function saveOptimizedImage(
         throw error;
     }
 }
-
-processImage("public/assets/nontrivial.png").then((result) => {
-    console.log(result.src);
-});
-
-processImage("https://letsenhance.io/static/73136da51c245e80edc6ccfe44888a99/396e9/MainBefore.jpg").then((result) => {
-    console.log(result.src);
-});

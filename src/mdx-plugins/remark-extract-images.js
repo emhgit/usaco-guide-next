@@ -1,4 +1,5 @@
 import { visit } from "unist-util-visit";
+import processImage from "../lib/imageUtils";
 
 export default function remarkExtractImages(options = {}) {
   if (!options.images) {
@@ -54,6 +55,14 @@ export default function remarkExtractImages(options = {}) {
           });
         }
       }
+    });
+
+    options.images = options.images.map(async (image) => {
+      const processedImage = await processImage(image.src);
+      return {
+        ...image,
+        processedImage,
+      };
     });
 
     return tree;

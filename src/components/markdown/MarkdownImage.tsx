@@ -11,7 +11,11 @@ export default function MarkdownImage({
   title: string;
 }) {
   const cachedImages = useCachedImages();
-  const renderImage = (imageSrc: string, imageAlt: string, imageTitle: string) => (
+  const renderImage = (
+    imageSrc: string,
+    imageAlt: string,
+    imageTitle: string
+  ) => (
     <ImageBase
       src={imageSrc}
       alt={imageAlt}
@@ -29,22 +33,30 @@ export default function MarkdownImage({
   if (cachedImages.has(src)) {
     const image = cachedImages.get(src);
     const imageElement = renderImage(image.src, alt, title);
-    
+
     // Wrap in figure for semantic HTML
     return (
       <figure className="relative w-full h-full">
         {image.originalImageLink ? (
-          <a href={image.originalImageLink} target="_blank" rel="noopener noreferrer">
+          <a
+            href={image.originalImageLink}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {imageElement}
           </a>
         ) : (
           imageElement
         )}
-        {image.caption && <figcaption className="text-center text-sm mt-2 text-gray-600">{image.caption}</figcaption>}
+        {image.caption && (
+          <figcaption className="text-center text-sm mt-2 text-gray-600">
+            {image.caption}
+          </figcaption>
+        )}
       </figure>
     );
   }
-  
+
   return (
     <figure className="relative w-full h-full">
       {renderImage(src, alt, title)}

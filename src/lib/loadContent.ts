@@ -174,6 +174,9 @@ export async function loadModule(slug: string): Promise<MdxContent> {
   const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
   const parsed = await parseMdxFile(filePath);
   cachedModules.set(slug, parsed);
+  parsed.images?.forEach((image) => {
+    cachedImages.set(image.src, image);
+  });
   return parsed;
 }
 
@@ -207,6 +210,9 @@ export async function loadAllModules(): Promise<Map<string, MdxContent>> {
       modules.set(moduleId, {
         ...parsed,
         slug: parsed.frontmatter.id,
+      });
+      parsed.images?.forEach((image) => {
+        cachedImages.set(image.src, image);
       });
     } catch (error) {
       console.error(`Error loading module ${file}:`, error);
