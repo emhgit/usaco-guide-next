@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 import { GetStaticProps, GetStaticPaths } from "next";
 import Layout from "../../../components/layout";
 import Markdown from "../../../components/markdown/Markdown";
@@ -13,19 +12,22 @@ import {
   MdxFrontmatter,
   ModuleProblemLists,
 } from "../../../types/content";
-import { ProblemInfo } from "../../../models/problem";
 import MarkdownLayout from "../../../components/MarkdownLayout/MarkdownLayout";
+import { ExtractedImage } from "../../../lib/parseMdxFile";
+import { CachedImagesProvider } from "../../../context/CachedImagesContext";
 
 interface ModulePageProps {
-  moduleData: MdxContent; // Replace with your actual module data type
+  moduleData: MdxContent;
   moduleProblemLists?: ModuleProblemLists;
   frontmatter: MdxFrontmatter[];
+  cachedImages: Map<string, ExtractedImage>;
 }
 
 export default function ModuleTemplate({
   moduleData,
   moduleProblemLists,
   frontmatter,
+  cachedImages,
 }: ModulePageProps): JSX.Element {
   const moduleInfo = React.useMemo(
     () => graphqlToModuleInfo(moduleData),
@@ -59,11 +61,15 @@ export default function ModuleTemplate({
     <Layout setLastViewedModule={moduleInfo.id}>
       <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
       <div className="py-4">
-        <MarkdownProblemListsProvider value={moduleProblemLists?.problemLists}>
-          <MarkdownLayout markdownData={moduleInfo} frontmatter={frontmatter}>
-            <Markdown body={moduleData.body} />
-          </MarkdownLayout>
-        </MarkdownProblemListsProvider>
+        <CachedImagesProvider value={cachedImages}>
+          <MarkdownProblemListsProvider
+            value={moduleProblemLists?.problemLists}
+          >
+            <MarkdownLayout markdownData={moduleInfo} frontmatter={frontmatter}>
+              <Markdown body={moduleData.body} />
+            </MarkdownLayout>
+          </MarkdownProblemListsProvider>
+        </CachedImagesProvider>
       </div>
     </Layout>
   );
@@ -92,8 +98,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { loadModule, loadAllModuleFrontmatter, loadAllProblems } =
-      await import("../../../lib/loadContent");
+    const {
+      loadModule,
+      loadAllModuleFrontmatter,
+      loadAllProblems,
+      getCachedImages,
+    } = await import("../../../lib/loadContent");
     const { division, slug } = context.params as {
       division: string;
       slug: string;
@@ -155,11 +165,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
         return problemLists;
       };
       const moduleProblemLists = await loadProblemListsForModule(slug);
+      const cachedImages = await getCachedImages();
       return {
         props: {
           moduleData,
           moduleProblemLists: moduleProblemLists ?? null,
           frontmatter: data.map((x) => x.frontmatter),
+          cachedImages,
         },
       };
     } catch (error) {

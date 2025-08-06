@@ -18,8 +18,9 @@ import {
   getProblemInfo,
   ProblemMetadata,
 } from "../models/problem";
+import { ExtractedImage } from "./parseMdxFile";
 
-let cachedModules: MdxContent[] | null = null;
+let cachedModules: Map<string, MdxContent> = new Map();
 let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: MdxContent[] | null = null;
@@ -27,6 +28,7 @@ let cachedCowImages: Array<{ name: string; src: string }> | null = null;
 let cachedFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
   | null = null;
+let cachedImages: Map<string, ExtractedImage> = new Map();
 /**
  * Loads all problem solutions from the solutions directory
  */
@@ -166,17 +168,20 @@ export async function loadAllProblems(): Promise<{
 }
 
 export async function loadModule(slug: string): Promise<MdxContent> {
+  if (cachedModules.has(slug)) return cachedModules.get(slug);
   const { parseMdxFile } = await import("./parseMdxFile");
 
   const filePath = path.join(process.cwd(), "content", `${slug}.mdx`);
   const parsed = await parseMdxFile(filePath);
-  return {
-    ...parsed,
-    slug,
-  };
+  cachedModules.set(slug, parsed);
+  return parsed;
 }
 
-export async function loadAllModules(): Promise<MdxContent[]> {
+export async function getCachedImages(): Promise<Map<string, ExtractedImage>> {
+  return cachedImages;
+}
+
+export async function loadAllModules(): Promise<Map<string, MdxContent>> {
   if (cachedModules) return cachedModules;
   const { parseMdxFile } = await import("./parseMdxFile");
   const { readdir } = await import("fs/promises");
@@ -185,7 +190,7 @@ export async function loadAllModules(): Promise<MdxContent[]> {
     (file: string) => typeof file === "string" && file.endsWith(".mdx")
   );
 
-  const modules: MdxContent[] = [];
+  const modules: Map<string, MdxContent> = new Map();
 
   for (const file of moduleFiles) {
     const filePath = path.join(contentDir, file);
@@ -199,7 +204,7 @@ export async function loadAllModules(): Promise<MdxContent[]> {
         );
       }
 
-      modules.push({
+      modules.set(moduleId, {
         ...parsed,
         slug: parsed.frontmatter.id,
       });
