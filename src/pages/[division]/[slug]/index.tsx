@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import Layout from "../../../components/layout";
 import Markdown from "../../../components/markdown/Markdown";
+import { CachedImagesProvider } from "../../../context/CachedImagesContext";
 import SEO from "../../../components/seo";
 import { useIsUserDataLoaded } from "../../../context/UserDataContext/UserDataContext";
 import { graphqlToModuleInfo } from "../../../utils/utils";
@@ -14,20 +15,19 @@ import {
 } from "../../../types/content";
 import MarkdownLayout from "../../../components/MarkdownLayout/MarkdownLayout";
 import { ExtractedImage } from "../../../lib/parseMdxFile";
-import { CachedImagesProvider } from "../../../context/CachedImagesContext";
 
 interface ModulePageProps {
   moduleData: MdxContent;
   moduleProblemLists?: ModuleProblemLists;
   frontmatter: MdxFrontmatter[];
-  cachedImages: Map<string, ExtractedImage>;
+  cachedImagesJson: string;
 }
 
 export default function ModuleTemplate({
   moduleData,
   moduleProblemLists,
   frontmatter,
-  cachedImages,
+  cachedImagesJson,
 }: ModulePageProps): JSX.Element {
   const moduleInfo = React.useMemo(
     () => graphqlToModuleInfo(moduleData),
@@ -58,10 +58,13 @@ export default function ModuleTemplate({
   }
 
   return (
-    <Layout setLastViewedModule={moduleInfo.id}>
-      <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
-      <div className="py-4">
-        <CachedImagesProvider value={cachedImages}>
+    <CachedImagesProvider value={cachedImagesJson}>
+      <Layout setLastViewedModule={moduleInfo.id}>
+        <SEO
+          title={`${moduleInfo.title}`}
+          description={moduleInfo.description}
+        />
+        <div className="py-4">
           <MarkdownProblemListsProvider
             value={moduleProblemLists?.problemLists}
           >
@@ -69,9 +72,9 @@ export default function ModuleTemplate({
               <Markdown body={moduleData.body} />
             </MarkdownLayout>
           </MarkdownProblemListsProvider>
-        </CachedImagesProvider>
-      </div>
-    </Layout>
+        </div>
+      </Layout>
+    </CachedImagesProvider>
   );
 }
 
@@ -166,12 +169,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
       };
       const moduleProblemLists = await loadProblemListsForModule(slug);
       const cachedImages = await getCachedImages();
+      const cachedImagesJson = JSON.stringify(
+        Array.from(cachedImages.entries())
+      );
       return {
         props: {
           moduleData,
           moduleProblemLists: moduleProblemLists ?? null,
           frontmatter: data.map((x) => x.frontmatter),
-          cachedImages,
+          cachedImagesJson,
         },
       };
     } catch (error) {
