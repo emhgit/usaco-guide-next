@@ -21,6 +21,7 @@ import {
 import { getModulesForDivision } from "../../utils/utils";
 import { MdxContent } from "../../types/content";
 import { ProblemInfo } from "../../types/content";
+import Layout from "../../components/layout";
 
 const HeroBGColor: { [key in SectionID]: string } = {
   general: "bg-blue-700 dark:bg-blue-900",
@@ -136,103 +137,105 @@ export default function SyllabusTemplate({
   };
 
   return (
-    <div>
-      <SEO
-        title={SECTION_SEO_TITLES[division]}
-        description={SECTION_SEO_DESCRIPTION[division]}
-      />
-      <div className="min-h-screen">
-        <TopNavigationBar currentSection={division} />
+    <Layout>
+      <div>
+        <SEO
+          title={SECTION_SEO_TITLES[division]}
+          description={SECTION_SEO_DESCRIPTION[division]}
+        />
+        <div className="min-h-screen">
+          <TopNavigationBar currentSection={division} />
 
-        <main>
-          <div className={`${HeroBGColor[division]} py-12 sm:py-16`}>
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-              <h1 className="mb-6 text-center text-5xl leading-10 font-black tracking-tight text-white sm:leading-none md:text-6xl">
-                {SECTION_LABELS[division]}
-              </h1>
+          <main>
+            <div className={`${HeroBGColor[division]} py-12 sm:py-16`}>
+              <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <h1 className="mb-6 text-center text-5xl leading-10 font-black tracking-tight text-white sm:leading-none md:text-6xl">
+                  {SECTION_LABELS[division]}
+                </h1>
 
-              <p
-                className={`${HeroTextColor[division]} mb-8 px-4 text-center sm:mb-12`}
-              >
-                {SECTION_DESCRIPTION[division]}
-              </p>
-              <div className="mx-auto grid max-w-2xl gap-8 lg:max-w-full lg:grid-cols-2">
-                <div className="bg-white shadow-sm sm:rounded-lg dark:bg-gray-900">
-                  <div className="px-4 py-5 sm:p-6">
-                    <h3 className="dark:text-dark-high-emphasis text-lg leading-6 font-medium text-gray-900">
-                      Modules Progress
-                    </h3>
-                    <div className="mt-6">
-                      <DashboardProgress
-                        {...moduleProgressInfo}
-                        total={moduleIDs.length}
-                      />
+                <p
+                  className={`${HeroTextColor[division]} mb-8 px-4 text-center sm:mb-12`}
+                >
+                  {SECTION_DESCRIPTION[division]}
+                </p>
+                <div className="mx-auto grid max-w-2xl gap-8 lg:max-w-full lg:grid-cols-2">
+                  <div className="bg-white shadow-sm sm:rounded-lg dark:bg-gray-900">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="dark:text-dark-high-emphasis text-lg leading-6 font-medium text-gray-900">
+                        Modules Progress
+                      </h3>
+                      <div className="mt-6">
+                        <DashboardProgress
+                          {...moduleProgressInfo}
+                          total={moduleIDs.length}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="bg-white shadow-sm sm:rounded-lg dark:bg-gray-900">
-                  <div className="px-4 py-5 sm:p-6">
-                    <h3 className="dark:text-dark-high-emphasis text-lg leading-6 font-medium text-gray-900">
-                      Problems Progress
-                    </h3>
-                    <div className="mt-6">
-                      <DashboardProgress
-                        {...problemsProgressInfo}
-                        total={problemIDs.length}
-                      />
+                  <div className="bg-white shadow-sm sm:rounded-lg dark:bg-gray-900">
+                    <div className="px-4 py-5 sm:p-6">
+                      <h3 className="dark:text-dark-high-emphasis text-lg leading-6 font-medium text-gray-900">
+                        Problems Progress
+                      </h3>
+                      <div className="mt-6">
+                        <DashboardProgress
+                          {...problemsProgressInfo}
+                          total={problemIDs.length}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div className="syllabus-dotted-line-container mx-auto max-w-(--breakpoint-xl) space-y-6 px-4 py-12">
-            {section.map((category) => (
-              <div
-                key={category.name}
-                className="group/category flex flex-col md:flex-row"
-              >
-                <div className="flex-1 pr-12 md:text-right">
-                  <h2 className="dark:text-dark-med-emphasis dark:group-hover/category:text-dark-high-emphasis py-3 text-2xl leading-6 font-semibold text-gray-500 transition group-hover/category:text-gray-800">
-                    {category.name}
-                  </h2>
-                  <div className="dark:text-dark-med-emphasis dark:group-hover/category:text-dark-high-emphasis py-3 leading-6 text-gray-500 transition group-hover/category:text-gray-800">
-                    {/* eslint-disable-next-line react-hooks/rules-of-hooks */}
-                    {useProgressBarForCategory(category)}
+            <div className="syllabus-dotted-line-container mx-auto max-w-(--breakpoint-xl) space-y-6 px-4 py-12">
+              {section.map((category) => (
+                <div
+                  key={category.name}
+                  className="group/category flex flex-col md:flex-row"
+                >
+                  <div className="flex-1 pr-12 md:text-right">
+                    <h2 className="dark:text-dark-med-emphasis dark:group-hover/category:text-dark-high-emphasis py-3 text-2xl leading-6 font-semibold text-gray-500 transition group-hover/category:text-gray-800">
+                      {category.name}
+                    </h2>
+                    <div className="dark:text-dark-med-emphasis dark:group-hover/category:text-dark-high-emphasis py-3 leading-6 text-gray-500 transition group-hover/category:text-gray-800">
+                      {/* eslint-disable-next-line react-hooks/rules-of-hooks */}
+                      {useProgressBarForCategory(category)}
+                    </div>
+                    <p className="dark:group-hover/category:text-dark-med-emphasis text-gray-400 transition group-hover/category:text-gray-600 md:ml-auto md:max-w-sm dark:text-gray-500">
+                      {category.description}
+                    </p>
                   </div>
-                  <p className="dark:group-hover/category:text-dark-med-emphasis text-gray-400 transition group-hover/category:text-gray-600 md:ml-auto md:max-w-sm dark:text-gray-500">
-                    {category.description}
-                  </p>
+                  <div className="flex-1 pl-12">
+                    {category.items.map((item) => (
+                      <ModuleLink
+                        key={item.frontmatter.id}
+                        link={
+                          new ModuleLinkInfo(
+                            item.frontmatter.id,
+                            moduleIDToSectionMap[item.frontmatter.id],
+                            item.frontmatter.title,
+                            item.frontmatter.description,
+                            item.frontmatter.frequency as ModuleFrequency,
+                            item.frontmatter.isIncomplete,
+                            item.cppOc,
+                            item.javaOc,
+                            item.pyOc,
+                            [],
+                            item.fields?.gitAuthorTime
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex-1 pl-12">
-                  {category.items.map((item) => (
-                    <ModuleLink
-                      key={item.frontmatter.id}
-                      link={
-                        new ModuleLinkInfo(
-                          item.frontmatter.id,
-                          moduleIDToSectionMap[item.frontmatter.id],
-                          item.frontmatter.title,
-                          item.frontmatter.description,
-                          item.frontmatter.frequency as ModuleFrequency,
-                          item.frontmatter.isIncomplete,
-                          item.cppOc,
-                          item.javaOc,
-                          item.pyOc,
-                          [],
-                          item.fields?.gitAuthorTime
-                        )
-                      }
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </main>
+              ))}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
 
