@@ -85,7 +85,7 @@ export interface ProblemSolutionInfo {
 }
 */
 
-export interface ModuleProblemInfo {
+export interface ProblemInfo {
   uniqueId: string;
 
   name: string;
@@ -103,10 +103,7 @@ export interface ModuleProblemInfo {
   tags: string[];
 
   solution: ProblemSolutionInfo;
-}
 
-
-export interface ProblemInfo extends ModuleProblemInfo {
   inModule?: boolean;
 
   module?: MdxContent; // Reference to parent module
