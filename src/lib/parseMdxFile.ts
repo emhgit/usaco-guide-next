@@ -89,8 +89,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   } catch (error) {
     console.error(`Error compiling MDX for ${filePath}:`, error);
     throw new Error(
-      `Error compiling MDX for ${filePath}: ${
-        error instanceof Error ? error.message : String(error)
+      `Error compiling MDX for ${filePath}: ${error instanceof Error ? error.message : String(error)
       }`
     );
   }
@@ -111,11 +110,10 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   // Get last updated timestamp from git
   const lastUpdated = await getLastUpdated(filePath);
 
-  let division: string | undefined;
+  let division: SectionID | null = null;
   if (filePath.includes("content")) {
     division = moduleIDToSectionMap[frontmatter.id];
   }
-
   return {
     body: String(compiledResult),
     fileAbsolutePath: filePath,
