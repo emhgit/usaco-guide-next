@@ -51,6 +51,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         [remarkExtractImages, { images: extractedImages }],
       ],
       rehypePlugins: [
+        rehypeSlug,
         [
           rehypeRaw,
           {
@@ -64,7 +65,6 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
           },
         ],
         customRehypeKatex,
-        rehypeSlug,
         rehypeSnippets,
         [rehypeExternalLinks, { target: "_blank", rel: ["nofollow"] }],
         [
