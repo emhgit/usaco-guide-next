@@ -9,29 +9,28 @@ import { UserGroupsProvider } from "../hooks/groups/useUserGroups";
 import { EditorContext } from "../context/EditorContext";
 import { Toaster } from "react-hot-toast";
 import { BlindModeProvider } from "../context/BlindModeContext";
-import Layout from "../components/layout";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-  <>
-    <GlobalErrorBoundary>
-      <FirebaseProvider>
-        <UserDataProvider>
-          <DarkModeProvider>
-            <SignInProvider>
-              <UserGroupsProvider>
-                <BlindModeProvider>
-                  <EditorContext.Provider value={{ inEditor: false }}>
+    <>
+      <GlobalErrorBoundary>
+        <FirebaseProvider>
+          <UserDataProvider>
+            <DarkModeProvider>
+              <SignInProvider>
+                <UserGroupsProvider>
+                  <BlindModeProvider>
+                    <EditorContext.Provider value={{ inEditor: false }}>
                       <Component {...pageProps} />
-                  </EditorContext.Provider>
-                </BlindModeProvider>
-              </UserGroupsProvider>
-            </SignInProvider>
-          </DarkModeProvider>
-        </UserDataProvider>
-      </FirebaseProvider>
-    </GlobalErrorBoundary>
-    <Toaster position="top-right" />
-  </>
+                    </EditorContext.Provider>
+                  </BlindModeProvider>
+                </UserGroupsProvider>
+              </SignInProvider>
+            </DarkModeProvider>
+          </UserDataProvider>
+        </FirebaseProvider>
+      </GlobalErrorBoundary>
+      <Toaster position="top-right" />
+    </>
   );
 }

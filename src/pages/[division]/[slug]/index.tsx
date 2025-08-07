@@ -14,9 +14,9 @@ import {
   ModuleProblemLists,
 } from "../../../types/content";
 import MarkdownLayout from "../../../components/MarkdownLayout/MarkdownLayout";
-import { ExtractedImage } from "../../../lib/parseMdxFile";
 import Head from "next/head";
 import { SECTION_LABELS } from "../../../../content/ordering";
+import { ConfettiProvider } from "../../../context/ConfettiContext";
 
 interface ModulePageProps {
   moduleData: MdxContent;
@@ -60,14 +60,10 @@ export default function ModuleTemplate({
   }
 
   return (
-    <CachedImagesProvider value={cachedImagesJson}>
-      <Layout setLastViewedModule={moduleInfo.id}>
-        <SEO
-          title={`${moduleInfo.title}`}
-          description={moduleInfo.description}
-        />
-        <Head>
-          <script type="application/ld+json">{`
+    <Layout setLastViewedModule={moduleInfo.id}>
+      <SEO title={`${moduleInfo.title}`} description={moduleInfo.description} />
+      <Head>
+        <script type="application/ld+json">{`
           {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
@@ -86,23 +82,29 @@ export default function ModuleTemplate({
               "position": 3,
               "name": "${moduleInfo.title}",
               "item": "https://usaco.guide/${moduleInfo.section}/${
-            moduleInfo.id
-          }"
+          moduleInfo.id
+        }"
             }]
           }
         `}</script>
-        </Head>
-        <div className="py-4">
-          <MarkdownProblemListsProvider
-            value={moduleProblemLists?.problemLists}
-          >
-            <MarkdownLayout markdownData={moduleInfo} frontmatter={frontmatter}>
-              <Markdown body={moduleData.body} />
-            </MarkdownLayout>
-          </MarkdownProblemListsProvider>
-        </div>
-      </Layout>
-    </CachedImagesProvider>
+      </Head>
+      <div className="py-4">
+        <ConfettiProvider>
+          <CachedImagesProvider value={cachedImagesJson}>
+            <MarkdownProblemListsProvider
+              value={moduleProblemLists?.problemLists}
+            >
+              <MarkdownLayout
+                markdownData={moduleInfo}
+                frontmatter={frontmatter}
+              >
+                <Markdown body={moduleData.body} />
+              </MarkdownLayout>
+            </MarkdownProblemListsProvider>
+          </CachedImagesProvider>
+        </ConfettiProvider>
+      </div>
+    </Layout>
   );
 }
 
