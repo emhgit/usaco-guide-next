@@ -41,7 +41,7 @@ export function validateProblemConsistency(problems: ProblemInfo[]): void {
       throw new Error(
         `The URL ${problem.url} is assigned to both problem unique ID ${problemURLToUniqueID.get(problem.url)
         } and ${problem.uniqueId
-        }. Is this correct? (If this is correct, add the URL to \`urlsThatCanHaveMultipleUniqueIDs\` in gatsby-node.ts)`
+        }. Is this correct? (If this is correct, add the URL to \`urlsThatCanHaveMultipleUniqueIDs\` in validateData.ts)`
       );
     }
 
