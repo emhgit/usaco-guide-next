@@ -46,6 +46,10 @@ The [SEO ](../src/components/seo.tsx) component has been adapted to use `next/ro
 
 - Because the `Map` can’t be passed as props due to serialization issues, I convert the map into JSON. (Another solution can probably be implemented)
 
+### Page Loading
+
+I have implemented the Syllabus pages for bronze, silver, gold, platinum, and advanced. The [pages/[division]/index.tsx](../src/pages/[division]/index.tsx) file uses `getStaticPaths` and `getStaticProps` to load the data, and then pass it to the [SyllabusPage](../src/components/syllabus/SyllabusPage.tsx) component. This essentially replicates the `SyllabusTemplate` component.
+
 ## Image Processing
 
 The new [remarkExtractImages](../src/mdx-plugins/remark-extract-images) plugin attempts to mimic the `gatsby-plugin-img.js` functionality. Many features, such as lazy loading, `srcset`, etc. are already built into `next/image`. However, the image processing is still needed to extract captions and `ImageMetadata`.
@@ -62,7 +66,6 @@ Below is a high level overview of steps that still need to be accomplished.
 
 **TODO**
 
-- Create syllabus pages
 - Create solutions pages
 - Create user solutions pages
 - Configure redirects
