@@ -64,9 +64,9 @@ export interface MdxContent {
 }
 
 export interface Fields {
-  gitAuthorTime?: string;
+  gitAuthorTime: string | null;
 
-  division?: SectionID;
+  division: SectionID | null;
 }
 
 /*
