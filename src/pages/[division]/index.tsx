@@ -14,14 +14,12 @@ import SEO from "../../components/seo";
 import ModuleLink from "../../components/syllabus/ModuleLink";
 import TopNavigationBar from "../../components/TopNavigationBar/TopNavigationBar";
 import { ModuleFrequency, ModuleLinkInfo } from "../../models/module";
-// import UserDataContext from '../context/UserDataContext/UserDataContext';
 import {
   useModulesProgressInfo,
   useProblemsProgressInfo,
 } from "../../utils/getProgressInfo";
 import { getModulesForDivision } from "../../utils/utils";
-import { CachedImagesProvider } from "../../context/CachedImagesContext";
-import { MdxContent, ModuleProblemLists } from "../../types/content";
+import { MdxContent } from "../../types/content";
 import { ProblemInfo } from "../../types/content";
 
 const HeroBGColor: { [key in SectionID]: string } = {
