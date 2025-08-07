@@ -5,10 +5,12 @@ export default function MarkdownImage({
   src,
   alt,
   title,
+  style,
 }: {
   src: string;
   alt?: string;
   title?: string;
+  style?: React.CSSProperties;
 }) {
   const cachedImages = useCachedImages();
   const fallBackSvg = `data:image/svg+xml;base64,${Buffer.from(
@@ -39,6 +41,7 @@ export default function MarkdownImage({
             className="object-contain w-full h-full m-0 absolute top-0 left-0"
             placeholder="blur"
             blurDataURL={svg}
+            style={style ? style : undefined}
           />
         </div>
       );

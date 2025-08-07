@@ -1,15 +1,15 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { useLastVisitInfo } from '../../context/UserDataContext/properties/lastVisit';
-import { Image } from '../../components/markdown/HTMLComponents';
-import { GetStaticProps } from 'next';
-import Link from 'next/link';
+import * as React from "react";
+import { useState } from "react";
+import { useLastVisitInfo } from "../../context/UserDataContext/properties/lastVisit";
+import MarkdownImage from "../../components/markdown/MarkdownImage";
+import { GetStaticProps } from "next";
+import Link from "next/link";
 
 // note: cows will be unlocked in lexicographical order
 
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const { loadCowImages } = await import('../../lib/loadContent');
+    const { loadCowImages } = await import("../../lib/loadContent");
     const cowImages = await loadCowImages();
     return {
       props: {
@@ -19,7 +19,7 @@ export const getStaticProps: GetStaticProps = async () => {
       revalidate: 3600,
     };
   } catch (error) {
-    console.error('Failed to load cow images:', error);
+    console.error("Failed to load cow images:", error);
     return {
       props: {
         cowImages: [],
@@ -52,7 +52,7 @@ const ComeBackTimer = ({ tomorrowMilliseconds }) => {
       <p className="my-2 text-2xl">
         {hours} hours {minutes} minutes {seconds} seconds
       </p>
-      to {days ? 'continue your streak' : 'unlock this cow photo'}!
+      to {days ? "continue your streak" : "unlock this cow photo"}!
       {days ? ` Photo will be unlocked after ${days + 1} days.` : null}
     </div>
   );
@@ -62,7 +62,7 @@ const PhotoCard = ({ img, day, tomorrowMilliseconds, hiddenOnDesktop }) => {
   return (
     <div
       className={
-        'mx-auto mb-8 max-w-[592px]' + (hiddenOnDesktop ? ' lg:hidden' : '')
+        "mx-auto mb-8 max-w-[592px]" + (hiddenOnDesktop ? " lg:hidden" : "")
       }
     >
       <div className="flex flex-col overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
@@ -78,13 +78,13 @@ const PhotoCard = ({ img, day, tomorrowMilliseconds, hiddenOnDesktop }) => {
               <ComeBackTimer tomorrowMilliseconds={tomorrowMilliseconds} />
             </div>
           ) : null}
-          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-            <Image
+          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+            <MarkdownImage
               src={img.src}
               alt="Cow"
               title=""
               style={{
-                filter: tomorrowMilliseconds >= 0 ? 'blur(60px)' : 'none',
+                filter: tomorrowMilliseconds >= 0 ? "blur(60px)" : "none",
               }}
             />
           </div>
@@ -146,8 +146,11 @@ export default function DailyStreak({ streak, cowImages }: DailyStreakProps) {
                 </h3>
                 <div className="dark:text-dark-med-emphasis mt-3 space-y-1 text-sm leading-5 text-gray-500">
                   Seeing that you're addicted to USACO Guide, you should
-                  definitely reach out to us regarding{' '}
-                  <Link href="/general/contributing" className="font-bold text-blue-500">
+                  definitely reach out to us regarding{" "}
+                  <Link
+                    href="/general/contributing"
+                    className="font-bold text-blue-500"
+                  >
                     contributing
                   </Link>
                   !
@@ -200,7 +203,7 @@ export default function DailyStreak({ streak, cowImages }: DailyStreakProps) {
             <div className="dark:text-dark-med-emphasis mt-3 space-y-1 text-sm leading-5 text-gray-500">
               <p>
                 You've visited this guide for {streak} consecutive day
-                {streak !== 1 && 's'}.
+                {streak !== 1 && "s"}.
               </p>
               <p>
                 Each (prime) day you visit, you'll unlock a new cow photo (until
