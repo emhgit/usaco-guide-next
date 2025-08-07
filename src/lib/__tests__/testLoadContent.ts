@@ -14,8 +14,9 @@ async function testLoadContent() {
         // Log summary of loaded content
         console.log('\n=== Modules ===');
         console.log(`Loaded ${content.modules.size} modules`);
+        const modulesArray = Array.from(content.modules.values());
         for (let i = 0; i < 2; i++) {
-            console.log(content.modules.values()[i]);
+            console.log("Loaded " + modulesArray[i].frontmatter.id + " " + modulesArray[i].frontmatter.division);
         }
         console.log(`  ... and ${content.modules.size - 3} more`);
 
@@ -40,8 +41,9 @@ async function testLoadContent() {
 
         console.log('\n=== Solutions ===');
         console.log(`Loaded ${content.solutions.size} solutions`);
+        const solutionsArray = Array.from(content.solutions.values());
         for (let i = 0; i < 2; i++) {
-            console.log(content.solutions.values()[i]);
+            console.log("Loaded " + solutionsArray[i].frontmatter.id + " " + solutionsArray[i].frontmatter.division);
         }
         if (content.solutions.size > 3) {
             console.log(`  ... and ${content.solutions.size - 3} more`);
