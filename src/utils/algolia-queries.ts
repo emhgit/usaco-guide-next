@@ -1,259 +1,185 @@
-import { moduleIDToSectionMap } from '../../content/ordering';
+import { moduleIDToSectionMap } from "../../content/ordering";
 import {
   AlgoliaEditorFile,
   AlgoliaEditorModuleFile,
   AlgoliaEditorSolutionFile,
-} from '../models/algoliaEditorFile';
-import { AlgoliaProblemInfo } from '../models/problem';
-import extractSearchableText from './extract-searchable-text';
+} from "../models/algoliaEditorFile";
+import { AlgoliaProblemInfo } from "../models/problem";
+import { MdxContent, ProblemInfo } from "../types/content";
+import extractSearchableText from "./extract-searchable-text";
 
-const pageQuery = `{
-  pages: allXdm(filter: {fileAbsolutePath: {regex: "/content/"}}) {
-    edges {
-      node {
-        frontmatter {
-          id
-          title
-          description
-        }
-        fields {
-          division
-        }
-        mdast
-      }
-    }
-  }
-}`;
+export async function getAlgoliaRecords() {
+  // Fetch data directly instead of using GraphQL
+  const { loadContent } = await import("../lib/loadContent");
+  const { modules, problems, solutions } = await loadContent();
 
-function pageToAlgoliaRecord({
-  node: { id, frontmatter, fields, mdast, ...rest },
-}) {
-  return {
-    objectID: frontmatter.id,
-    ...frontmatter,
-    ...fields,
-    ...rest,
-    content: extractSearchableText(JSON.parse(mdast)),
-  };
+  // Transform data into Algolia records
+  const moduleRecords = modules
+    .values()
+    .filter((m) => m.frontmatter.id in moduleIDToSectionMap)
+    .map((m) => ({
+      objectID: m.frontmatter.id,
+      ...m.frontmatter,
+      ...m.fields,
+      content: extractSearchableText(JSON.parse(m.mdast)),
+    }));
+
+  const moduleFiles = modules.values();
+  const solutionFiles = solutions.values();
+  const files = { modules: moduleFiles, solutions: solutionFiles };
+  const problemRecords = transformProblems(problems);
+  const fileRecords = transformFiles(files, problems);
+
+  return [
+    {
+      records: moduleRecords,
+      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_modules",
+      matchFields: ["title", "description", "content", "id", "division"],
+    },
+    {
+      records: problemRecords,
+      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_problems",
+      matchFields: [
+        "source",
+        "name",
+        "tags",
+        "url",
+        "difficulty",
+        "isStarred",
+        "tags",
+        "problemModules",
+        "solution",
+      ],
+    },
+    {
+      records: fileRecords,
+      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_editorFiles",
+      matchFields: [
+        "kind",
+        "title",
+        "id",
+        "source",
+        "solutions",
+        "path",
+        "problemModules",
+      ],
+    },
+  ];
 }
 
-const problemsQuery = `{
-  data: allProblemInfo {
-    edges {
-      node {
-        uniqueId
-        name
-        source
-        tags
-        url
-        isStarred
-        difficulty
-        solution {
-          kind
-          label
-          labelTooltip
-          hasHints
-          url
-          sketch
-        }
-        module {
-          frontmatter {
-            id
-            title
-          }
-        }
-      }
-    }
-  }
-}`;
+function transformProblems(problems: ProblemInfo[]): AlgoliaProblemInfo[] {
+  const res: AlgoliaProblemInfo[] = [];
 
-export const filesQuery = `{
-  data: allXdm(filter: {fileAbsolutePath: {regex: "/(content)|(solutions)/"}}) {
-    edges {
-      node {
-        frontmatter {
-          title
-          id
-        }
-        parent {
-          ... on File {
-            relativePath
-            sourceInstanceName
-          }
-        }
+  problems.forEach((p) => {
+    const existingProblem = res.find((x) => x.objectID === p.uniqueId);
+    const moduleInfo = p.module
+      ? {
+        id: p.module.frontmatter.id,
+        title: p.module.frontmatter.title,
       }
-    }
-  }
-  problems: allProblemInfo {
-    edges {
-      node {
-        uniqueId
-        name
-        source
-        solution {
-          kind
-          label
-          labelTooltip
-          hasHints
-          url
-          sketch
-        }
-        module {
-          frontmatter {
-            id
-            title
-          }
-        }
-      }
-    }
-  }
-}`;
+      : null;
 
-const queries = [
-  {
-    query: pageQuery,
-    transformer: ({ data }) =>
-      data.pages.edges
-        .filter(x => x.node.frontmatter.id in moduleIDToSectionMap)
-        .map(pageToAlgoliaRecord),
-    indexName: (process.env.GATSBY_ALGOLIA_INDEX_NAME ?? 'dev') + '_modules',
-    matchFields: ['title', 'description', 'content', 'id', 'division'],
-  },
-  {
-    query: problemsQuery,
-    transformer: ({ data }): AlgoliaProblemInfo[] => {
-      const res: AlgoliaProblemInfo[] = [];
-      data.data.edges.forEach(({ node }) => {
-        // some problems appear in multiple modules
-        const existingProblem = res.find(x => x.objectID === node.uniqueId);
-        // some problems (from extraProblems.json) don't have modules associated with them
-        const moduleInfo = node.module
-          ? {
-              id: node.module.frontmatter.id,
-              title: node.module.frontmatter.title,
-            }
-          : null;
-        if (existingProblem) {
-          existingProblem.tags = [
-            ...new Set([...existingProblem.tags, ...(node.tags || [])]),
-          ];
-          if (
-            moduleInfo &&
-            !existingProblem.problemModules.find(
-              module => module.id === moduleInfo.id
-            )
-          ) {
-            existingProblem.problemModules.push(moduleInfo);
-          }
-        } else {
-          res.push({
-            objectID: node.uniqueId,
-            name: node.name,
-            source: node.source,
-            tags: node.tags || [],
-            url: node.url,
-            difficulty: node.difficulty,
-            isStarred: node.isStarred,
-            // this removes null fields from the problem info solution
-            // graphql doesn't do this for us so we need to do it manually
-            solution: node.solution
-              ? (Object.fromEntries(
-                  Object.entries(node.solution).filter(([_, v]) => v != null)
-                ) as any)
-              : null,
-            problemModules: moduleInfo ? [moduleInfo] : [],
-          });
-        }
-      });
-      return res;
-    },
-    indexName: (process.env.GATSBY_ALGOLIA_INDEX_NAME ?? 'dev') + '_problems',
-    matchFields: [
-      'source',
-      'name',
-      'tags',
-      'url',
-      'difficulty',
-      'isStarred',
-      'tags',
-      'problemModules',
-      'solution',
-    ],
-  },
-  {
-    query: filesQuery,
-    transformer: ({ data }): AlgoliaEditorFile[] => {
-      const moduleFiles: AlgoliaEditorModuleFile[] = [];
-      data.data.edges.forEach(({ node }) => {
-        if (node.parent.sourceInstanceName === 'content') {
-          moduleFiles.push({
-            title: node.frontmatter.title,
-            id: node.frontmatter.id,
-            path: `${node.parent.sourceInstanceName}/${node.parent.relativePath}`,
-          });
-        }
-      });
-      const solutionFiles: AlgoliaEditorSolutionFile[] = [];
-      data.problems.edges.forEach(({ node }) => {
-        const module = moduleFiles.find(
-          file => file.id === node.module?.frontmatter.id
-        );
-        const relativePath = data.data.edges.find(
-          ({ node: fileNode }) =>
-            fileNode.parent.sourceInstanceName === 'solutions' &&
-            fileNode.frontmatter.id === node.uniqueId
-        )?.node.parent.relativePath;
-        const file: AlgoliaEditorSolutionFile = solutionFiles.find(
-          file => file.id === node.uniqueId
-        ) || {
-          id: node.uniqueId,
-          title: node.name,
-          source: node.source,
-          solutions: [],
-          path: relativePath ? `solutions/${relativePath}` : null,
-          problemModules: [],
-        };
-        if (solutionFiles.indexOf(file) !== -1) {
-          solutionFiles.splice(solutionFiles.indexOf(file), 1);
-        }
-        if (module != null) {
-          file.problemModules.push(module);
-        }
-        if (node.solution != null) {
-          // for some reason not making a copy messes with algolia change detection
-          file.solutions.push({ ...node.solution });
-        }
-        solutionFiles.push(file);
-      });
-      return [
-        ...moduleFiles.map<
-          { kind: 'module'; objectID: string } & AlgoliaEditorModuleFile
-        >(x => ({
-          ...x,
-          kind: 'module',
-          objectID: x.id,
-        })),
-        ...solutionFiles.map<
-          { kind: 'solution'; objectID: string } & AlgoliaEditorSolutionFile
-        >(x => ({
-          ...x,
-          kind: 'solution',
-          objectID: x.id,
-        })),
+    if (existingProblem) {
+      existingProblem.tags = [
+        ...new Set([...existingProblem.tags, ...(p.tags || [])]),
       ];
-    },
-    indexName:
-      (process.env.GATSBY_ALGOLIA_INDEX_NAME ?? 'dev') + '_editorFiles',
-    matchFields: [
-      'kind',
-      'title',
-      'id',
-      'source',
-      'solutions',
-      'path',
-      'problemModules',
-    ],
-  },
-];
+      if (
+        moduleInfo &&
+        !existingProblem.problemModules.find(
+          (module) => module.id === moduleInfo.id
+        )
+      ) {
+        existingProblem.problemModules.push(moduleInfo);
+      }
+    } else {
+      res.push({
+        objectID: p.uniqueId,
+        name: p.name,
+        source: p.source,
+        tags: p.tags || [],
+        url: p.url,
+        difficulty: p.difficulty,
+        isStarred: p.isStarred,
+        solution: p.solution
+          ? (Object.fromEntries(
+            Object.entries(p.solution).filter(([_, v]) => v != null)
+          ) as any)
+          : null,
+        problemModules: moduleInfo ? [moduleInfo] : [],
+      });
+    }
+  });
 
-module.exports = queries;
+  return res;
+}
+
+function transformFiles(
+  data: {
+    modules: MapIterator<MdxContent>,
+    solutions: MapIterator<MdxContent>
+  },
+  problems: ProblemInfo[]
+): AlgoliaEditorFile[] {
+  const moduleFiles: AlgoliaEditorModuleFile[] = Array.from(data.modules).map((m) => ({
+    title: m.frontmatter.title,
+    id: m.frontmatter.id,
+    path: m.fileAbsolutePath,
+  }));
+
+  const solutionFiles: AlgoliaEditorSolutionFile[] = [];
+
+  problems.forEach((problem) => {
+    const module = moduleFiles.find(
+      (file) => file.id === problem.module?.frontmatter.id
+    );
+    const relativePath = Array.from(data.solutions).find(
+      (fileNode) =>
+        fileNode.frontmatter.id === problem.uniqueId
+    )?.fileAbsolutePath;
+    // might need to convert fileAbsolutePath to relativePath
+
+    const file: AlgoliaEditorSolutionFile = solutionFiles.find(
+      (file) => file.id === problem.uniqueId
+    ) || {
+      id: problem.uniqueId,
+      title: problem.name,
+      source: problem.source,
+      solutions: [],
+      path: relativePath ? `solutions/${relativePath}` : null,
+      problemModules: [],
+    };
+
+    if (solutionFiles.indexOf(file) !== -1) {
+      solutionFiles.splice(solutionFiles.indexOf(file), 1);
+    }
+
+    if (module != null) {
+      file.problemModules.push(module);
+    }
+
+    if (problem.solution != null) {
+      file.solutions.push({ ...problem.solution });
+    }
+
+    solutionFiles.push(file);
+  });
+
+  return [
+    ...moduleFiles.map<
+      { kind: "module"; objectID: string } & AlgoliaEditorModuleFile
+    >((x) => ({
+      ...x,
+      kind: "module",
+      objectID: x.id,
+    })),
+    ...solutionFiles.map<
+      { kind: 'solution'; objectID: string } & AlgoliaEditorSolutionFile
+    >(x => ({
+      ...x,
+      kind: 'solution',
+      objectID: x.id,
+    })),
+  ];
+}
+
+export default getAlgoliaRecords;
