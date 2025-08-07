@@ -282,7 +282,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       return { notFound: true };
     }
     const problemsForThisDivision = loadedProblems.problems.filter(
-      (problem) => problem.module?.fields.division === division
+      (problem) => problem.module?.fields?.division === division
     );
     return {
       props: {
