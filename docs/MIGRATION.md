@@ -30,7 +30,7 @@ The `validateModuleProblems` function can be ignored.
 
 **Note**
 
-- I used Maps to act as caches for the loaded data. These in-memory caches will be useful during build time, but they essentially have no effect during development mode because a new process is created to load the data each time. I will try to implement caching for development by conditionally saving the loaded data as JSON files to the `public/` directory (in the future).
+- I used Maps to act as caches for the loaded data. These in-memory caches will be useful during build time, and they also work during development mode apparently.
 
 ## Pages Creation
 
