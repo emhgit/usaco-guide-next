@@ -79,12 +79,14 @@ export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
-  if (cachedProblems && cachedModuleProblemLists)
+  const { readdir, readFile } = await import("fs/promises");
+  if (cachedProblems && cachedModuleProblemLists) {
     return {
       problems: cachedProblems,
       moduleProblemLists: cachedModuleProblemLists,
     };
-  const { readdir, readFile } = await import("fs/promises");
+  }
+
   const contentDir = path.join(process.cwd(), "content");
   const allFiles = await readdir(contentDir, { recursive: true });
 
@@ -114,7 +116,7 @@ export async function loadAllProblems(): Promise<{
         throw new Error(`Unable to parse JSON: ${hint}`);
       }
 
-      const moduleId = parsedContent["MODULE_ID"];
+      const moduleId: string = parsedContent["MODULE_ID"];
       if (!moduleId && !isExtraProblems) {
         throw new Error(
           `MODULE_ID not found in problem JSON file: ${filePath}`
@@ -347,12 +349,12 @@ export async function loadAllSolutionFrontmatter(): Promise<
 export async function loadContent() {
   // Load all MDX modules
   const modules = await loadAllModules();
-  // Load and validate problems
-  const { problems: loadedProblems, moduleProblemLists } =
-    await loadAllProblems();
 
   // Load solutions
   const solutions = await loadAllSolutions();
+  // Load and validate problems
+  const { problems: loadedProblems, moduleProblemLists } =
+    await loadAllProblems();
 
   // Run validations
   validateProblemConsistency(loadedProblems);
