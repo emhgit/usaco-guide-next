@@ -366,5 +366,4 @@ export async function loadContent() {
   };
 }
 
-loadAllSolutionFrontmatter();
 export type { MdxContent, ProblemInfo } from "../types/content";
