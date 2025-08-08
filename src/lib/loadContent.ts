@@ -25,8 +25,11 @@ let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: Map<string, MdxContent> = new Map();
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
-let cachedFrontmatter:
+let cachedModuleFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
+  | null = null;
+let cachedSolutionFrontmatter:
+  | { filePath: string; frontmatter: MdxFrontmatter }[]
   | null = null;
 let cachedImages: Map<string, ExtractedImage> = new Map();
 /**
@@ -215,30 +218,6 @@ export async function loadAllModules(): Promise<Map<string, MdxContent>> {
   return cachedModules;
 }
 
-/**
- * Main function to load all content (modules, problems, solutions) and their relationships
- */
-export async function loadContent() {
-  // Load all MDX modules
-  const modules = await loadAllModules();
-  // Load and validate problems
-  const { problems: loadedProblems, moduleProblemLists } =
-    await loadAllProblems();
-
-  // Load solutions
-  const solutions = await loadAllSolutions();
-
-  // Run validations
-  validateProblemConsistency(loadedProblems);
-  validateSolutionRelationships(solutions, loadedProblems);
-
-  return {
-    modules,
-    problems: loadedProblems,
-    moduleProblemLists,
-    solutions,
-  };
-}
 
 /**
  * Loads and processes cow images from the assets directory
@@ -295,7 +274,7 @@ export async function loadCowImages() {
 export async function loadAllModuleFrontmatter(): Promise<
   { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
 > {
-  if (cachedFrontmatter) return cachedFrontmatter;
+  if (cachedModuleFrontmatter) return cachedModuleFrontmatter;
   const { readdir, readFile } = await import("fs/promises");
   const matter = (await import("gray-matter")).default;
   const contentDir = path.join(process.cwd(), "content");
@@ -328,9 +307,64 @@ export async function loadAllModuleFrontmatter(): Promise<
     }
   }
 
-  cachedFrontmatter = data;
+  cachedModuleFrontmatter = data;
   return data;
 }
 
+export async function loadAllSolutionFrontmatter(): Promise<
+  { filePath: string; frontmatter: MdxFrontmatter }[]
+> {
+  if (cachedSolutionFrontmatter) return cachedSolutionFrontmatter;
+  const { readdir, readFile } = await import("fs/promises");
+  const matter = (await import("gray-matter")).default;
+  const contentDir = path.join(process.cwd(), "solutions");
+  const solutionFiles = (await readdir(contentDir, { recursive: true })).filter(
+    (file: string) => typeof file === "string" && file.endsWith(".mdx")
+  );
+  const data: { filePath: string; frontmatter: MdxFrontmatter }[] = [];
 
+  for (const file of solutionFiles) {
+    const filePath = path.join(contentDir, file);
+    try {
+      const fileContent = await readFile(filePath, "utf-8");
+      const { data: frontmatter } = matter(fileContent);
+      data.push({
+        filePath: file,
+        frontmatter: frontmatter as MdxFrontmatter,
+      });
+    } catch (error) {
+      console.error(`Error loading solution ${file}:`, error);
+    }
+  }
+
+  cachedSolutionFrontmatter = data;
+  return data;
+}
+
+/**
+ * Main function to load all content (modules, problems, solutions) and their relationships
+ */
+export async function loadContent() {
+  // Load all MDX modules
+  const modules = await loadAllModules();
+  // Load and validate problems
+  const { problems: loadedProblems, moduleProblemLists } =
+    await loadAllProblems();
+
+  // Load solutions
+  const solutions = await loadAllSolutions();
+
+  // Run validations
+  validateProblemConsistency(loadedProblems);
+  validateSolutionRelationships(solutions, loadedProblems);
+
+  return {
+    modules,
+    problems: loadedProblems,
+    moduleProblemLists,
+    solutions,
+  };
+}
+
+loadAllSolutionFrontmatter();
 export type { MdxContent, ProblemInfo } from "../types/content";
