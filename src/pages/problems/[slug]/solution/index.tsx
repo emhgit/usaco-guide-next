@@ -14,6 +14,7 @@ import { ProblemSolutionContext } from "../../../../context/ProblemSolutionConte
 import MarkdownLayout from "../../../../components/MarkdownLayout/MarkdownLayout";
 import Markdown from "../../../../components/markdown/Markdown";
 import { CachedImagesProvider } from "../../../../context/CachedImagesContext";
+import { getProblemURL } from "../../../../models/problem";
 
 interface SolutionTemplateProps {
   solutionForSlug: MdxContent;
@@ -40,10 +41,10 @@ export default function SolutionTemplate({
         .filter((problem) => !!problem.module)
         .map((problem) => ({
           id: loadedModuleFrontmatter.find(
-            (x) => x.frontmatter.id === problem.module
+            (x) => x.frontmatter.id === problem.moduleId
           )?.frontmatter.id,
           title: loadedModuleFrontmatter.find(
-            (x) => x.frontmatter.id === problem.module
+            (x) => x.frontmatter.id === problem.moduleId
           )?.frontmatter.title,
         }))
     );
@@ -98,8 +99,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
     const { loadAllProblems, loadAllSolutionFrontmatter } = await import(
       "../../../../lib/loadContent"
     );
+    const writeFile = await import("fs/promises");
+    const { mkdir } = await import("fs/promises");
+    const path = await import("path");
+    const mappingFilePath = path.join(
+      process.cwd(),
+      "public/data",
+      "slug-id-mapping.json"
+    );
     const { problems } = await loadAllProblems();
     const solutions = await loadAllSolutionFrontmatter();
+    const slugIdMap: { [slug: string]: string } = {};
     const paths = solutions.map(({ frontmatter }) => {
       const problem = problems.find(
         (problem) => problem.uniqueId === frontmatter.id
@@ -108,12 +118,17 @@ export const getStaticPaths: GetStaticPaths = async () => {
         console.error(`Problem not found for slug: ${frontmatter.id}`);
         return;
       }
+      const slug = getProblemURL(problem);
+      slugIdMap[slug] = problem.uniqueId;
       return {
         params: {
-          slug: frontmatter.id,
+          slug,
         },
       };
     });
+
+    await mkdir(path.dirname(mappingFilePath), { recursive: true });
+    await writeFile.writeFile(mappingFilePath, JSON.stringify(slugIdMap));
 
     return {
       paths,
@@ -136,7 +151,22 @@ export const getStaticProps: GetStaticProps = async (context) => {
       loadAllModuleFrontmatter,
       getCachedImages,
     } = await import("../../../../lib/loadContent");
-    const { slug } = context.params as { slug: string };
+    const readFileSync = await import("fs/promises");
+    const path = await import("path");
+    const mappingFilePath = path.join(
+      process.cwd(),
+      "public/data",
+      "slug-id-mapping.json"
+    );
+    const mappingFileContent = await readFileSync.readFile(
+      mappingFilePath,
+      "utf-8"
+    );
+    const slugIdMap = JSON.parse(mappingFileContent);
+    const { slug } = context.params as {
+      slug: string;
+    };
+    const uniqueId = slugIdMap[slug];
     const loadedSolutions = await loadAllSolutions();
     if (!loadedSolutions) {
       console.error("Failed to load solutions");
@@ -144,28 +174,28 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    const solutionForSlug = loadedSolutions.get(slug);
+    const solutionForSlug = loadedSolutions.get(uniqueId);
     if (!solutionForSlug) {
-      console.error(`Solution not found for slug: ${slug}`);
+      console.error(`Solution not found for slug: ${uniqueId}`);
       return {
         notFound: true,
       };
     }
     const problems = await loadAllProblems();
     const allProblemInfo = problems.problems.filter(
-      (problem) => problem.uniqueId === slug
+      (problem) => problem.uniqueId === uniqueId
     );
     if (!allProblemInfo || allProblemInfo.length === 0) {
-      console.error(`Problems not found for slug: ${slug}`);
+      console.error(`Problems not found for slug: ${uniqueId}`);
       return {
         notFound: true,
       };
     }
     const problemInfo = problems.problems.find(
-      (problem) => problem.uniqueId === slug
+      (problem) => problem.uniqueId === uniqueId
     );
     if (!problemInfo) {
-      console.error(`Problem not found for slug: ${slug}`);
+      console.error(`Problem not found for slug: ${uniqueId}`);
       return {
         notFound: true,
       };
