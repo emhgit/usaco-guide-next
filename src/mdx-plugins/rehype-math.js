@@ -59,19 +59,16 @@ const customRehypeKatex = (options) => {
         );
       }
 
-      if (element.tagName === "div") element.tagName = "MATHDIV";
-      else if (element.tagName === "span") element.tagName = "MATHSPAN";
-      else element.tagName = "MATHSPAN";
-
-      element.children = [
-        {
-          type: "text",
-          value: result,
+      const newNode = {
+        type: "element",
+        tagName: displayMode ? "MATHDIV" : "MATHSPAN",
+        properties: {
+          className: element.properties.className,
+          latex: value,
         },
-      ];
-      element.properties["latex"] = value;
-      element.parent = null; // remove parent to avoid circular references
-      // element.children = parseHtml.parse(result).children
+        children: [{ type: "text", value: result }],
+      };
+      assign(element, newNode);
     }
   }
 };
