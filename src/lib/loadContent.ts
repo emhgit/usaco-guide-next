@@ -19,6 +19,7 @@ import {
   ProblemMetadata,
 } from "../models/problem";
 import { ExtractedImage } from "./parseMdxFile";
+import { CACHED_IMAGES_FILE, CACHED_MODULE_FRONTMATTER_FILE, CACHED_MODULE_PROBLEM_LISTS_FILE, CACHED_MODULES_FILE, CACHED_PROBLEMS_FILE, CACHED_SOLUTION_FRONTMATTER_FILE, CACHED_SOLUTIONS_FILE, CONTENT_DIR, SOLUTIONS_DIR } from "./constants";
 
 let cachedModules: Map<string, MdxContent> = new Map();
 let cachedProblems: ProblemInfo[] | null = null;
@@ -36,11 +37,25 @@ let cachedImages: Map<string, ExtractedImage> = new Map();
  * Loads all problem solutions from the solutions directory
  */
 export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
-  const { readdir } = await import("fs/promises");
-  const solutionsDir = path.join(process.cwd(), "solutions");
+  const { readdir, access, readFile } = await import("fs/promises");
   try {
-    const solutionFiles = (await readdir(solutionsDir, { recursive: true })).filter((file) => file.endsWith(".mdx"));
+    const solutionFiles = (await readdir(SOLUTIONS_DIR, { recursive: true })).filter((file) => file.endsWith(".mdx"));
+    // check in-memory cache first
     if (solutionFiles.length === cachedSolutions.size) return cachedSolutions;
+
+    // Try to load from cache file
+    try {
+      await access(CACHED_SOLUTIONS_FILE);
+      const content = await readFile(CACHED_SOLUTIONS_FILE, "utf-8");
+      cachedSolutions = new Map(JSON.parse(content));
+      return cachedSolutions;
+    } catch (error) {
+      // Cache file doesn't exist or is invalid, continue with normal loading
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        console.error('Error reading cache file:', error);
+      }
+    }
+
     for (const file of solutionFiles) {
       try {
         await loadSolution(file);
@@ -48,6 +63,8 @@ export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
         console.error(`Error loading solution ${file}:`, error);
       }
     }
+    saveFileCache(CACHED_SOLUTIONS_FILE, cachedSolutions);
+    saveFileCache(CACHED_IMAGES_FILE, cachedImages);
     return cachedSolutions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -56,6 +73,16 @@ export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
     }
     throw error;
   }
+}
+
+export async function saveFileCache(filePath: string, data: any) {
+  const { writeFile, mkdir } = await import("fs/promises");
+  await mkdir(path.dirname(filePath), { recursive: true });
+  let dataToWrite = data;
+  if (data instanceof Map) {
+    dataToWrite = Array.from(data.entries());
+  }
+  await writeFile(filePath, JSON.stringify(dataToWrite));
 }
 
 export async function loadSolution(fileName: string, id?: string): Promise<MdxContent> {
@@ -79,7 +106,7 @@ export async function loadAllProblems(): Promise<{
   problems: ProblemInfo[];
   moduleProblemLists: ModuleProblemLists[];
 }> {
-  const { readdir, readFile } = await import("fs/promises");
+  const { readdir, readFile, access } = await import("fs/promises");
   if (cachedProblems && cachedModuleProblemLists) {
     return {
       problems: cachedProblems,
@@ -87,8 +114,25 @@ export async function loadAllProblems(): Promise<{
     };
   }
 
-  const contentDir = path.join(process.cwd(), "content");
-  const allFiles = await readdir(contentDir, { recursive: true });
+  try {
+    await access(CACHED_PROBLEMS_FILE);
+    const problemsContent = await readFile(CACHED_PROBLEMS_FILE, "utf-8");
+    cachedProblems = JSON.parse(problemsContent);
+    await access(CACHED_MODULE_PROBLEM_LISTS_FILE);
+    const moduleProblemListsContent = await readFile(CACHED_MODULE_PROBLEM_LISTS_FILE, "utf-8");
+    cachedModuleProblemLists = JSON.parse(moduleProblemListsContent);
+    return {
+      problems: cachedProblems,
+      moduleProblemLists: cachedModuleProblemLists,
+    };
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
+
+  const allFiles = await readdir(CONTENT_DIR, { recursive: true });
 
   if (cachedModules.size === 0) {
     await loadAllModules();
@@ -104,7 +148,7 @@ export async function loadAllProblems(): Promise<{
   );
 
   for (const file of problemFiles) {
-    const filePath = path.join(contentDir, file);
+    const filePath = path.join(CONTENT_DIR, file);
     const fileName = path.basename(file);
     const isExtraProblems = fileName === "extraProblems.json";
 
@@ -181,14 +225,51 @@ export async function loadAllProblems(): Promise<{
 
   cachedProblems = problems;
   cachedModuleProblemLists = moduleProblemLists;
+  saveFileCache(CACHED_PROBLEMS_FILE, problems);
+  saveFileCache(CACHED_MODULE_PROBLEM_LISTS_FILE, moduleProblemLists);
   return { problems, moduleProblemLists };
+}
+
+export async function getCachedImages(): Promise<Map<string, ExtractedImage>> {
+  return cachedImages;
+}
+
+export async function loadAllModules(): Promise<Map<string, MdxContent>> {
+  const { readdir, access, readFile } = await import("fs/promises");
+  const moduleFiles = (await readdir(CONTENT_DIR, { recursive: true })).filter(
+    (file: string) => typeof file === "string" && file.endsWith(".mdx")
+  );
+  if (moduleFiles.length === cachedModules.size) return cachedModules;
+  try {
+    await access(CACHED_MODULES_FILE);
+    const content = await readFile(CACHED_MODULES_FILE, "utf-8");
+    cachedModules = new Map(JSON.parse(content));
+    return cachedModules;
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
+
+  for (const file of moduleFiles) {
+    try {
+      await loadModule(file);
+    } catch (error) {
+      console.error(`Error loading module ${file}:`, error);
+    }
+  }
+
+  saveFileCache(CACHED_MODULES_FILE, cachedModules);
+  saveFileCache(CACHED_IMAGES_FILE, cachedImages);
+  return cachedModules;
 }
 
 export async function loadModule(fileName: string, id?: string): Promise<MdxContent> {
   if (id && cachedModules.has(id)) return cachedModules.get(id);
   const { parseMdxFile } = await import("./parseMdxFile");
 
-  const filePath = path.join(process.cwd(), "content", fileName);
+  const filePath = path.join(CONTENT_DIR, fileName);
   const parsed = await parseMdxFile(filePath);
 
   if (!(parsed.frontmatter.id in moduleIDToSectionMap)) {
@@ -202,30 +283,6 @@ export async function loadModule(fileName: string, id?: string): Promise<MdxCont
   });
   return parsed;
 }
-
-export async function getCachedImages(): Promise<Map<string, ExtractedImage>> {
-  return cachedImages;
-}
-
-export async function loadAllModules(): Promise<Map<string, MdxContent>> {
-  const { readdir } = await import("fs/promises");
-  const contentDir = path.join(process.cwd(), "content");
-  const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
-    (file: string) => typeof file === "string" && file.endsWith(".mdx")
-  );
-  if (moduleFiles.length === cachedModules.size) return cachedModules;
-
-  for (const file of moduleFiles) {
-    try {
-      await loadModule(file);
-    } catch (error) {
-      console.error(`Error loading module ${file}:`, error);
-    }
-  }
-
-  return cachedModules;
-}
-
 
 /**
  * Loads and processes cow images from the assets directory
@@ -282,17 +339,27 @@ export async function loadCowImages() {
 export async function loadAllModuleFrontmatter(): Promise<
   { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
 > {
+  const { readdir, readFile, access } = await import("fs/promises");
   if (cachedModuleFrontmatter) return cachedModuleFrontmatter;
-  const { readdir, readFile } = await import("fs/promises");
+  try {
+    await access(CACHED_MODULE_FRONTMATTER_FILE);
+    const content = await readFile(CACHED_MODULE_FRONTMATTER_FILE, "utf-8");
+    cachedModuleFrontmatter = JSON.parse(content);
+    return cachedModuleFrontmatter;
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
   const matter = (await import("gray-matter")).default;
-  const contentDir = path.join(process.cwd(), "content");
-  const moduleFiles = (await readdir(contentDir, { recursive: true })).filter(
+  const moduleFiles = (await readdir(CONTENT_DIR, { recursive: true })).filter(
     (file: string) => typeof file === "string" && file.endsWith(".mdx")
   );
   const data: { filePath: string; frontmatter: MdxFrontmatter; division: string }[] = [];
 
   for (const file of moduleFiles) {
-    const filePath = path.join(contentDir, file);
+    const filePath = path.join(CONTENT_DIR, file);
     try {
       const fileContent = await readFile(filePath, "utf-8");
       const { data: frontmatter } = matter(fileContent);
@@ -316,23 +383,34 @@ export async function loadAllModuleFrontmatter(): Promise<
   }
 
   cachedModuleFrontmatter = data;
+  saveFileCache(CACHED_MODULE_FRONTMATTER_FILE, data);
   return data;
 }
 
 export async function loadAllSolutionFrontmatter(): Promise<
   { filePath: string; frontmatter: MdxFrontmatter }[]
 > {
+  const { readdir, readFile, access } = await import("fs/promises");
   if (cachedSolutionFrontmatter) return cachedSolutionFrontmatter;
-  const { readdir, readFile } = await import("fs/promises");
+  try {
+    await access(CACHED_SOLUTION_FRONTMATTER_FILE);
+    const content = await readFile(CACHED_SOLUTION_FRONTMATTER_FILE, "utf-8");
+    cachedSolutionFrontmatter = JSON.parse(content);
+    return cachedSolutionFrontmatter;
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
   const matter = (await import("gray-matter")).default;
-  const contentDir = path.join(process.cwd(), "solutions");
-  const solutionFiles = (await readdir(contentDir, { recursive: true })).filter(
+  const solutionFiles = (await readdir(SOLUTIONS_DIR, { recursive: true })).filter(
     (file: string) => typeof file === "string" && file.endsWith(".mdx")
   );
   const data: { filePath: string; frontmatter: MdxFrontmatter }[] = [];
 
   for (const file of solutionFiles) {
-    const filePath = path.join(contentDir, file);
+    const filePath = path.join(SOLUTIONS_DIR, file);
     try {
       const fileContent = await readFile(filePath, "utf-8");
       const { data: frontmatter } = matter(fileContent);
@@ -346,6 +424,7 @@ export async function loadAllSolutionFrontmatter(): Promise<
   }
 
   cachedSolutionFrontmatter = data;
+  saveFileCache(CACHED_SOLUTION_FRONTMATTER_FILE, data);
   return data;
 }
 
