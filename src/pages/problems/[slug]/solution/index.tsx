@@ -99,14 +99,11 @@ export const getStaticPaths: GetStaticPaths = async () => {
     const { loadAllProblems, loadAllSolutionFrontmatter } = await import(
       "../../../../lib/loadContent"
     );
+    const { SLUG_ID_MAPPING_FILE } = await import("../../../../lib/constants");
     const writeFile = await import("fs/promises");
     const { mkdir } = await import("fs/promises");
     const path = await import("path");
-    const mappingFilePath = path.join(
-      process.cwd(),
-      "public/data",
-      "slug-id-mapping.json"
-    );
+
     const { problems } = await loadAllProblems();
     const solutions = await loadAllSolutionFrontmatter();
     const slugIdMap: { [slug: string]: string } = {};
@@ -127,8 +124,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
       };
     });
 
-    await mkdir(path.dirname(mappingFilePath), { recursive: true });
-    await writeFile.writeFile(mappingFilePath, JSON.stringify(slugIdMap));
+    await mkdir(path.dirname(SLUG_ID_MAPPING_FILE), { recursive: true });
+    await writeFile.writeFile(SLUG_ID_MAPPING_FILE, JSON.stringify(slugIdMap));
 
     return {
       paths,
@@ -152,14 +149,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
       getCachedImages,
     } = await import("../../../../lib/loadContent");
     const readFileSync = await import("fs/promises");
-    const path = await import("path");
-    const mappingFilePath = path.join(
-      process.cwd(),
-      "public/data",
-      "slug-id-mapping.json"
-    );
+    const { SLUG_ID_MAPPING_FILE } = await import("../../../../lib/constants");
     const mappingFileContent = await readFileSync.readFile(
-      mappingFilePath,
+      SLUG_ID_MAPPING_FILE,
       "utf-8"
     );
     const slugIdMap = JSON.parse(mappingFileContent);
