@@ -4,8 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "yarn prebuild && next dev",
+    "prebuild": "yarn clean && yarn tsx scripts/load-content.ts",
+    "build": "yarn prebuild && next build",
     "start": "next start",
     "lint": "next lint",
     "clean": "rm -rf dist .next public/images public/data",
