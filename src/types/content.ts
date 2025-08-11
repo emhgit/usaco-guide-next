@@ -106,7 +106,9 @@ export interface ProblemInfo {
 
   inModule?: boolean;
 
-  module?: string; // Reference to parent module
+  moduleId?: string;
+
+  module?: MdxContent;
 }
 
 export interface ModuleProblemList {

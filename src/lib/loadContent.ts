@@ -90,6 +90,9 @@ export async function loadAllProblems(): Promise<{
   const contentDir = path.join(process.cwd(), "content");
   const allFiles = await readdir(contentDir, { recursive: true });
 
+  if (cachedModules.size === 0) {
+    await loadAllModules();
+  }
   const problems: ProblemInfo[] = [];
   const moduleProblemLists: ModuleProblemLists[] = [];
 
@@ -136,9 +139,12 @@ export async function loadAllProblems(): Promise<{
             checkInvalidUsacoMetadata(metadata);
             // if (process.env.CI) stream.write(metadata.uniqueId + "\n");
             const problemInfo = getProblemInfo(metadata);
+            let module: MdxContent | null = null;
+            module = cachedModules.get(moduleId) || null;
             problems.push({
               ...problemInfo,
-              module: moduleId,
+              module,
+              moduleId: moduleId,
               inModule: true,
             });
           });
