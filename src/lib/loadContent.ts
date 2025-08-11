@@ -63,8 +63,8 @@ export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
         console.error(`Error loading solution ${file}:`, error);
       }
     }
-    saveFileCache(CACHED_SOLUTIONS_FILE, cachedSolutions);
-    saveFileCache(CACHED_IMAGES_FILE, cachedImages);
+    await saveFileCache(CACHED_SOLUTIONS_FILE, cachedSolutions);
+    await saveFileCache(CACHED_IMAGES_FILE, cachedImages);
     return cachedSolutions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -81,8 +81,24 @@ export async function saveFileCache(filePath: string, data: any) {
   let dataToWrite = data;
   if (data instanceof Map) {
     dataToWrite = Array.from(data.entries());
+  } else if (Array.isArray(data)) {
+    // Deep clone to strip class instances / prototype methods
+    dataToWrite = JSON.parse(JSON.stringify(data, replacer));
   }
-  await writeFile(filePath, JSON.stringify(dataToWrite));
+
+  try {
+    const json = JSON.stringify(dataToWrite, null, 2);
+    await writeFile(filePath, json, "utf8");
+  } catch (err) {
+    console.error("Failed to stringify data for", filePath, err);
+    throw err;
+  }
+}
+
+function replacer(key: string, value: any) {
+  // Remove functions or unserializable objects
+  if (typeof value === "function") return undefined;
+  return value;
 }
 
 export async function loadSolution(fileName: string, id?: string): Promise<MdxContent> {
@@ -117,10 +133,10 @@ export async function loadAllProblems(): Promise<{
   try {
     await access(CACHED_PROBLEMS_FILE);
     const problemsContent = await readFile(CACHED_PROBLEMS_FILE, "utf-8");
-    cachedProblems = JSON.parse(problemsContent);
+    cachedProblems = JSON.parse(problemsContent.trim());
     await access(CACHED_MODULE_PROBLEM_LISTS_FILE);
     const moduleProblemListsContent = await readFile(CACHED_MODULE_PROBLEM_LISTS_FILE, "utf-8");
-    cachedModuleProblemLists = JSON.parse(moduleProblemListsContent);
+    cachedModuleProblemLists = JSON.parse(moduleProblemListsContent.trim());
     return {
       problems: cachedProblems,
       moduleProblemLists: cachedModuleProblemLists,
@@ -225,8 +241,8 @@ export async function loadAllProblems(): Promise<{
 
   cachedProblems = problems;
   cachedModuleProblemLists = moduleProblemLists;
-  saveFileCache(CACHED_PROBLEMS_FILE, problems);
-  saveFileCache(CACHED_MODULE_PROBLEM_LISTS_FILE, moduleProblemLists);
+  await saveFileCache(CACHED_PROBLEMS_FILE, problems);
+  await saveFileCache(CACHED_MODULE_PROBLEM_LISTS_FILE, moduleProblemLists);
   return { problems, moduleProblemLists };
 }
 
@@ -260,8 +276,8 @@ export async function loadAllModules(): Promise<Map<string, MdxContent>> {
     }
   }
 
-  saveFileCache(CACHED_MODULES_FILE, cachedModules);
-  saveFileCache(CACHED_IMAGES_FILE, cachedImages);
+  await saveFileCache(CACHED_MODULES_FILE, cachedModules);
+  await saveFileCache(CACHED_IMAGES_FILE, cachedImages);
   return cachedModules;
 }
 
@@ -383,7 +399,7 @@ export async function loadAllModuleFrontmatter(): Promise<
   }
 
   cachedModuleFrontmatter = data;
-  saveFileCache(CACHED_MODULE_FRONTMATTER_FILE, data);
+  await saveFileCache(CACHED_MODULE_FRONTMATTER_FILE, data);
   return data;
 }
 
@@ -424,7 +440,7 @@ export async function loadAllSolutionFrontmatter(): Promise<
   }
 
   cachedSolutionFrontmatter = data;
-  saveFileCache(CACHED_SOLUTION_FRONTMATTER_FILE, data);
+  await saveFileCache(CACHED_SOLUTION_FRONTMATTER_FILE, data);
   return data;
 }
 
