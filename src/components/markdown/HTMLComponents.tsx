@@ -2,6 +2,7 @@ import * as React from "react";
 import { useDarkMode } from "../../context/DarkModeContext";
 import CodeBlock from "./CodeBlock/CodeBlock";
 import MarkdownImage from "./MarkdownImage";
+import { MATHDIV, MATHSPAN } from "./MDXComponents";
 // Note: try to avoid adding inline styles here; rather, use css selectors to target them.
 // Otherwise it's really hard to override some of these styles
 
@@ -66,6 +67,21 @@ const a = ({ children, ...props }) => (
 const pre = ({ children, copyButton = true, ...props }) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const isDarkMode = useDarkMode();
+
+  const isMATHSPAN = children.props.className?.includes("math-inline");
+  const isMATHDIV = children.props.className?.includes("math-display");
+
+  if (isMATHDIV) {
+    return MATHDIV({
+      ...children.props,
+    });
+  }
+
+  if (isMATHSPAN) {
+    return MATHSPAN({
+      ...children.props,
+    });
+  }
 
   return (
     <pre {...props}>

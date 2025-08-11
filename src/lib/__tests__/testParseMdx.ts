@@ -9,7 +9,7 @@ async function test() {
     const startTime = Date.now();
     const filePath = path.join(
       process.cwd(),
-      "content\\2_Bronze\\Rect_Geo.mdx"
+      "content\\2_Bronze\\Intro_Complete.mdx"
     );
     const content = await parseMdxFile(filePath);
     const endTime = Date.now();

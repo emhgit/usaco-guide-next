@@ -1,4 +1,9 @@
 import "../styles/main.css";
+import "katex/dist/katex.min.css";
+import "tippy.js/animations/scale-subtle.css";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/themes/material.css";
+import "easymde/dist/easymde.min.css";
 import type { AppProps } from "next/app";
 import GlobalErrorBoundary from "../context/GlobalErrorBoundary";
 import { FirebaseProvider } from "../context/FirebaseContext";
