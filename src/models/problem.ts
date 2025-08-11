@@ -281,7 +281,7 @@ export function getProblemURL(
 ): string {
   // USACO and CSES sometimes have duplicate problem names
   // so we should add the ID to the URL
-  return `/problems/${isUsaco(problem.source) || problem.source === 'CSES'
+  return `${isUsaco(problem.source) || problem.source === 'CSES'
     ? problem.uniqueId
     : slug(problem.source)
     }-${slug(problem.name.replace(' - ', ''))}`;
