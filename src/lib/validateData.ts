@@ -1,15 +1,14 @@
 import { getProblemURL } from "../models/problem";
 import { MdxContent, ProblemInfo, ModuleProblemLists } from "../types/content";
 
-export function validateProblemConsistency(problems: ProblemInfo[]): void {
+export function validateProblemConsistency(problems: ProblemInfo[]): { usacoIds: Set<string>, problemSlugs: Map<string, string>, problemInfo: Map<string, ProblemInfo>, problemURLToUniqueID: Map<string, string> } {
   // Check to make sure problems with the same unique ID have consistent information, and that there aren't duplicate slugs
   // Also creates user solution pages for each problem
   const problemSlugs = new Map<string, string>(); // maps slug to problem unique ID
   const problemInfo = new Map<string, ProblemInfo>(); // maps unique problem ID to problem info
   const problemURLToUniqueID = new Map<string, string>(); // maps problem URL to problem unique ID
   const urlsThatCanHaveMultipleUniqueIDs = ["https://cses.fi/107/list/"];
-  const usacoIds: string[] = [];
-
+  const usacoIds: Set<string> = new Set();
   problems.forEach((problem) => {
     const slug = getProblemURL(problem);
     if (problemSlugs.has(slug) && problemSlugs.get(slug) !== problem.uniqueId) {
@@ -47,13 +46,15 @@ export function validateProblemConsistency(problems: ProblemInfo[]): void {
 
     // skipping usaco problems to be created with div_to_probs
     if (problem.uniqueId.startsWith("usaco")) {
-      usacoIds.push(problem.uniqueId);
+      usacoIds.add(problem.uniqueId);
     }
 
     problemSlugs.set(slug, problem.uniqueId);
     problemInfo.set(problem.uniqueId, problem);
     problemURLToUniqueID.set(problem.url, problem.uniqueId);
   });
+
+  return { usacoIds, problemSlugs, problemInfo, problemURLToUniqueID };
 }
 
 export function validateModuleProblems(

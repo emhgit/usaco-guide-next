@@ -19,7 +19,19 @@ import {
   ProblemMetadata,
 } from "../models/problem";
 import { ExtractedImage } from "./parseMdxFile";
-import { CACHED_IMAGES_FILE, CACHED_MODULE_FRONTMATTER_FILE, CACHED_MODULE_PROBLEM_LISTS_FILE, CACHED_MODULES_FILE, CACHED_PROBLEMS_FILE, CACHED_SOLUTION_FRONTMATTER_FILE, CACHED_SOLUTIONS_FILE, CONTENT_DIR, SOLUTIONS_DIR } from "./constants";
+import {
+  CACHED_IMAGES_FILE,
+  CACHED_MODULE_FRONTMATTER_FILE,
+  CACHED_MODULE_PROBLEM_LISTS_FILE,
+  CACHED_MODULES_FILE,
+  CACHED_PROBLEMS_FILE,
+  CACHED_SOLUTION_FRONTMATTER_FILE,
+  CACHED_SOLUTIONS_FILE,
+  CONTENT_DIR,
+  SOLUTIONS_DIR,
+  CACHED_PROBLEM_SLUGS_FILE,
+  CACHED_USACO_IDS_FILE
+} from "./constants";
 
 let cachedModules: Map<string, MdxContent> = new Map();
 let cachedProblems: ProblemInfo[] | null = null;
@@ -33,6 +45,8 @@ let cachedSolutionFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter }[]
   | null = null;
 let cachedImages: Map<string, ExtractedImage> = new Map();
+let cachedProblemSlugs: Map<string, string> | null = null;
+let cachedUSACOIds: Set<string> | null = null;
 /**
  * Loads all problem solutions from the solutions directory
  */
@@ -84,10 +98,12 @@ export async function saveFileCache(filePath: string, data: any) {
   } else if (Array.isArray(data)) {
     // Deep clone to strip class instances / prototype methods
     dataToWrite = JSON.parse(JSON.stringify(data, replacer));
+  } else if (data instanceof Set) {
+    dataToWrite = Array.from(data);
   }
 
   try {
-    const json = JSON.stringify(dataToWrite, null, 2);
+    const json = JSON.stringify(dataToWrite);
     await writeFile(filePath, json, "utf8");
   } catch (err) {
     console.error("Failed to stringify data for", filePath, err);
@@ -444,6 +460,39 @@ export async function loadAllSolutionFrontmatter(): Promise<
   return data;
 }
 
+export async function loadAllProblemSlugs(): Promise<Map<string, string>> {
+  const { access, readFile } = await import("fs/promises");
+  if (cachedProblemSlugs) return cachedProblemSlugs;
+  try {
+    await access(CACHED_PROBLEM_SLUGS_FILE);
+    const content = await readFile(CACHED_PROBLEM_SLUGS_FILE, "utf-8");
+    cachedProblemSlugs = new Map(JSON.parse(content));
+    return cachedProblemSlugs;
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
+  return cachedProblemSlugs;
+}
+
+export async function loadAllUSACOIds(): Promise<Set<string>> {
+  const { access, readFile } = await import("fs/promises");
+  if (cachedUSACOIds) return cachedUSACOIds;
+  try {
+    await access(CACHED_USACO_IDS_FILE);
+    const content = await readFile(CACHED_USACO_IDS_FILE, "utf-8");
+    cachedUSACOIds = new Set(JSON.parse(content));
+    return cachedUSACOIds;
+  } catch (error) {
+    // Cache file doesn't exist or is invalid, continue with normal loading
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error('Error reading cache file:', error);
+    }
+  }
+  return cachedUSACOIds;
+}
 /**
  * Main function to load all content (modules, problems, solutions) and their relationships
  */
@@ -458,14 +507,21 @@ export async function loadContent() {
     await loadAllProblems();
 
   // Run validations
-  validateProblemConsistency(loadedProblems);
+  const { problemSlugs, usacoIds } = validateProblemConsistency(loadedProblems);
   validateSolutionRelationships(solutions, loadedProblems);
+
+  cachedProblemSlugs = problemSlugs;
+  cachedUSACOIds = usacoIds;
+  saveFileCache(CACHED_PROBLEM_SLUGS_FILE, problemSlugs);
+  saveFileCache(CACHED_USACO_IDS_FILE, usacoIds);
 
   return {
     modules,
     problems: loadedProblems,
     moduleProblemLists,
     solutions,
+    usacoIds,
+    problemSlugs,
   };
 }
 
