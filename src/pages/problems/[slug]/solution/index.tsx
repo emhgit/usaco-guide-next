@@ -39,14 +39,7 @@ export default function SolutionTemplate({
     removeDuplicates(
       allProblemInfo
         .filter((problem) => !!problem.module)
-        .map((problem) => ({
-          id: loadedModuleFrontmatter.find(
-            (x) => x.frontmatter.id === problem.moduleId
-          )?.frontmatter.id,
-          title: loadedModuleFrontmatter.find(
-            (x) => x.frontmatter.id === problem.moduleId
-          )?.frontmatter.title,
-        }))
+        .map((x) => ({ id: x.moduleId, title: x.module?.frontmatter.title }))
     );
 
   const markdownData = React.useMemo(() => {
@@ -100,7 +93,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
       "../../../../lib/loadContent"
     );
     const { SLUG_ID_MAPPING_FILE } = await import("../../../../lib/constants");
-    const writeFile = await import("fs/promises");
+    const { writeFile } = await import("fs/promises");
     const { mkdir } = await import("fs/promises");
     const path = await import("path");
 
@@ -125,7 +118,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     });
 
     await mkdir(path.dirname(SLUG_ID_MAPPING_FILE), { recursive: true });
-    await writeFile.writeFile(SLUG_ID_MAPPING_FILE, JSON.stringify(slugIdMap));
+    await writeFile(SLUG_ID_MAPPING_FILE, JSON.stringify(slugIdMap));
 
     return {
       paths,
@@ -148,12 +141,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
       loadAllModuleFrontmatter,
       getCachedImages,
     } = await import("../../../../lib/loadContent");
-    const readFileSync = await import("fs/promises");
+    const { readFile } = await import("fs/promises");
     const { SLUG_ID_MAPPING_FILE } = await import("../../../../lib/constants");
-    const mappingFileContent = await readFileSync.readFile(
-      SLUG_ID_MAPPING_FILE,
-      "utf-8"
-    );
+    const mappingFileContent = await readFile(SLUG_ID_MAPPING_FILE, "utf-8");
     const slugIdMap = JSON.parse(mappingFileContent);
     const { slug } = context.params as {
       slug: string;
