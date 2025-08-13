@@ -1,5 +1,5 @@
 import { getAlgoliaRecords } from '../src/utils/algolia-queries';
-import { searchClient } from '../src/utils/algoliaSearchClient';
+import searchClient from '../src/utils/algoliaSearchClient';
 async function runIndexing() {
     if (!process.env.ALGOLIA_APP_ID) {
         console.log('Algolia app ID not found - skipping indexing');
