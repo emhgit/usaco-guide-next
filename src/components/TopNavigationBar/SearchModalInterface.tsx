@@ -12,7 +12,7 @@ import {
 } from "react-instantsearch";
 import { moduleIDToURLMap, SECTION_LABELS } from "../../../content/ordering";
 import { AlgoliaModuleInfoHit } from "../../models/module";
-import { searchClient } from "../../utils/algoliaSearchClient";
+import searchClient from "../../utils/algoliaLiteSearchClient";
 
 const indexName = `${process.env.GATSBY_ALGOLIA_INDEX_NAME ?? "dev"}_modules`;
 
