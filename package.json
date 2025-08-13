@@ -32,6 +32,7 @@
     "@tippyjs/react": "^4.2.6",
     "@types/mdx": "^2.0.13",
     "algoliasearch": "^5.35.0",
+    "axios": "^1.11.0",
     "bad-words": "^4.0.0",
     "child_process": "^1.0.2",
     "classnames": "^2.5.1",
