@@ -11946,7 +11946,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.5.7, prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -12214,6 +12214,18 @@ __metadata:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
   checksum: 10c0/2027ef57b0a375d1accdad60550329dc0911b31d429ec6eb9ae391ae9baf9f26991b0ff8615eb99de319a55ce6e9382107783e615cb2116522ed0275b214b7f7
+  languageName: node
+  linkType: hard
+
+"react-split@npm:^2.0.14":
+  version: 2.0.14
+  resolution: "react-split@npm:2.0.14"
+  dependencies:
+    prop-types: "npm:^15.5.7"
+    split.js: "npm:^1.6.0"
+  peerDependencies:
+    react: "*"
+  checksum: 10c0/59cd0f459a7c4016cd937319a3208cf31500fc7d90aa1f5d20004c2c6626e5da24ebbaa0942db64dc88f84bc41039083b9480612fb19d6bfd5e1906ef0aa5d59
   languageName: node
   linkType: hard
 
@@ -13267,6 +13279,13 @@ __metadata:
   version: 2.0.2
   resolution: "space-separated-tokens@npm:2.0.2"
   checksum: 10c0/6173e1d903dca41dcab6a2deed8b4caf61bd13b6d7af8374713500570aa929ff9414ae09a0519f4f8772df993300305a395d4871f35bc4ca72b6db57e1f30af8
+  languageName: node
+  linkType: hard
+
+"split.js@npm:^1.6.0":
+  version: 1.6.5
+  resolution: "split.js@npm:1.6.5"
+  checksum: 10c0/aff3985b838cee93bca712ba178e6be0928760ade1292fd0b38eb5e4da0130341f183a530bde58e85a3cd4d747b68aaacbd381b73552639f5b9773b5d0a7d4e9
   languageName: node
   linkType: hard
 
@@ -14393,6 +14412,7 @@ __metadata:
     react-hot-toast: "npm:^2.5.2"
     react-instantsearch: "npm:^7.16.2"
     react-select: "npm:^5.10.2"
+    react-split: "npm:^2.0.14"
     rehype-autolink-headings: "npm:^7.1.0"
     rehype-external-links: "npm:^3.0.0"
     rehype-katex: "npm:^7.0.1"
