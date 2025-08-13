@@ -5,7 +5,7 @@ import gfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import rehypeSlug from "rehype-slug";
-import { compile } from "@mdx-js/mdx";
+import { compile as mdxCompile } from "@mdx-js/mdx";
 import customRehypeKatex from "../../mdx-plugins/rehype-math";
 import rehypeSnippets from "../../mdx-plugins/rehype-snippets";
 import remarkToC from "../../mdx-plugins/remark-toc";
@@ -24,7 +24,7 @@ const compile = async ({ markdown, problems }) => {
       }));
 
     const tableOfContents = {};
-    const compiledResult = await compile(
+    const compiledResult = await mdxCompile(
       markdown.replace(/<!--/g, "{/* ").replace(/-->/g, "*/}"),
       {
         remarkPlugins: [
