@@ -1,0 +1,102 @@
+import * as React from "react";
+import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
+import { useDarkMode } from "../../context/DarkModeContext";
+import CodeBlock from "../markdown/CodeBlock/CodeBlock";
+import YouTube from "../markdown/YouTube";
+import Feedback from "./Feedback";
+
+const VideoComponent = ({ link }: { link: string }) => {
+  const getParameterByName = (name: string, url = window.location.href) => {
+    name = name.replace(/[\[\]]/g, "\\$&");
+    const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  };
+  let id = "";
+  if (link.indexOf("youtube.com") !== -1) {
+    id = getParameterByName("v", link.trim())!;
+  } else if (link.indexOf("youtu.be") !== -1) {
+    id = link.split("/").pop()!;
+  }
+
+  if (!id) {
+    return (
+      <div
+        className={"mt-6"}
+        style={{
+          position: "relative",
+          width: "100%",
+          // 16:9 aspect ratio
+          paddingBottom: "56.25%",
+        }}
+      >
+        <div
+          className={
+            "absolute top-0 left-0 h-full w-full border-2 border-solid bg-gray-200"
+          }
+        >
+          <p className={"text-center"}>
+            <i>Video Error: invalid youtube video link.</i>
+            <p>Try using one of the following link formats:</p>
+            <p>https://www.youtube.com/watch?v=VIDEOID</p>
+            <p>https://youtu.be/VIDEOID</p>
+          </p>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={"mt-6"}>
+      <YouTube id={id} />
+      <div className="h-4" />
+      <Feedback videoId={id} />
+    </div>
+  );
+};
+
+const GroupsCodeBlock = ({
+  className,
+  children,
+  inline,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  inline?: boolean;
+}) => {
+  const value = children![0];
+  const isDarkMode = useDarkMode();
+  if (className === "language-video") {
+    return <VideoComponent link={value} />;
+  }
+  if (inline) {
+    return <code>{value}</code>;
+  }
+
+  return (
+    <CodeBlock className={className} isDarkMode={isDarkMode}>
+      {value}
+    </CodeBlock>
+  );
+};
+
+const renderers = {
+  code: GroupsCodeBlock,
+};
+
+export default function SafeMarkdownRenderer({ children }) {
+  return (
+    <div className="prose dark:prose-light max-w-none">
+      <a target="_blank" rel="noopener noreferrer" className="react-markdown">
+        <ReactMarkdown
+          components={renderers as any}
+          remarkPlugins={[gfm as any]}
+        >
+          {children}
+        </ReactMarkdown>
+      </a>
+    </div>
+  );
+}
