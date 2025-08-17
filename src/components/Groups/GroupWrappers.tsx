@@ -110,7 +110,7 @@ export const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
   return <>{props.children}</>;
 };
 
-export default function Wrapper(children: React.ReactNode) {
+export default function Wrapper(children: any) {
   return (
     <ActiveGroupProvider>
       <ActivePostProblemsProvider>
