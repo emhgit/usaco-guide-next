@@ -10,15 +10,14 @@ import Layout from "../layout";
 import TopNavigationBar from "../TopNavigationBar/TopNavigationBar";
 import SEO from "../seo";
 import Link from "next/link";
+import { useActivePostProblems } from "../../hooks/groups/useActivePostProblems";
 
 interface GroupPageWrapperProps extends RouteComponentProps {
   children: React.ReactNode;
   groupId?: string;
 }
 
-export default function GroupPageWrapper(
-  props: GroupPageWrapperProps
-): ReactElement {
+export function GroupPageWrapper(props: GroupPageWrapperProps): ReactElement {
   /* keeps track of current group id and error handling pages
      if that group cannot be accessed for whatever reason*/
 
@@ -88,3 +87,18 @@ export default function GroupPageWrapper(
 
   return <>{props.children}</>;
 }
+
+interface PostPageWrapperProps extends GroupPageWrapperProps {
+  postId?: string;
+}
+
+const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
+  const { setActivePostId } = useActivePostProblems();
+  useEffect(() => {
+    setActivePostId(props.postId);
+    //remove postId on exit
+    return () => setActivePostId(undefined);
+  }, []);
+
+  return <>{props.children}</>;
+};
