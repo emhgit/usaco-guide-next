@@ -1,6 +1,9 @@
 import { RouteComponentProps } from "@reach/router";
 import { ReactElement, useEffect } from "react";
-import { useActiveGroup } from "../../hooks/groups/useActiveGroup";
+import {
+  ActiveGroupProvider,
+  useActiveGroup,
+} from "../../hooks/groups/useActiveGroup";
 import {
   useFirebaseUser,
   useIsUserDataLoaded,
@@ -10,7 +13,11 @@ import Layout from "../layout";
 import TopNavigationBar from "../TopNavigationBar/TopNavigationBar";
 import SEO from "../seo";
 import Link from "next/link";
-import { useActivePostProblems } from "../../hooks/groups/useActivePostProblems";
+import {
+  ActivePostProblemsProvider,
+  useActivePostProblems,
+} from "../../hooks/groups/useActivePostProblems";
+import { ProblemSubmissionPopupProvider } from "./ProblemSubmissionPopup";
 
 interface GroupPageWrapperProps extends RouteComponentProps {
   children: React.ReactNode;
@@ -92,7 +99,7 @@ interface PostPageWrapperProps extends GroupPageWrapperProps {
   postId?: string;
 }
 
-const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
+export const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
   const { setActivePostId } = useActivePostProblems();
   useEffect(() => {
     setActivePostId(props.postId);
@@ -102,3 +109,15 @@ const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
 
   return <>{props.children}</>;
 };
+
+export default function Wrapper(children: React.ReactNode) {
+  return (
+    <ActiveGroupProvider>
+      <ActivePostProblemsProvider>
+        <ProblemSubmissionPopupProvider>
+          {children}
+        </ProblemSubmissionPopupProvider>
+      </ActivePostProblemsProvider>
+    </ActiveGroupProvider>
+  );
+}
