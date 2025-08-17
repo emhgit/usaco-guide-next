@@ -4197,7 +4197,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/codemirror@npm:^5.60.10":
+"@types/codemirror@npm:^5.60.10, @types/codemirror@npm:~5.60.5":
   version: 5.60.16
   resolution: "@types/codemirror@npm:5.60.16"
   dependencies:
@@ -12948,6 +12948,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-simplemde-editor@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "react-simplemde-editor@npm:5.2.0"
+  dependencies:
+    "@types/codemirror": "npm:~5.60.5"
+  peerDependencies:
+    easymde: ">= 2.0.0 < 3.0.0"
+    react: ">=16.8.2"
+    react-dom: ">=16.8.2"
+  checksum: 10c0/6b352fe0634cc45277502b83eeb70030d50a0726943b8e343e4afccb0dd152a395a533c151795a9724ec61413a3567fd23ed209d60f0ec283006add12b0c120e
+  languageName: node
+  linkType: hard
+
 "react-transition-group@npm:^4.3.0":
   version: 4.4.5
   resolution: "react-transition-group@npm:4.4.5"
@@ -15201,6 +15214,7 @@ __metadata:
     react-instantsearch: "npm:^7.16.2"
     react-markdown: "npm:^10.1.0"
     react-select: "npm:^5.10.2"
+    react-simplemde-editor: "npm:^5.2.0"
     rehype-autolink-headings: "npm:^7.1.0"
     rehype-external-links: "npm:^3.0.0"
     rehype-katex: "npm:^7.0.1"
