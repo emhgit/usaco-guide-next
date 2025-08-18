@@ -38,6 +38,7 @@ let cachedProblems: ProblemInfo[] | null = null;
 let cachedModuleProblemLists: ModuleProblemLists[] | null = null;
 let cachedSolutions: Map<string, MdxContent> = new Map();
 let cachedCowImages: Array<{ name: string; src: string }> | null = null;
+let cachedTeamImages: Array<{ name: string; src: string }> | null = null;
 let cachedModuleFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter; division: string }[]
   | null = null;
@@ -323,7 +324,7 @@ export async function loadModule(fileName: string, id?: string): Promise<MdxCont
 export async function loadCowImages() {
   if (cachedCowImages) return cachedCowImages;
   const { readdir } = await import("fs/promises");
-  const assetsDir = path.join(process.cwd(), "src", "assets");
+  const assetsDir = path.join(process.cwd(), "public", "assets");
   const cowImages: Array<{
     name: string;
     src: string;
@@ -364,6 +365,50 @@ export async function loadCowImages() {
     return cowImages;
   } catch (error) {
     console.error("Error loading cow images:", error);
+    return [];
+  }
+}
+
+export const loadTeamImages = async () => {
+  if (cachedTeamImages) return cachedTeamImages;
+  const { readdir } = await import("fs/promises");
+  const teamImagesDir = path.join(process.cwd(), "public", "content", "team", "images");
+  console.log("Loading team images from", teamImagesDir);
+  const teamImages: Array<{
+    name: string;
+    src: string;
+  }> = [];
+  try {
+    // Recursively find all image files in the assets directory
+    const findImages = async (dir: string, basePath: string = "") => {
+      const entries = await readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        const relativePath = path.join(basePath, entry.name);
+
+        if (entry.isDirectory()) {
+          await findImages(fullPath, relativePath);
+        } else if (
+          entry.isFile() &&
+          /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
+        ) {
+          teamImages.push({
+            name: path.parse(entry.name).name,
+            src: `/${path
+              .relative(process.cwd(), fullPath)
+              .replace(/\\/g, "/")}`,
+          });
+        }
+      }
+    };
+
+    await findImages(teamImagesDir);
+
+    cachedTeamImages = teamImages;
+    return teamImages;
+  } catch (error) {
+    console.error("Error loading team images:", error);
     return [];
   }
 }

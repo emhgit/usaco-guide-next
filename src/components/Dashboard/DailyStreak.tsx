@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
 import { useLastVisitInfo } from "../../context/UserDataContext/properties/lastVisit";
-import MarkdownImage from "../../components/markdown/MarkdownImage";
 import { GetStaticProps } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 // note: cows will be unlocked in lexicographical order
 
@@ -79,7 +79,7 @@ const PhotoCard = ({ img, day, tomorrowMilliseconds, hiddenOnDesktop }) => {
             </div>
           ) : null}
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-            <MarkdownImage
+            <Image
               src={img.src}
               alt="Cow"
               title=""
