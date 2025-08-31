@@ -391,13 +391,17 @@ export const loadTeamImages = async () => {
           await findImages(fullPath, relativePath);
         } else if (
           entry.isFile() &&
-          /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
+          /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(entry.name) // Common image extensions
         ) {
+          // Remove the 'public' prefix from the path
+          const publicPath = path.relative(
+            path.join(process.cwd(), "public"),
+            fullPath
+          ).replace(/\\/g, "/");
+
           teamImages.push({
-            name: path.parse(entry.name).name,
-            src: `/${path
-              .relative(process.cwd(), fullPath)
-              .replace(/\\/g, "/")}`,
+            name: path.basename(entry.name, path.extname(entry.name)),
+            src: `/${publicPath}`,
           });
         }
       }
