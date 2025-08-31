@@ -346,11 +346,13 @@ export async function loadCowImages() {
           /cows/i.test(fullPath) && // Check if path contains 'cows' (case insensitive)
           /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
         ) {
+          const publicPath = path.relative(
+            path.join(process.cwd(), "public"),
+            fullPath
+          ).replace(/\\/g, "/");
           cowImages.push({
             name: path.parse(entry.name).name,
-            src: `/${path
-              .relative(process.cwd(), fullPath)
-              .replace(/\\/g, "/")}`,
+            src: `/${publicPath}`,
           });
         }
       }

@@ -4,6 +4,8 @@ import "tippy.js/animations/scale-subtle.css";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/material.css";
 import "easymde/dist/easymde.min.css";
+import "../components/Dashboard/heatmap-styles.css";
+import "react-calendar-heatmap/dist/styles.css";
 import type { AppProps } from "next/app";
 import GlobalErrorBoundary from "../context/GlobalErrorBoundary";
 import { FirebaseProvider } from "../context/FirebaseContext";

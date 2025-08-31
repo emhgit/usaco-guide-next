@@ -1,32 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
 import { useLastVisitInfo } from "../../context/UserDataContext/properties/lastVisit";
-import { GetStaticProps } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { useCowImages } from "../../context/CowImagesContext";
 
 // note: cows will be unlocked in lexicographical order
-
-export const getStaticProps: GetStaticProps = async () => {
-  try {
-    const { loadCowImages } = await import("../../lib/loadContent");
-    const cowImages = await loadCowImages();
-    return {
-      props: {
-        cowImages,
-      },
-      // Re-generate the page at most once per hour
-      revalidate: 3600,
-    };
-  } catch (error) {
-    console.error("Failed to load cow images:", error);
-    return {
-      props: {
-        cowImages: [],
-      },
-    };
-  }
-};
 
 const ComeBackTimer = ({ tomorrowMilliseconds }) => {
   const [milliseconds, setMilliseconds] = React.useState(
@@ -73,19 +52,19 @@ const PhotoCard = ({ img, day, tomorrowMilliseconds, hiddenOnDesktop }) => {
         </div>
         {/* We set text size to 0px because GatsbyImage is inline block. Without it, there's extra space after the image. */}
         <div className="relative overflow-hidden text-[0px]">
-          {tomorrowMilliseconds >= 0 ? (
+          {tomorrowMilliseconds >= 0 && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/25 p-4 text-center text-base font-medium text-black dark:bg-black/25 dark:text-white">
               <ComeBackTimer tomorrowMilliseconds={tomorrowMilliseconds} />
             </div>
-          ) : null}
-          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+          )}
+          <div className="relative w-full aspect-[16/9]">
             <Image
               src={img.src}
               alt="Cow"
-              title=""
-              style={{
-                filter: tomorrowMilliseconds >= 0 ? "blur(60px)" : "none",
-              }}
+              fill
+              sizes="(max-width: 768px) 100vw, 592px"
+              className={`object-cover ${tomorrowMilliseconds >= 0 ? "blur-2xl" : ""}`}
+              priority={day === 1} // Only preload the first image
             />
           </div>
         </div>
@@ -95,12 +74,11 @@ const PhotoCard = ({ img, day, tomorrowMilliseconds, hiddenOnDesktop }) => {
 };
 
 interface DailyStreakProps {
-  cowImages: Array<{ name: string; src: string }>;
   streak: number;
 }
 
-export default function DailyStreak({ streak, cowImages }: DailyStreakProps) {
-  const cows = cowImages || [];
+export default function DailyStreak({ streak }: DailyStreakProps) {
+  const cows = useCowImages() || [];
   const { lastVisitDate } = useLastVisitInfo();
 
   // we don't want to render streaks during Server-Side Generation

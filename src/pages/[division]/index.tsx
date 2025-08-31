@@ -267,11 +267,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const modulesForThisDivision = loadedModules
       .values()
       .filter((module) => module.fields.division === division);
-
-    const allModules = modulesForThisDivision.reduce((acc, curr) => {
-      acc[curr.frontmatter.id] = curr;
-      return acc;
-    }, {} as { [key: string]: MdxContent });
+    const allModules = modulesForThisDivision.reduce(
+      (acc, curr) => {
+        acc[curr.frontmatter.id] = curr;
+        return acc;
+      },
+      {} as { [key: string]: MdxContent }
+    );
     if (!allModules) {
       console.error("Failed to load modules for division:", division);
       return { notFound: true };
