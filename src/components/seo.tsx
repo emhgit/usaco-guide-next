@@ -74,7 +74,7 @@ const SEO: React.FC<SEOProps> = ({
   return (
     <Head>
       <html lang={lang} />
-      <title>{`${title} · ${siteTitle}`}</title>
+      <title>{title ? `${title} · ${siteTitle}` : siteTitle}</title>
       <meta name="description" content={metaDescription} />
       <link rel="canonical" href={canonicalUrl} />
       {metaTags.concat(meta).map((meta) => (
