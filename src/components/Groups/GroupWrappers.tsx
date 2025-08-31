@@ -20,7 +20,7 @@ import {
 import { ProblemSubmissionPopupProvider } from "./ProblemSubmissionPopup";
 
 interface GroupPageWrapperProps extends RouteComponentProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   groupId?: string;
 }
 
@@ -95,22 +95,21 @@ export function GroupPageWrapper(props: GroupPageWrapperProps): ReactElement {
   return <>{props.children}</>;
 }
 
-interface PostPageWrapperProps extends GroupPageWrapperProps {
-  postId?: string;
-}
-
-export const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
+export const PostPageWrapper = (
+  postId?: string,
+  children?: React.ReactNode
+): ReactElement => {
   const { setActivePostId } = useActivePostProblems();
   useEffect(() => {
-    setActivePostId(props.postId);
+    setActivePostId(postId);
     //remove postId on exit
     return () => setActivePostId(undefined);
   }, []);
 
-  return <>{props.children}</>;
+  return <>{children}</>;
 };
 
-export default function Wrapper(children: any) {
+export default function Wrapper({ children }: { children: React.ReactNode }) {
   return (
     <ActiveGroupProvider>
       <ActivePostProblemsProvider>
