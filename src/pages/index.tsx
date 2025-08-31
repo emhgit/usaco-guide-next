@@ -284,8 +284,12 @@ export default function IndexPage({ teamImages }: IndexPageProps): JSX.Element {
                   src="/assets/forum-screenshot.png"
                   alt="USACO Forum Screenshot"
                   placeholder="blur"
+                  blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
+                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/>`
+                  ).toString("base64")}`}
                   layout="constrained"
                   width={560}
+                  height={315}
                 />
               </div>
             }
