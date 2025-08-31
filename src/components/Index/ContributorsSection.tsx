@@ -2,6 +2,7 @@ import * as React from "react";
 import { Member, Members } from "../../../content/team/contributors";
 import Image from "next/image";
 import { useCachedImages } from "../../context/CachedImagesContext";
+import { useTeamImages } from "../../context/TeamImagesContext";
 
 const MemberCard = ({ member }: { member: Member }) => {
   const socialMedia = {
@@ -104,8 +105,10 @@ const MemberCard = ({ member }: { member: Member }) => {
       link: (x) => `https://reddit.com/user/${x}`,
     },
   };
-  const cachedImages = useCachedImages();
-  const image = member.photo ? cachedImages.get(member.photo) : undefined;
+  const teamImages = useTeamImages();
+  const image = member.photo
+    ? teamImages.find((x) => x.name === member.photo)
+    : undefined;
   return (
     <li
       key={member.name}

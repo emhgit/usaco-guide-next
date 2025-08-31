@@ -33,7 +33,7 @@ import {
   useFirebaseUser,
   useIsUserDataLoaded,
 } from "../context/UserDataContext/UserDataContext";
-import { CachedImagesProvider } from "../context/CachedImagesContext";
+import { TeamImagesProvider } from "../context/TeamImagesContext";
 import { GetStaticProps } from "next";
 
 const containerClasses = "max-w-(--breakpoint-xl) mx-auto px-4 sm:px-6 lg:px-8";
@@ -53,11 +53,12 @@ const linkTextStyles =
   "text-blue-600 dark:text-blue-300 transition hover:text-purple-600 dark:hover:text-purple-300";
 
 interface IndexPageProps {
-  cachedImagesJson: string;
+  teamImages: {
+    name: string;
+    src: string;
+  }[];
 }
-export default function IndexPage({
-  cachedImagesJson,
-}: IndexPageProps): JSX.Element {
+export default function IndexPage({ teamImages }: IndexPageProps): JSX.Element {
   const firebaseUser = useFirebaseUser();
   const loading = useIsUserDataLoaded();
   const router = useRouter();
@@ -735,9 +736,9 @@ export default function IndexPage({
         </div>
       </div>
       {/*End FAQ*/}
-      <CachedImagesProvider value={cachedImagesJson}>
+      <TeamImagesProvider value={teamImages}>
         <ContributorsSection />
-      </CachedImagesProvider>
+      </TeamImagesProvider>
 
       <div className="bg-gray-100 dark:bg-gray-900">
         <div className="mx-auto max-w-(--breakpoint-xl) px-4 py-12">
@@ -759,16 +760,15 @@ export default function IndexPage({
 
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const { getCachedImages } = await import("../lib/loadContent");
-    const cachedImages = await getCachedImages();
-    const cachedImagesJson = JSON.stringify(Array.from(cachedImages.entries()));
+    const { loadTeamImages } = await import("../lib/loadContent");
+    const teamImages = await loadTeamImages();
     return {
       props: {
-        cachedImagesJson,
+        teamImages,
       },
     };
   } catch (error) {
-    console.error("Error loading cached images:", error);
+    console.error("Error loading team images:", error);
     return {
       props: {
         cachedImagesJson: null,
