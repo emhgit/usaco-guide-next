@@ -34,7 +34,7 @@ The `validateModuleProblems` function can be ignored.
 
 ## Pages Creation
 
-Pages that have brackets in their file path (e.g. `[value]`) will use `getStaticPaths` to dynamically load. Pages that require data from the [lib/](../src/lib) will use `getStaticProps`.`getStaticPaths` and `getStaticProps` run during build time on the server, which will reduce load on the client.
+Pages that have brackets in their file path (e.g. `[value]`) will use `getStaticPaths` to dynamically load. Pages that require data from the [lib/](../src/lib) (`solutions/`, `user-solutions`, etc.) will use `getStaticProps`. `getStaticPaths` and `getStaticProps` run during build time on the server, which will reduce load on the client.
 
 `getStaticPaths` essentially replaces `createPage`, and `getStaticProps` essentially replaces the GraphQL queries.
 
@@ -58,6 +58,10 @@ While the [remark-extract-images.js](../src/mdx-plugins/remark-extract-images.js
 
 The `cachedImages` map in [loadContent.ts](../src/lib/loadContent.ts) stores image `src`s as keys and `ExtractedImage`s as values. I created the [CachedImagesContext.tsx](../src/context/CachedImagesContext.tsx) file to avoid prop drilling, which allows me to serve the `cachedImages` to the custom [MarkdownImage.tsx](../src/components/markdown/MarkdownImage.ts) component.
 
+The [CowImagesContext](../src/context/CowImagesContext.tsx) component is used to serve the cow images to the [DailyStreak.tsx](../src/components/Dashboard/DailyStreak.tsx) component.
+
+The [TeamImagesContext](../src/context/TeamImagesContext.tsx) component is used to serve the team images to the [ContributorsSection.tsx](../src/components/Index/ContributorsSection.tsx) component.
+
 **Note**
 
 All static files have been moved to the [public/](../public/) directory because Next.js can only serve static files from there. I used the soon to be extant `migrate-imports.cjs` script to update change all relative imports to absolute imports in the [content/](../content/) and [solutions/](../solutions/) directories.
@@ -66,14 +70,10 @@ Below is a high level overview of steps that still need to be accomplished.
 
 **TODO**
 
-- Create solutions pages
-- Create user solutions pages
 - Configure redirects
-- Copy over `api/` directory and convert Gatsby syntax to Next.js syntax
-- Update algolia config for Next.js
-- Create Problems pages
-- Implement Groups
-- Implement editor
+- Update algolia config for Next.js (indexing script in `/scripts`)
+- Implement Groups (Set each component to the proper file under `pages/`, i have already converted the components)
+- Implement editor (investigate why auth isnt working; might be bc dev mode)
 - copy over all other components/scripts/utils
 - Update storybook config for next.js
 - copy over stories
