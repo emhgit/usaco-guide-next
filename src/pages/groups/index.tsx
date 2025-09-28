@@ -1,7 +1,7 @@
 import GroupSelectPage from "../../components/Groups/GroupSelectPage/GroupSelectPage";
 import Wrapper from "../../components/Groups/GroupWrappers";
 
-const GroupSelectPageWrapper = () => {
+const Index = () => {
   return (
     <Wrapper>
       <GroupSelectPage />
@@ -9,4 +9,4 @@ const GroupSelectPageWrapper = () => {
   );
 };
 
-export default GroupSelectPageWrapper;
+export default Index;
