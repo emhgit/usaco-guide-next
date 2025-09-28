@@ -8,7 +8,7 @@ import Feed from "./Feed";
 import GroupPageHeader from "./GroupPageHeader";
 import LeaderboardSidebar from "./LeaderboardSidebar";
 
-export default function GroupPage(props) {
+export default function GroupPage() {
   const group = useActiveGroup();
 
   return (
@@ -18,7 +18,7 @@ export default function GroupPage(props) {
       <div className="dark:bg-dark-surface min-h-screen bg-gray-100">
         <GroupPageHeader group={group.groupData!} />
         <Link
-          href="leaderboard"
+          href={"/groups/" + group.activeGroupId + "/leaderboard"}
           className="flex items-center justify-between bg-white px-4 py-3 shadow-sm sm:px-8 md:hidden dark:bg-gray-800"
         >
           <span>View Leaderboard</span> &rarr;
