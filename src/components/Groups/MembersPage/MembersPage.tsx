@@ -8,7 +8,7 @@ import SEO from "../../seo";
 import TopNavigationBar from "../../TopNavigationBar/TopNavigationBar";
 import MemberDetail from "./MemberDetail";
 
-export default function MembersPage({ path }: { path: string }): JSX.Element {
+export default function MembersPage(): JSX.Element {
   const activeGroup = useActiveGroup();
   const memberInfo = useMemberInfoForGroup(activeGroup.groupData!);
   const leaderboard = useLeaderboardData({
