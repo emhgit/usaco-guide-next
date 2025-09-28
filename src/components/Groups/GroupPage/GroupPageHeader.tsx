@@ -111,19 +111,19 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                       Create New Announcement
                     </button>
                     <Link
-                      href="edit"
+                      href={"/groups/" + props.group?.id + "/edit"}
                       className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden"
                     >
                       Edit Group
                     </Link>
                     <Link
-                      href="join-links"
+                      href={"/groups/" + props.group?.id + "/join-links"}
                       className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden"
                     >
                       View Join Links
                     </Link>
                     <Link
-                      href="members"
+                      href={"/groups/" + props.group?.id + "/members"}
                       className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:bg-gray-100 focus:text-gray-900 focus:outline-hidden"
                     >
                       View Members
