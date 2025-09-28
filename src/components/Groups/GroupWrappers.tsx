@@ -21,7 +21,7 @@ import { ProblemSubmissionPopupProvider } from "./ProblemSubmissionPopup";
 
 interface GroupPageWrapperProps extends RouteComponentProps {
   children?: React.ReactNode;
-  groupId?: string;
+  groupId: string;
 }
 
 export function GroupPageWrapper(props: GroupPageWrapperProps): ReactElement {
@@ -37,7 +37,7 @@ export function GroupPageWrapper(props: GroupPageWrapperProps): ReactElement {
     setActiveGroupId(props.groupId);
     //remove groupId on exit
     return () => setActiveGroupId(undefined);
-  }, []);
+  }, [props.groupId]);
 
   if (isUserLoaded && !firebaseUser?.uid) {
     return (
