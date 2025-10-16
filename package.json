@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "yarn prebuild && next dev",
+    "dev": "next dev",
     "prebuild": "yarn clean && yarn tsx scripts/load-content.ts",
     "build": "yarn prebuild && next build",
     "start": "next start",
@@ -67,6 +67,7 @@
     "react-markdown": "^10.1.0",
     "react-select": "^5.10.2",
     "react-simplemde-editor": "^5.2.0",
+    "react-split": "^2.0.14",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-external-links": "^3.0.0",
     "rehype-katex": "^7.0.1",
