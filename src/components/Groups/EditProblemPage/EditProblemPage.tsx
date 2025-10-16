@@ -166,7 +166,11 @@ export default function EditProblemPage(props: Props) {
             </h1>
           </div>
           <div className="mt-4 flex space-x-3 md:mt-0">
-            <Link href="../" replace className="btn">
+            <Link
+              href={`/groups/${groupId}/post/${postId}/problems/${problemId}`}
+              replace
+              className="btn"
+            >
               <span>Back</span>
             </Link>
             <button type="submit" onClick={handleSaveProblem} className="btn">
