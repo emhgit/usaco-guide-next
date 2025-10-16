@@ -108,7 +108,7 @@ export default function EditPostPage(props) {
             </h1>
           </div>
           <div className="mt-4 flex space-x-3 md:mt-0">
-            <Link href="../" className="btn">
+            <Link href=".." className="btn">
               <span>Back</span>
             </Link>
           </div>

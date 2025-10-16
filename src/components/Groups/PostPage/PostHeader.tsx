@@ -21,7 +21,16 @@ export default function PostHeader({ post }: { post: PostData }) {
       </div>
       {activeGroup.showAdminView && (
         <div className="mt-4 flex space-x-3 md:mt-0">
-          <Link href="edit" className="btn">
+          <Link
+            href={
+              "/groups/" +
+              activeGroup.groupData!.id +
+              "/post/" +
+              post.id +
+              "/edit"
+            }
+            className="btn"
+          >
             <svg
               className="mr-2 -ml-1 h-5 w-5 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
