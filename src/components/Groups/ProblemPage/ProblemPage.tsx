@@ -17,14 +17,15 @@ import SafeMarkdownRenderer from "../SafeMarkdownRenderer";
 import ProblemSidebar from "./ProblemSidebar";
 import ProblemSubmission from "./ProblemSubmissionInterface";
 
-export default function ProblemPage(props) {
+interface ProblemPageProps {
+  groupId: string;
+  postId: string;
+  problemId: string;
+}
+
+export default function ProblemPage(props: ProblemPageProps) {
   const router = useRouter();
-  const { postId, problemId } = props as {
-    path: string;
-    groupId: string;
-    postId: string;
-    problemId: string;
-  };
+  const { groupId, postId, problemId } = props;
   const activeGroup = useActiveGroup();
   const post = usePost(postId);
   const problem = useProblem(problemId);
