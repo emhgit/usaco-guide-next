@@ -134,7 +134,9 @@ export default function PostProblems({
                   type="button"
                   onClick={() =>
                     createNewProblem(post).then((id) =>
-                      router.push(`problems/${id}/edit`)
+                      router.push(
+                        `/groups/${router.query.id}/post/${router.query.postId}/problems/${id}/edit`
+                      )
                     )
                   }
                   className="btn"
