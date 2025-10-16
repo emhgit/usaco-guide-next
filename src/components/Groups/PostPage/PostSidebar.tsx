@@ -66,7 +66,13 @@ export default function PostSidebar({
                 Assignment Leaderboard
               </h3>
               <Link
-                href="leaderboard"
+                href={
+                  "/groups/" +
+                  activeGroup.activeGroupId +
+                  "/post/" +
+                  post.id +
+                  "/leaderboard"
+                }
                 className="text-sm font-medium text-gray-700 hover:text-black dark:text-gray-300 dark:hover:text-white"
               >
                 View All &rarr;

@@ -15,12 +15,12 @@ import Breadcrumbs from "../Breadcrumbs";
 import { LeaderboardTable } from "../LeaderboardTable/LeaderboardTable";
 import { useProblemSubmissionPopupAction } from "../ProblemSubmissionPopup";
 
-export default function PostLeaderboardPage(props) {
-  const { postId, path } = props as {
-    path: string;
-    groupId: string;
-    postId: string;
-  };
+interface PostLeaderboardPageProps {
+  groupId: string;
+  postId: string;
+}
+export default function PostLeaderboardPage(props: PostLeaderboardPageProps) {
+  const { groupId, postId } = props;
   const activeGroup = useActiveGroup();
   const post = usePost(postId);
   if (!post) throw new Error("Post not found");
