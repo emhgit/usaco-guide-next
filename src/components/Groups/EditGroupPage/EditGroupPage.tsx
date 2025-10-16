@@ -43,7 +43,7 @@ export default function EditGroupPage(props) {
   }
 
   const handleSave = () =>
-    updateGroup(groupId, group).then(() => router.push("../"));
+    updateGroup(groupId, group).then(() => router.push(`../${groupId}`));
 
   return (
     <Layout>
@@ -63,7 +63,7 @@ export default function EditGroupPage(props) {
             </h1>
           </div>
           <div className="mt-4 flex space-x-3 md:mt-0">
-            <Link href="../" className="btn">
+            <Link href={`../${groupId}`} className="btn">
               <span>Back</span>
             </Link>
           </div>

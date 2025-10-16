@@ -10,7 +10,7 @@ const edit = () => {
   return (
     <Wrapper>
       <GroupPageWrapper groupId={id as string}>
-        <EditGroupPage />
+        <EditGroupPage groupId={id as string} />
       </GroupPageWrapper>
     </Wrapper>
   );
