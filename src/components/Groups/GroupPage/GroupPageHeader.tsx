@@ -89,7 +89,9 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                         const groupId = props.group?.id;
                         if (groupId) {
                           createNewPost("assignment").then((postId) =>
-                            router.push(`post/${postId}/edit`)
+                            router.push(
+                              `/groups/${groupId}/post/${postId}/edit`
+                            )
                           );
                         }
                       }}
@@ -103,7 +105,9 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                         const groupId = props.group?.id;
                         if (groupId) {
                           createNewPost("announcement").then((postId) =>
-                            router.push(`post/${postId}/edit`)
+                            router.push(
+                              `/groups/${groupId}/post/${postId}/edit`
+                            )
                           );
                         }
                       }}
