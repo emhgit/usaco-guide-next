@@ -95,18 +95,19 @@ export function GroupPageWrapper(props: GroupPageWrapperProps): ReactElement {
   return <>{props.children}</>;
 }
 
-export const PostPageWrapper = (
-  postId?: string,
-  children?: React.ReactNode
-): ReactElement => {
+interface PostPageWrapperProps {
+  postId?: string;
+  children?: React.ReactNode;
+}
+export const PostPageWrapper = (props: PostPageWrapperProps): ReactElement => {
   const { setActivePostId } = useActivePostProblems();
   useEffect(() => {
-    setActivePostId(postId);
+    setActivePostId(props.postId);
     //remove postId on exit
     return () => setActivePostId(undefined);
   }, []);
 
-  return <>{children}</>;
+  return <>{props.children}</>;
 };
 
 export default function Wrapper({ children }: { children: React.ReactNode }) {
