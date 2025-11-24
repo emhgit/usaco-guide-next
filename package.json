@@ -4,17 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
+    "dev": "yarn tsx scripts/load-content.ts && next dev",
     "prebuild": "yarn clean && yarn tsx scripts/load-content.ts",
     "build": "yarn prebuild && next build",
     "start": "next start",
     "lint": "next lint",
     "clean": "rm -rf dist .next public/images public/data",
-    "check-ts-errors": "tsc --noEmit",
-    "test:load-content": "tsx src/lib/__tests__/testLoadContent.ts",
-    "test:parse-mdx": "tsx src/lib/__tests__/testParseMdx.ts",
-    "test:load-problems": "tsx src/lib/__tests__/testLoadProblems.ts",
-    "test:load-all-module-frontmatter": "tsx src/lib/__tests__/testLoadAllModuleFrontmatter.ts"
+    "check-ts-errors": "tsc --noEmit"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
