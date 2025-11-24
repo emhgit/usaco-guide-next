@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-assign-module-variable */
 import path from "path";
 // import { linkProblemsToModules } from "./buildRelationships";
 import {
@@ -45,7 +46,7 @@ let cachedModuleFrontmatter:
 let cachedSolutionFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter }[]
   | null = null;
-let cachedImages: Map<string, ExtractedImage> = new Map();
+const cachedImages: Map<string, ExtractedImage> = new Map();
 let cachedProblemSlugs: Map<string, string> | null = null;
 let cachedUSACOIds: Set<string> | null = null;
 /**

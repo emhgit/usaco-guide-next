@@ -5,7 +5,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import PostLeaderboardPage from "../../../../../components/Groups/PostLeaderboardPage/PostLeaderboardPage";
 
-const index = () => {
+const Index = () => {
   const router = useRouter();
   const { id, postId } = router.query;
   return (
@@ -22,4 +22,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

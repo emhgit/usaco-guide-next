@@ -4,7 +4,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import MembersPage from "../../../components/Groups/MembersPage/MembersPage";
 
-const members = () => {
+const Members = () => {
   const router = useRouter();
   const { id } = router.query;
   return (
@@ -16,4 +16,4 @@ const members = () => {
   );
 };
 
-export default members;
+export default Members;

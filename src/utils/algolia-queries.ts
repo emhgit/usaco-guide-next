@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-assign-module-variable */
 import { moduleIDToSectionMap } from "../../content/ordering";
 import {
   AlgoliaEditorFile,

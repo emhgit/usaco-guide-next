@@ -5,7 +5,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import ProblemPage from "../../../../../../../components/Groups/ProblemPage/ProblemPage";
 
-const index = () => {
+const Index = () => {
   const router = useRouter();
   const { id, postId, problemId } = router.query;
   return (
@@ -23,4 +23,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

@@ -4,7 +4,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import GroupLeaderboardPage from "../../../components/Groups/GroupLeaderboardPage/GroupLeaderboardPage";
 
-const leaderboard = () => {
+const Leaderboard = () => {
   const router = useRouter();
   const { id } = router.query;
   return (
@@ -16,4 +16,4 @@ const leaderboard = () => {
   );
 };
 
-export default leaderboard;
+export default Leaderboard;

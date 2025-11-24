@@ -19,6 +19,10 @@ export default function UserSolutionsTemplate({
   const router = useRouter();
   const [isSubmitModalOpen, setIsSubmitModalOpen] = React.useState(false);
 
+  React.useEffect(() => {
+    if (!problem) router.push("/");
+  }, []);
+
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -29,10 +33,6 @@ export default function UserSolutionsTemplate({
         .filter((x) => !!x.module)
         .map((x) => ({ id: x.moduleId, title: x.module?.frontmatter?.title }))
     );
-
-  React.useEffect(() => {
-    if (!problem) router.push("/");
-  }, []);
 
   if (!problem) return null;
 

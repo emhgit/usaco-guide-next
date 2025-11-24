@@ -595,21 +595,21 @@ export default function IndexPage({ teamImages }: IndexPageProps): JSX.Element {
                   <dd className="mt-2">
                     <p className="text-base leading-6 text-gray-500 dark:text-gray-400">
                       USACO stands for the{" "}
-                      <a
+                      <Link
                         href="http://www.usaco.org/"
                         target="_blank"
                         rel="noreferrer"
                         className="text-blue-600 underline dark:text-blue-400"
                       >
                         USA Computing Olympiad
-                      </a>
+                      </Link>
                       . Check out the{" "}
-                      <a
+                      <Link
                         href="/general/usaco-faq"
                         className="text-blue-600 underline dark:text-blue-400"
                       >
                         USACO FAQ Page
-                      </a>{" "}
+                      </Link>{" "}
                       for more information.
                     </p>
                   </dd>

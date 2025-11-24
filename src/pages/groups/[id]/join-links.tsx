@@ -4,7 +4,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import JoinLinksPage from "../../../components/Groups/JoinLinksPage/JoinLinksPage";
 
-const joinLinks = () => {
+const JoinLinks = () => {
   const router = useRouter();
   const { id } = router.query;
   return (
@@ -16,4 +16,4 @@ const joinLinks = () => {
   );
 };
 
-export default joinLinks;
+export default JoinLinks;

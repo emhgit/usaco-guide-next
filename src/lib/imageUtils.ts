@@ -82,7 +82,7 @@ export async function optimizeImage(
   const { maxWidth, quality } = { ...DEFAULT_OPTIONS, ...options };
 
   try {
-    let sharpInstance = typeof input === "string" ? sharp(input) : sharp(input);
+    const sharpInstance = typeof input === "string" ? sharp(input) : sharp(input);
 
     const metadata = await sharpInstance.metadata();
     const buffer = await sharpInstance

@@ -4,7 +4,7 @@ import Wrapper, {
 import { useRouter } from "next/router";
 import EditGroupPage from "../../../components/Groups/EditGroupPage/EditGroupPage";
 
-const edit = () => {
+const Edit = () => {
   const router = useRouter();
   const { id } = router.query;
   return (
@@ -16,4 +16,4 @@ const edit = () => {
   );
 };
 
-export default edit;
+export default Edit;
