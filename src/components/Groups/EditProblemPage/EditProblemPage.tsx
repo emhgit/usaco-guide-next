@@ -12,8 +12,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { useReducer } from "react";
-import Flatpickr from "react-flatpickr";
 import toast from "react-hot-toast";
+
+const Flatpickr = React.lazy(() => import("react-flatpickr"));
 import { useActiveGroup } from "../../../hooks/groups/useActiveGroup";
 import { usePost } from "../../../hooks/groups/usePost";
 import { usePostActions } from "../../../hooks/groups/usePostActions";
@@ -286,35 +287,45 @@ export default function EditProblemPage(props: Props) {
                       </p>
                     )}
                     {problem.solutionReleaseMode === "custom" && (
-                      <Flatpickr
-                        placeholder={"Choose a release time"}
-                        options={{
-                          dateFormat:
-                            "l, F J, Y, h:i K " +
-                            [
-                              "",
-                              ...(
-                                "UTC" +
-                                // sign is reversed for some reason
-                                (new Date().getTimezoneOffset() > 0
-                                  ? "-"
-                                  : "+") +
-                                Math.abs(new Date().getTimezoneOffset()) / 60
-                              ).split(""),
-                            ].join("\\\\"),
-                          enableTime: true,
-                        }}
-                        value={problem.solutionReleaseTimestamp?.toDate()}
-                        onChange={(date) => {
-                          console.log(date);
-                          editProblem({
-                            solutionReleaseTimestamp: Timestamp.fromDate(
-                              date[0]
-                            ),
-                          });
-                        }}
-                        className="input mt-2"
-                      />
+                      <React.Suspense
+                        fallback={
+                          <input
+                            className="input mt-2"
+                            placeholder="Loading date picker..."
+                            disabled
+                          />
+                        }
+                      >
+                        <Flatpickr
+                          placeholder={"Choose a release time"}
+                          options={{
+                            dateFormat:
+                              "l, F J, Y, h:i K " +
+                              [
+                                "",
+                                ...(
+                                  "UTC" +
+                                  // sign is reversed for some reason
+                                  (new Date().getTimezoneOffset() > 0
+                                    ? "-"
+                                    : "+") +
+                                  Math.abs(new Date().getTimezoneOffset()) / 60
+                                ).split(""),
+                              ].join("\\\\"),
+                            enableTime: true,
+                          }}
+                          value={problem.solutionReleaseTimestamp?.toDate()}
+                          onChange={(date) => {
+                            console.log(date);
+                            editProblem({
+                              solutionReleaseTimestamp: Timestamp.fromDate(
+                                date[0]
+                              ),
+                            });
+                          }}
+                          className="input mt-2"
+                        />
+                      </React.Suspense>
                     )}
                   </div>
                 </div>

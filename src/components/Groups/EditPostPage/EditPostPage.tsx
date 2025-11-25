@@ -3,8 +3,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { useReducer } from "react";
-import Flatpickr from "react-flatpickr";
 import toast from "react-hot-toast";
+
+const Flatpickr = React.lazy(() => import("react-flatpickr"));
 import { useActiveGroup } from "../../../hooks/groups/useActiveGroup";
 import { usePost } from "../../../hooks/groups/usePost";
 import { usePostActions } from "../../../hooks/groups/usePostActions";
@@ -142,48 +143,13 @@ export default function EditPostPage(props) {
                 </label>
 
                 <div className="mt-1">
-                  <Flatpickr
-                    placeholder={"Choose a post date"}
-                    options={{
-                      dateFormat:
-                        "Posted On".split("").join("\\\\") +
-                        " l, F J, Y, h:i K " +
-                        [
-                          "",
-                          ...(
-                            "UTC" +
-                            // sign is reversed for some reason
-                            (new Date().getTimezoneOffset() > 0 ? "-" : "+") +
-                            Math.abs(new Date().getTimezoneOffset()) / 60
-                          ).split(""),
-                        ].join("\\\\"),
-                      enableTime: true,
-                    }}
-                    value={post.timestamp?.toDate()}
-                    onChange={(date) =>
-                      editPost({
-                        timestamp: date[0]
-                          ? Timestamp.fromDate(date[0])
-                          : undefined,
-                      })
-                    }
-                    className="input"
-                  />
-                </div>
-              </div>
-
-              {post.type === "assignment" && (
-                <div className="sm:col-span-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                    Due Date (Optional)
-                  </label>
-
-                  <div className="mt-1">
+                  <React.Suspense fallback={<input className="input" placeholder="Loading date picker..." disabled />}>
                     <Flatpickr
-                      placeholder={"Choose a due date (optional)"}
+                      placeholder={"Choose a post date"}
                       options={{
                         dateFormat:
-                          "\\D\\u\\e l, F J, Y, h:i K " +
+                          "Posted On".split("").join("\\\\") +
+                          " l, F J, Y, h:i K " +
                           [
                             "",
                             ...(
@@ -194,16 +160,55 @@ export default function EditPostPage(props) {
                             ).split(""),
                           ].join("\\\\"),
                         enableTime: true,
-                        minDate: post.timestamp?.toDate(),
                       }}
-                      value={post.dueTimestamp?.toDate()}
+                      value={post.timestamp?.toDate()}
                       onChange={(date) =>
                         editPost({
-                          dueTimestamp: Timestamp.fromDate(date[0]),
+                          timestamp: date[0]
+                            ? Timestamp.fromDate(date[0])
+                            : undefined,
                         })
                       }
                       className="input"
                     />
+                  </React.Suspense>
+                </div>
+              </div>
+
+              {post.type === "assignment" && (
+                <div className="sm:col-span-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Due Date (Optional)
+                  </label>
+
+                  <div className="mt-1">
+                    <React.Suspense fallback={<input className="input" placeholder="Loading date picker..." disabled />}>
+                      <Flatpickr
+                        placeholder={"Choose a due date (optional)"}
+                        options={{
+                          dateFormat:
+                            "\\D\\u\\e l, F J, Y, h:i K " +
+                            [
+                              "",
+                              ...(
+                                "UTC" +
+                                // sign is reversed for some reason
+                                (new Date().getTimezoneOffset() > 0 ? "-" : "+") +
+                                Math.abs(new Date().getTimezoneOffset()) / 60
+                              ).split(""),
+                            ].join("\\\\"),
+                          enableTime: true,
+                          minDate: post.timestamp?.toDate(),
+                        }}
+                        value={post.dueTimestamp?.toDate()}
+                        onChange={(date) =>
+                          editPost({
+                            dueTimestamp: Timestamp.fromDate(date[0]),
+                          })
+                        }
+                        className="input"
+                      />
+                    </React.Suspense>
                   </div>
                 </div>
               )}

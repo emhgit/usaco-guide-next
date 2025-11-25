@@ -3,7 +3,12 @@ import Wrapper, {
   PostPageWrapper,
 } from "../../../../../components/Groups/GroupWrappers";
 import { useRouter } from "next/router";
-import EditPostPage from "../../../../../components/Groups/EditPostPage/EditPostPage";
+import dynamic from "next/dynamic";
+
+const EditPostPage = dynamic(
+  () => import("../../../../../components/Groups/EditPostPage/EditPostPage"),
+  { ssr: false }
+);
 
 const Index = () => {
   const router = useRouter();
