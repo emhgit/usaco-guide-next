@@ -98,10 +98,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
       USACO_IDS_TO_PROBLEMS_MAP_FILE,
       JSON.stringify(Array.from(usacoIdsToProblemsMap.entries()))
     );
-    return { paths, fallback: true };
+    return { paths, fallback: false };
   } catch (error) {
     console.error("Error loading problem slugs:", error);
-    return { paths: [], fallback: true };
+    return { paths: [], fallback: false };
   }
 };
 

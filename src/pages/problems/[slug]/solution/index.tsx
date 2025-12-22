@@ -122,13 +122,13 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
     return {
       paths,
-      fallback: true,
+      fallback: false,
     };
   } catch (error) {
     console.error("Error loading problem file paths:", error);
     return {
       paths: [],
-      fallback: true,
+      fallback: false,
     };
   }
 };
@@ -149,6 +149,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
       slug: string;
     };
     const uniqueId = slugIdMap[slug];
+    if (!uniqueId) {
+      console.error(`UniqueId not found for slug: ${slug}`);
+      return {
+        notFound: true,
+      };
+    }
     const loadedSolutions = await loadAllSolutions();
     if (!loadedSolutions) {
       console.error("Failed to load solutions");
