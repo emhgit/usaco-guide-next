@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Member, Members } from "../../../content/team/contributors";
 import Image from "next/image";
-import { useCachedImages } from "../../context/CachedImagesContext";
 import { useTeamImages } from "../../context/TeamImagesContext";
 
 const MemberCard = ({ member }: { member: Member }) => {

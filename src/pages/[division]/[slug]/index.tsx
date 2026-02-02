@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { GetStaticProps, GetStaticPaths } from "next";
 import Layout from "../../../components/layout";
 import Markdown from "../../../components/markdown/Markdown";
-import { CachedImagesProvider } from "../../../context/CachedImagesContext";
 import SEO from "../../../components/seo";
 import { useIsUserDataLoaded } from "../../../context/UserDataContext/UserDataContext";
 import { graphqlToModuleInfo } from "../../../utils/utils";
@@ -22,14 +21,12 @@ interface ModulePageProps {
   moduleData: MdxContent;
   moduleProblemLists?: ModuleProblemLists;
   frontmatter: MdxFrontmatter[];
-  cachedImagesJson: string;
 }
 
 export default function ModuleTemplate({
   moduleData,
   moduleProblemLists,
   frontmatter,
-  cachedImagesJson,
 }: ModulePageProps): JSX.Element {
   const moduleInfo = React.useMemo(
     () => graphqlToModuleInfo(moduleData),
@@ -90,7 +87,6 @@ export default function ModuleTemplate({
       </Head>
       <div className="py-4">
         <ConfettiProvider>
-          <CachedImagesProvider value={cachedImagesJson}>
             <MarkdownProblemListsProvider
               value={moduleProblemLists?.problemLists}
             >
@@ -101,7 +97,6 @@ export default function ModuleTemplate({
                 <Markdown body={moduleData.body} />
               </MarkdownLayout>
             </MarkdownProblemListsProvider>
-          </CachedImagesProvider>
         </ConfettiProvider>
       </div>
     </Layout>
@@ -135,7 +130,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       loadModule,
       loadAllModuleFrontmatter,
       loadAllProblems,
-      getCachedImages,
     } = await import("../../../lib/loadContent");
     const { division, slug } = context.params as {
       division: string;
@@ -198,16 +192,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
         return problemLists;
       };
       const moduleProblemLists = await loadProblemListsForModule(slug);
-      const cachedImages = await getCachedImages();
-      const cachedImagesJson = JSON.stringify(
-        Array.from(cachedImages.entries())
-      );
       return {
         props: {
           moduleData,
           moduleProblemLists: moduleProblemLists ?? null,
           frontmatter: data.map((x) => x.frontmatter),
-          cachedImagesJson,
         },
       };
     } catch (error) {

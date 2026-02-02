@@ -13,7 +13,6 @@ import { ConfettiProvider } from "../../../../context/ConfettiContext";
 import { ProblemSolutionContext } from "../../../../context/ProblemSolutionContext";
 import MarkdownLayout from "../../../../components/MarkdownLayout/MarkdownLayout";
 import Markdown from "../../../../components/markdown/Markdown";
-import { CachedImagesProvider } from "../../../../context/CachedImagesContext";
 import { getProblemURL } from "../../../../models/problem";
 
 interface SolutionTemplateProps {
@@ -25,7 +24,6 @@ interface SolutionTemplateProps {
     frontmatter: MdxFrontmatter;
     division: string;
   }[];
-  cachedImagesJson?: string;
 }
 
 export default function SolutionTemplate({
@@ -33,7 +31,6 @@ export default function SolutionTemplate({
   allProblemInfo,
   problemInfo,
   loadedModuleFrontmatter,
-  cachedImagesJson,
 }: SolutionTemplateProps) {
   const modulesThatHaveProblem: { id: string; title: string }[] =
     removeDuplicates(
@@ -71,7 +68,6 @@ export default function SolutionTemplate({
             problem,
           }}
         >
-          <CachedImagesProvider value={cachedImagesJson}>
             <MarkdownLayout
               markdownData={markdownData}
               frontmatter={loadedModuleFrontmatter.map((x) => x.frontmatter)}
@@ -80,7 +76,6 @@ export default function SolutionTemplate({
                 <Markdown body={solutionForSlug.body} />
               </div>
             </MarkdownLayout>
-          </CachedImagesProvider>
         </ProblemSolutionContext.Provider>
       </ConfettiProvider>
     </Layout>
@@ -139,7 +134,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       loadAllProblems,
       loadAllSolutions,
       loadAllModuleFrontmatter,
-      getCachedImages,
     } = await import("../../../../lib/loadContent");
     const { readFile } = await import("fs/promises");
     const { SLUG_ID_MAPPING_FILE } = await import("../../../../lib/constants");
@@ -195,15 +189,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    const cachedImages = await getCachedImages();
-    const cachedImagesJson = JSON.stringify(Array.from(cachedImages.entries()));
     return {
       props: {
         solutionForSlug,
         allProblemInfo,
         problemInfo,
         loadedModuleFrontmatter,
-        cachedImagesJson,
       },
     };
   } catch (error) {

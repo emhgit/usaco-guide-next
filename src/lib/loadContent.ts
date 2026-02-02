@@ -19,7 +19,6 @@ import {
   getProblemInfo,
   ProblemMetadata,
 } from "../models/problem";
-import { ExtractedImage } from "./parseMdxFile";
 import {
   CACHED_IMAGES_FILE,
   CACHED_MODULE_FRONTMATTER_FILE,
@@ -46,7 +45,6 @@ let cachedModuleFrontmatter:
 let cachedSolutionFrontmatter:
   | { filePath: string; frontmatter: MdxFrontmatter }[]
   | null = null;
-const cachedImages: Map<string, ExtractedImage> = new Map();
 let cachedProblemSlugs: Map<string, string> | null = null;
 let cachedUSACOIds: Set<string> | null = null;
 /**
@@ -80,7 +78,6 @@ export async function loadAllSolutions(): Promise<Map<string, MdxContent>> {
       }
     }
     await saveFileCache(CACHED_SOLUTIONS_FILE, cachedSolutions);
-    await saveFileCache(CACHED_IMAGES_FILE, cachedImages);
     return cachedSolutions;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -127,9 +124,6 @@ export async function loadSolution(fileName: string, id?: string): Promise<MdxCo
   const parsed = await parseMdxFile(filePath);
 
   cachedSolutions.set(parsed.frontmatter.id, parsed);
-  parsed.images?.forEach((image) => {
-    cachedImages.set(image.src, image);
-  });
   return parsed;
 }
 
@@ -264,10 +258,6 @@ export async function loadAllProblems(): Promise<{
   return { problems, moduleProblemLists };
 }
 
-export async function getCachedImages(): Promise<Map<string, ExtractedImage>> {
-  return cachedImages;
-}
-
 export async function loadAllModules(): Promise<Map<string, MdxContent>> {
   const { readdir, access, readFile } = await import("fs/promises");
   const moduleFiles = (await readdir(CONTENT_DIR, { recursive: true })).filter(
@@ -295,7 +285,6 @@ export async function loadAllModules(): Promise<Map<string, MdxContent>> {
   }
 
   await saveFileCache(CACHED_MODULES_FILE, cachedModules);
-  await saveFileCache(CACHED_IMAGES_FILE, cachedImages);
   return cachedModules;
 }
 
@@ -312,9 +301,6 @@ export async function loadModule(fileName: string, id?: string): Promise<MdxCont
     );
   }
   cachedModules.set(parsed.frontmatter.id, parsed);
-  parsed.images?.forEach((image) => {
-    cachedImages.set(image.src, image);
-  });
   return parsed;
 }
 

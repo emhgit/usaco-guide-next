@@ -18,20 +18,12 @@ import { getLastUpdated } from "./getGitAuthorTimestamp";
 import { moduleIDToSectionMap, SectionID } from "../../content/ordering";
 import { ProcessedImage } from "./imageUtils";
 
-export interface ExtractedImage {
-  src: string;
-  caption?: string;
-  originalImageLink?: string;
-  processedImage?: ProcessedImage;
-}
-
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   const { readFile } = await import("fs/promises");
   const fileContent = await readFile(filePath, "utf-8");
   const { content, data: frontmatter } = matter(fileContent);
   const mdast: any = { data: null };
   const tableOfContents: any = {};
-  const extractedImages: ExtractedImage[] = [];
 
   let compiledResult;
   try {
@@ -48,7 +40,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
         [remarkMdxFrontmatter, { name: "frontmatter" }],
         [remarkExtractAST, { mdast }],
         [remarkToC, { tableOfContents }],
-        [remarkExtractImages, { images: extractedImages }],
+        [remarkExtractImages],
       ],
       rehypePlugins: [
         rehypeSlug,
@@ -123,7 +115,6 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     pyOc,
     toc: tableOfContents,
     mdast: mdast.data,
-    images: extractedImages,
     fields: {
       division: division as SectionID,
       gitAuthorTime: lastUpdated,

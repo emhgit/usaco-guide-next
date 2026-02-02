@@ -775,7 +775,7 @@ export const getStaticProps: GetStaticProps = async () => {
     console.error("Error loading team images:", error);
     return {
       props: {
-        cachedImagesJson: null,
+        teamImages: null,
       },
     };
   }
