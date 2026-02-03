@@ -20,7 +20,6 @@ import {
 } from "../../utils/getProgressInfo";
 import { getModulesForDivision } from "../../utils/utils";
 import { MdxContent } from "../../types/content";
-import { ProblemInfo } from "../../types/content";
 import Layout from "../../components/layout";
 
 const HeroBGColor: { [key in SectionID]: string } = {
@@ -97,13 +96,13 @@ const SECTION_DESCRIPTION: { [key in SectionID]: React.ReactNode } = {
 export interface SyllabusProps {
   division: SectionID;
   allModules: { [key: string]: MdxContent };
-  problemsForThisDivision: ProblemInfo[];
+  problemIDs: string[];
 }
 
 export default function SyllabusTemplate({
   division,
   allModules,
-  problemsForThisDivision,
+  problemIDs,
 }: SyllabusProps) {
   const section = getModulesForDivision(allModules, division);
 
@@ -112,19 +111,17 @@ export default function SyllabusTemplate({
   }, [] as string[]);
 
   const moduleProgressInfo = useModulesProgressInfo(moduleIDs);
-  const problemIDs = [
-    ...new Set(problemsForThisDivision.map((p) => p.uniqueId) as string[]),
-  ];
+  
   const problemsProgressInfo = useProblemsProgressInfo(problemIDs);
   const useProgressBarForCategory = (category: (typeof section)[0]) => {
     const categoryModuleIds = category.items.map(
       (module) => module.frontmatter.id
     );
-    const categoryProblemIds = problemsForThisDivision
-      .filter((problem) =>
-        categoryModuleIds.includes(problem.module?.frontmatter.id || "")
+    const categoryProblemIds = problemIDs
+      .filter((id) =>
+        categoryModuleIds.includes(id || "")
       )
-      .map((x) => x.uniqueId);
+      .map((x) => x);
     const problemsProgressInfo = useProblemsProgressInfo(categoryProblemIds);
     return (
       categoryProblemIds.length > 1 && (
@@ -240,13 +237,14 @@ export default function SyllabusTemplate({
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { loadAllModuleFrontmatter } = await import("../../lib/loadContent");
-  const data = await loadAllModuleFrontmatter();
-  const paths = data.map(({ division }) => ({
-    params: {
-      division,
-    },
-  }));
+  const paths = [
+    { params: { division: "bronze" } },
+    { params: { division: "silver" } },
+    { params: { division: "gold" } },
+    { params: { division: "plat" } },
+    { params: { division: "adv" } },
+    { params: { division: "general" } },
+  ];
   return {
     paths,
     fallback: false,
@@ -255,43 +253,23 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { loadAllModules, loadAllProblems } = await import(
-      "../../lib/loadContent"
-    );
+    const { queryProblemIdsByDivision, queryModulesByDivision } = await import("../../lib/queryContent");
     const { division } = context.params as { division: SectionID };
-    const loadedModules = await loadAllModules();
-    if (!loadedModules || loadedModules.size === 0) {
-      console.error("No modules loaded or failed to load modules");
-      return { notFound: true };
-    }
-    const modulesForThisDivision = loadedModules
-      .values()
-      .filter((module) => module.fields.division === division);
-    const allModules = modulesForThisDivision.reduce(
-      (acc, curr) => {
-        acc[curr.frontmatter.id] = curr;
-        return acc;
-      },
-      {} as { [key: string]: MdxContent }
-    );
+    const allModules = await queryModulesByDivision(division);
     if (!allModules) {
       console.error("Failed to load modules for division:", division);
       return { notFound: true };
     }
-
-    const loadedProblems = await loadAllProblems();
-    if (!loadedProblems) {
-      console.error("Failed to load modules or problems");
+    const problemIDs = await queryProblemIdsByDivision(division);
+    if (!problemIDs) {
+      console.error("Failed to query problem IDs for division:", division);
       return { notFound: true };
     }
-    const problemsForThisDivision = loadedProblems.problems.filter(
-      (problem) => problem.module?.fields?.division === division
-    );
     return {
       props: {
         division,
         allModules,
-        problemsForThisDivision,
+        problemIDs,
       },
     };
   } catch (error) {

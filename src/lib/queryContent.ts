@@ -143,6 +143,27 @@ function deserializeMdxContent(row: any): MdxContent {
 }
 
 /**
+ * Deserialize lightweight MdxContent from database row (without body, toc, mdast)
+ * Used for listing pages where full content is not needed
+ */
+function deserializeMdxContentLight(row: any): MdxContent {
+  return {
+    body: "", // Empty body for listing pages
+    fileAbsolutePath: row.file_path,
+    frontmatter: JSON.parse(row.frontmatter_json),
+    toc: { cpp: [], java: [], py: [] }, // Empty TOC for listing pages
+    cppOc: row.cpp_oc,
+    javaOc: row.java_oc,
+    pyOc: row.py_oc,
+    mdast: null, // No mdast for listing pages
+    fields: {
+      division: row.division || null,
+      gitAuthorTime: row.git_author_time || null,
+    },
+  };
+}
+
+/**
  * Query all problems with the same unique ID
  * Used for modulesThatHaveProblem - finds all modules that contain a problem
  * Since a problem can appear in multiple modules, we need to find all module_problem_lists
@@ -245,18 +266,38 @@ export async function queryModuleProblemListsByModuleId(
 }
 
 /**
- * Query module IDs by division
- * Returns an array of module IDs for the given division
+ * Query modules by division
+ * Returns an object mapping module IDs to MdxContent for the given division
+ * Optimized to exclude large fields (body, toc, mdast) for listing pages
  */
-export async function queryModuleIdsByDivision(
+export async function queryModulesByDivision(
   division: string,
-): Promise<string[]> {
+): Promise<{ [key: string]: MdxContent }> {
   const db = await getDatabase();
+  // Only select fields needed for listing pages to reduce payload size
   const rows = db
-    .prepare("SELECT module_id FROM module_frontmatter WHERE division = ?")
-    .all(division) as any[];
+    .prepare(`
+      SELECT 
+        id,
+        file_path,
+        frontmatter_json,
+        cpp_oc,
+        java_oc,
+        py_oc,
+        division,
+        git_author_time
+      FROM mdx_content 
+      WHERE division = ? AND type = ?
+    `)
+    .all(division, "module") as any[];
 
-  return rows.map((row) => row.module_id);
+  const result: { [key: string]: MdxContent } = {};
+  for (const row of rows) {
+    const content = deserializeMdxContentLight(row);
+    result[content.frontmatter.id] = content;
+  }
+
+  return result;
 }
 
 /**
