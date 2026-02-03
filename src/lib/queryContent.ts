@@ -29,6 +29,25 @@ export async function queryModule(id: string): Promise<MdxContent | null> {
   return deserializeMdxContent(row);
 }
 
+export async function queryModuleProblemsLists(id: string): Promise<ModuleProblemLists | null> {
+  const db = await getDatabase();
+  const rows = db
+    .prepare("SELECT list_id, problems_json FROM module_problem_lists WHERE module_id = ?")
+    .all(id) as any[];
+
+  if (rows.length === 0) return null;
+
+  const problemLists = rows.map((row) => ({
+    listId: row.list_id,
+    problems: JSON.parse(row.problems_json) as ProblemInfo[],
+  }));
+
+  return {
+    moduleId: id,
+    problemLists,
+  };
+}
+
 /**
  * Query problem by unique ID
  */

@@ -105,8 +105,8 @@ export default function ModuleTemplate({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Load all modules to generate paths
-  const { loadAllModuleFrontmatter } = await import("../../../lib/loadContent");
-  const data = await loadAllModuleFrontmatter();
+  const { queryAllModuleFrontmatter } = await import("../../../lib/queryContent");
+  const data = await queryAllModuleFrontmatter();
   const paths = data
     .map(({ division, frontmatter }) => {
       return {
@@ -126,85 +126,35 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const {
-      loadModule,
-      loadAllModuleFrontmatter,
-      loadAllProblems,
-    } = await import("../../../lib/loadContent");
+    const { queryModule, queryModuleProblemsLists, queryAllModuleFrontmatter } = await import("../../../lib/queryContent");
     const { division, slug } = context.params as {
       division: string;
       slug: string;
     };
-
     if (!division || !slug) {
       console.error("Missing division or slug in params");
       return { notFound: true };
     }
-
-    let data: {
-      filePath: string;
-      frontmatter: MdxFrontmatter;
-      division: string;
-    }[];
-    try {
-      data = await loadAllModuleFrontmatter();
-      if (
-        !data ||
-        !Array.isArray(data) ||
-        data === null ||
-        data === undefined
-      ) {
-        console.error(
-          "Failed to load module file paths or invalid data format"
-        );
-        return { notFound: true };
-      }
-    } catch (error) {
-      console.error("Error loading module file paths:", error);
+    const module = await queryModule(slug);
+    if (!module) {
+      console.error(`Module not found for slug: ${slug}`);
       return { notFound: true };
     }
-
-    const moduleInfo = data.find(
-      (item) => item.division === division && item.frontmatter.id === slug
-    );
-
-    if (!moduleInfo?.filePath) {
-      console.error(
-        `Module not found for division: ${division}, slug: ${slug}`
-      );
+    const frontmatterData = await queryAllModuleFrontmatter();
+    if (!frontmatterData) {
+      console.error("No module frontmatter found");
       return { notFound: true };
     }
-
-    // Load the specific module data
-    try {
-      const moduleData = await loadModule(moduleInfo.filePath, slug);
-      if (!moduleData) {
-        console.error(
-          `Failed to load module data for path: ${moduleInfo.filePath}`
-        );
-        return { notFound: true };
-      }
-      const loadProblemListsForModule = async (moduleId: string) => {
-        const { moduleProblemLists } = await loadAllProblems();
-        const problemLists = moduleProblemLists.find(
-          (moduleProblemList) => moduleProblemList.moduleId === moduleId
-        );
-        return problemLists;
-      };
-      const moduleProblemLists = await loadProblemListsForModule(slug);
+    const moduleProblemLists = await queryModuleProblemsLists(slug);
       return {
         props: {
-          moduleData,
+          moduleData: module,
           moduleProblemLists: moduleProblemLists ?? null,
-          frontmatter: data.map((x) => x.frontmatter),
+          frontmatter: frontmatterData.map((x) => x.frontmatter),
         },
       };
     } catch (error) {
-      console.error(`Error loading module ${moduleInfo.filePath}:`, error);
+      console.error(`Error loading module in getStaticProps:`, error);
       return { notFound: true };
     }
-  } catch (error) {
-    console.error("Unexpected error in getStaticProps:", error);
-    return { notFound: true };
-  }
 };
