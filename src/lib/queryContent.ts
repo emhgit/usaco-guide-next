@@ -66,6 +66,18 @@ export async function queryAllProblems(): Promise<ProblemInfo[]> {
 }
 
 /**
+ * Query all problems (for getStaticPaths)
+ */
+export async function queryAllProblemIds(): Promise<string[]> {
+    const db = await getDatabase();
+    const rows = db
+      .prepare("SELECT unique_id FROM problems")
+      .all() as any[];
+  
+    return rows.map((row) => row.unique_id);
+  }
+
+/**
  * Query problems by module ID
  */
 export async function queryProblemsByModule(

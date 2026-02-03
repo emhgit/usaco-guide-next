@@ -22,16 +22,14 @@ import TopNavigationBar from "../../components/TopNavigationBar/TopNavigationBar
 import { useUserProgressOnProblems } from "../../context/UserDataContext/properties/userProgress";
 import searchClient from "../../utils/algoliaLiteSearchClient";
 import { GetStaticProps } from "next";
-import { ProblemInfo } from "../../types/content";
 
 const indexName = `${process.env.GATSBY_ALGOLIA_INDEX_NAME ?? "dev"}_problems`;
 
 interface ProblemsPageProps {
-  allProblemInfo: ProblemInfo[];
+  problemIds: string[];
 }
 
-export default function ProblemsPage({ allProblemInfo }: ProblemsPageProps) {
-  const problemIds = allProblemInfo.map((problem) => problem.uniqueId);
+export default function ProblemsPage({ problemIds }: ProblemsPageProps) {
   const userProgress = useUserProgressOnProblems();
   const selectionMetadata: SelectionProps[] = [
     {
@@ -164,23 +162,15 @@ export default function ProblemsPage({ allProblemInfo }: ProblemsPageProps) {
 
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const { loadAllProblems } = await import("../../lib/loadContent");
-    const { problems: allProblemInfo } = await loadAllProblems();
-    if (!allProblemInfo) {
-      console.error("Failed to load problems");
-      return {
-        notFound: true,
-      };
+    const { queryAllProblemIds } = await import("../../lib/queryContent");
+    const problemIds = await queryAllProblemIds();
+    if (!problemIds) {
+      console.error("Failed to load problem IDs");
+      return { notFound: true };
     }
-    return {
-      props: {
-        allProblemInfo,
-      },
-    };
+    return { props: { problemIds }, fallback: false };
   } catch (error) {
-    console.error("Error loading problem file paths:", error);
-    return {
-      notFound: true,
-    };
+    console.error("Error loading problem IDs:", error);
+    return { notFound: true };
   }
 };
