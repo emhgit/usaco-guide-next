@@ -168,7 +168,7 @@ export const getStaticProps: GetStaticProps = async () => {
       console.error("Failed to load problem IDs");
       return { notFound: true };
     }
-    return { props: { problemIds }, fallback: false };
+    return { props: { problemIds } };
   } catch (error) {
     console.error("Error loading problem IDs:", error);
     return { notFound: true };
