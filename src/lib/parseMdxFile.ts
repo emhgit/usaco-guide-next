@@ -100,7 +100,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   }
 
   // Get last updated timestamp from git
-  const lastUpdated = await getLastUpdated(filePath);
+  // const lastUpdated = await getLastUpdated(filePath);
 
   let division: SectionID | null = null;
   if (filePath.includes("content")) {
@@ -117,7 +117,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
     mdast: mdast.data,
     fields: {
       division: division as SectionID,
-      gitAuthorTime: lastUpdated,
+      gitAuthorTime: null,
     },
   };
 }
