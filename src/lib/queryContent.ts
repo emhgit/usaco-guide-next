@@ -339,3 +339,120 @@ export async function queryProblemIdsByDivision(
 
   return rows.map((row) => row.unique_id);
 }
+
+/**
+ * Query problem slugs for problems that have corresponding solutions with the same id
+ * Replicates the logic from src/pages/problems/[slug]/solution/index.tsx lines 95-113
+ * Returns an array of slugs for problems that have matching solutions
+ * Optimized with a single SQL JOIN query instead of N queries
+ */
+export async function queryProblemSlugsForSolutionsIds(): Promise<string[]> {
+  const db = await getDatabase();
+  
+  // Single query: join solution_frontmatter with problems and problem_slugs
+  // to get all slugs for problems that have corresponding solutions
+  const rows = db
+    .prepare(`
+      SELECT DISTINCT ps.slug
+      FROM solution_frontmatter sf
+      INNER JOIN problems p ON sf.solution_id = p.unique_id
+      INNER JOIN problem_slugs ps ON p.unique_id = ps.unique_id
+    `)
+    .all() as Array<{ slug: string }>;
+  
+  return rows.map((row) => row.slug);
+}
+
+/**
+ * Query solution by problem slug
+ * Takes a slug and returns the corresponding solution
+ */
+export async function querySolutionByProblemSlug(
+  slug: string,
+): Promise<MdxContent | null> {
+  const db = await getDatabase();
+  
+  // Get the unique_id from the slug
+  const slugRow = db
+    .prepare("SELECT unique_id FROM problem_slugs WHERE slug = ?")
+    .get(slug) as { unique_id: string } | undefined;
+  
+  if (!slugRow) {
+    return null;
+  }
+  
+  const uniqueId = slugRow.unique_id;
+  
+  // Get the solution using the unique_id
+  const solutionRow = db
+    .prepare("SELECT * FROM mdx_content WHERE id = ? AND type = ?")
+    .get(uniqueId, "solution") as any;
+  
+  if (!solutionRow) {
+    return null;
+  }
+  
+  return deserializeMdxContent(solutionRow);
+}
+
+/**
+ * Query module IDs and titles for all modules that contain a problem
+ * Replicates the logic from src/pages/problems/[slug]/solution/index.tsx lines 39-44
+ * Finds all modules that contain this problem by searching module_problem_lists,
+ * then filters to ensure each module exists (has frontmatter)
+ * Returns only modules that actually exist (matching the !!problem.module filter)
+ */
+export async function queryModuleIdAndTitleFromProblemBySolutionId(
+ uniqueId: string
+): Promise<{ id: string; title: string }[]> {
+  const db = await getDatabase();
+  
+  // Find all modules that contain this problem by querying module_problem_lists
+  // This matches the logic in queryAllProblemsWithUniqueId
+  const moduleListRows = db
+    .prepare(`
+      SELECT module_id, list_id, problems_json 
+      FROM module_problem_lists
+    `)
+    .all() as any[];
+
+  const moduleIds = new Set<string>();
+
+  // Check each module's problem lists to see if they contain this problem
+  for (const row of moduleListRows) {
+    const problemList: ProblemInfo[] = JSON.parse(row.problems_json);
+    const hasProblem = problemList.some((p) => p.uniqueId === uniqueId);
+    
+    if (hasProblem) {
+      moduleIds.add(row.module_id);
+    }
+  }
+
+  // If no modules found via module_problem_lists, check if the problem has a direct module_id
+  if (moduleIds.size === 0) {
+    const problemRow = db
+      .prepare("SELECT module_id FROM problems WHERE unique_id = ? AND module_id IS NOT NULL")
+      .get(uniqueId) as { module_id: string } | undefined;
+    
+    if (problemRow?.module_id) {
+      moduleIds.add(problemRow.module_id);
+    }
+  }
+
+  // Get module IDs and titles from module_frontmatter, ensuring modules exist
+  // This filters out any modules that don't have frontmatter (matching !!problem.module check)
+  if (moduleIds.size === 0) {
+    return [];
+  }
+
+  const placeholders = Array.from(moduleIds).map(() => '?').join(',');
+  const rows = db.prepare(`
+    SELECT 
+      module_id as id,
+      json_extract(frontmatter_json, '$.title') as title
+    FROM module_frontmatter
+    WHERE module_id IN (${placeholders})
+  `).all(...Array.from(moduleIds)) as { id: string; title: string }[];
+
+  return rows;
+}
