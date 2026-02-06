@@ -71,9 +71,7 @@ In Gatsby, the `gatsby-node.ts` file orchestrated:
 
 These were core components of the system design. Hence, the Next.js system design has to replicate this functionality while adapting to the changes in the framework.
 
-The static page generation phase of the Next.js build process utilizes parallel processing to build pages simultaneously. To account for this, content will be pre-loaded using filesystem reads in a similar manner, but an **SQLite database** will be used as a shared caching layer. This allows for read-only queries across all workers during build time, eliminating redundant I/O and parsing. A prebuild script will be used to parse all MDX files and store them in the database. The types defined in [content.ts](../src/types/content.ts) will be used to ensure consistency. Files such as the [solution template](../src/pages/problems/[slug]/solution/index.tsx) and [module template](../src/pages/[division]/[slug]/index.tsx) will query the database and dynamically load content.
-
-Note: the current system design is currently being transitioned from JSON file-based caching to SQLite.
+The static page generation phase of the Next.js build process utilizes parallel processing to build pages simultaneously. To account for this, content will be pre-loaded using filesystem reads in a similar manner. But, an **SQLite database** will be used as a shared caching layer. This allows for read-only queries across all workers during build time, eliminating redundant I/O and parsing. A prebuild script will be used to parse all MDX files and store them in the database. The types defined in [content.ts](../src/types/content.ts) will be used to ensure consistency. Files such as the [solution template](../src/pages/problems/[slug]/solution/index.tsx) and [module template](../src/pages/[division]/[slug]/index.tsx) will query the database and dynamically load content.
 
 ## Database Schema Design
 
