@@ -1,4 +1,4 @@
-import { getAlgoliaRecords } from '../src/utils/algolia-queries';
+/*import { getAlgoliaRecords } from '../src/utils/algolia-queries';
 import searchClient from '../src/utils/algoliaSearchClient';
 async function runIndexing() {
     if (!process.env.ALGOLIA_APP_ID) {
@@ -19,4 +19,4 @@ async function runIndexing() {
     console.log('Algolia indexing complete');
 }
 
-runIndexing().catch(console.error);
+runIndexing().catch(console.error);*/

@@ -9,10 +9,15 @@ import { AlgoliaProblemInfo } from "../models/problem";
 import { MdxContent, ProblemInfo } from "../types/content";
 import extractSearchableText from "./extract-searchable-text";
 
+/*
 export async function getAlgoliaRecords() {
   // Fetch data directly instead of using GraphQL
-  const { loadContent } = await import("../lib/loadContent");
-  const { modules, problems, solutions } = await loadContent();
+  const { queryModules, queryProblems, querySolutions } = await import("../lib/queryContent");
+  const { modules, problems, solutions } = await Promise.all([
+    queryModules(),
+    queryProblems(),
+    querySolutions(),
+  ]);
 
   // Transform data into Algolia records
   const moduleRecords = modules
@@ -184,3 +189,4 @@ function transformFiles(
 }
 
 export default getAlgoliaRecords;
+*/
