@@ -49,6 +49,22 @@ export async function queryModuleProblemsLists(id: string): Promise<ModuleProble
 }
 
 /**
+ * Query all module frontmatter
+ */
+export async function queryAllModuleFrontmatter(): Promise<
+  Array<{ filePath: string; frontmatter: MdxFrontmatter; division: string }>
+> {
+  const db = await getDatabase();
+  const rows = db.prepare("SELECT * FROM module_frontmatter").all() as any[];
+
+  return rows.map((row) => ({
+    filePath: row.file_path,
+    frontmatter: JSON.parse(row.frontmatter_json),
+    division: row.division,
+  }));
+}
+
+/**
  * Query problem by unique ID
  */
 export async function queryProblem(
@@ -75,213 +91,13 @@ export async function queryProblem(
 /**
  * Query all problems (for getStaticPaths)
  */
-export async function queryAllProblems(): Promise<ProblemInfo[]> {
-  const db = await getDatabase();
-  const rows = db
-    .prepare("SELECT problem_data_json FROM problems")
-    .all() as any[];
-
-  return rows.map((row) => JSON.parse(row.problem_data_json));
-}
-
-/**
- * Query all problems (for getStaticPaths)
- */
 export async function queryAllProblemIds(): Promise<string[]> {
-    const db = await getDatabase();
-    const rows = db
-      .prepare("SELECT unique_id FROM problems")
-      .all() as any[];
-  
-    return rows.map((row) => row.unique_id);
-  }
-
-/**
- * Query problems by module ID
- */
-export async function queryProblemsByModule(
-  moduleId: string,
-): Promise<ProblemInfo[]> {
   const db = await getDatabase();
   const rows = db
-    .prepare("SELECT problem_data_json FROM problems WHERE module_id = ?")
-    .all(moduleId) as any[];
-
-  return rows.map((row) => JSON.parse(row.problem_data_json));
-}
-
-/**
- * Query all module frontmatter
- */
-export async function queryAllModuleFrontmatter(): Promise<
-  Array<{ filePath: string; frontmatter: MdxFrontmatter; division: string }>
-> {
-  const db = await getDatabase();
-  const rows = db.prepare("SELECT * FROM module_frontmatter").all() as any[];
-
-  return rows.map((row) => ({
-    filePath: row.file_path,
-    frontmatter: JSON.parse(row.frontmatter_json),
-    division: row.division,
-  }));
-}
-
-/**
- * Query all solution frontmatter
- */
-export async function queryAllSolutionFrontmatter(): Promise<
-  Array<{ filePath: string; frontmatter: MdxFrontmatter }>
-> {
-  const db = await getDatabase();
-  const rows = db.prepare("SELECT * FROM solution_frontmatter").all() as any[];
-
-  return rows.map((row) => ({
-    filePath: row.file_path,
-    frontmatter: JSON.parse(row.frontmatter_json),
-  }));
-}
-
-/**
- * Deserialize MdxContent from database row
- */
-function deserializeMdxContent(row: any): MdxContent {
-  return {
-    body: row.body,
-    fileAbsolutePath: row.file_path, // Note: may need to resolve to absolute
-    frontmatter: JSON.parse(row.frontmatter_json),
-    toc: JSON.parse(row.toc_json),
-    cppOc: row.cpp_oc,
-    javaOc: row.java_oc,
-    pyOc: row.py_oc,
-    mdast: row.mdast_json ? JSON.parse(row.mdast_json) : undefined,
-    fields: {
-      division: row.division || null,
-      gitAuthorTime: row.git_author_time || null,
-    },
-  };
-}
-
-/**
- * Deserialize lightweight MdxContent from database row (without body, toc, mdast)
- * Used for listing pages where full content is not needed
- */
-function deserializeMdxContentLight(row: any): MdxContent {
-  return {
-    body: "", // Empty body for listing pages
-    fileAbsolutePath: row.file_path,
-    frontmatter: JSON.parse(row.frontmatter_json),
-    toc: { cpp: [], java: [], py: [] }, // Empty TOC for listing pages
-    cppOc: row.cpp_oc,
-    javaOc: row.java_oc,
-    pyOc: row.py_oc,
-    mdast: null, // No mdast for listing pages
-    fields: {
-      division: row.division || null,
-      gitAuthorTime: row.git_author_time || null,
-    },
-  };
-}
-
-/**
- * Query all problems with the same unique ID
- * Used for modulesThatHaveProblem - finds all modules that contain a problem
- * Since a problem can appear in multiple modules, we need to find all module_problem_lists
- * that contain this problem and create a ProblemInfo for each occurrence
- */
-export async function queryAllProblemsWithUniqueId(
-  uniqueId: string,
-): Promise<ProblemInfo[]> {
-  const db = await getDatabase();
-  
-  // First, get the base problem data
-  const problemRow = db
-    .prepare("SELECT problem_data_json FROM problems WHERE unique_id = ?")
-    .get(uniqueId) as any;
-
-  if (!problemRow) return [];
-
-  const baseProblem: ProblemInfo = JSON.parse(problemRow.problem_data_json);
-  const problems: ProblemInfo[] = [];
-
-  // Find all modules that contain this problem by querying module_problem_lists
-  const moduleListRows = db
-    .prepare(`
-      SELECT module_id, list_id, problems_json 
-      FROM module_problem_lists
-    `)
+    .prepare("SELECT unique_id FROM problems")
     .all() as any[];
 
-  // Check each module's problem lists to see if they contain this problem
-  for (const row of moduleListRows) {
-    const problemList: ProblemInfo[] = JSON.parse(row.problems_json);
-    const hasProblem = problemList.some((p) => p.uniqueId === uniqueId);
-    
-    if (hasProblem) {
-      // Create a ProblemInfo for this module occurrence
-      const problem: ProblemInfo = {
-        ...baseProblem,
-        moduleId: row.module_id,
-        inModule: true,
-      };
-      
-      // Load the module
-      const module = await queryModule(row.module_id);
-      if (module) {
-        problem.module = module;
-      }
-      
-      problems.push(problem);
-    }
-  }
-
-  // If no modules found but problem exists, return at least one instance
-  if (problems.length === 0) {
-    problems.push(baseProblem);
-  }
-
-  return problems;
-}
-
-/**
- * Query all problem slugs (slug -> unique_id mapping)
- * Returns a Map of slug to unique_id
- */
-export async function queryAllProblemSlugs(): Promise<Map<string, string>> {
-  const db = await getDatabase();
-  const rows = db
-    .prepare("SELECT slug, unique_id FROM problem_slugs")
-    .all() as any[];
-
-  const slugMap = new Map<string, string>();
-  for (const row of rows) {
-    slugMap.set(row.slug, row.unique_id);
-  }
-
-  return slugMap;
-}
-
-/**
- * Query module problem lists by module ID
- */
-export async function queryModuleProblemListsByModuleId(
-  moduleId: string,
-): Promise<ModuleProblemLists | null> {
-  const db = await getDatabase();
-  const rows = db
-    .prepare("SELECT list_id, problems_json FROM module_problem_lists WHERE module_id = ?")
-    .all(moduleId) as any[];
-
-  if (rows.length === 0) return null;
-
-  const problemLists = rows.map((row) => ({
-    listId: row.list_id,
-    problems: JSON.parse(row.problems_json) as ProblemInfo[],
-  }));
-
-  return {
-    moduleId,
-    problemLists,
-  };
+  return rows.map((row) => row.unique_id);
 }
 
 /**
@@ -348,7 +164,7 @@ export async function queryProblemIdsByDivision(
  */
 export async function queryProblemSlugsForSolutionsIds(): Promise<string[]> {
   const db = await getDatabase();
-  
+
   // Single query: join solution_frontmatter with problems and problem_slugs
   // to get all slugs for problems that have corresponding solutions
   const rows = db
@@ -359,7 +175,7 @@ export async function queryProblemSlugsForSolutionsIds(): Promise<string[]> {
       INNER JOIN problem_slugs ps ON p.unique_id = ps.unique_id
     `)
     .all() as Array<{ slug: string }>;
-  
+
   return rows.map((row) => row.slug);
 }
 
@@ -371,27 +187,27 @@ export async function querySolutionByProblemSlug(
   slug: string,
 ): Promise<MdxContent | null> {
   const db = await getDatabase();
-  
+
   // Get the unique_id from the slug
   const slugRow = db
     .prepare("SELECT unique_id FROM problem_slugs WHERE slug = ?")
     .get(slug) as { unique_id: string } | undefined;
-  
+
   if (!slugRow) {
     return null;
   }
-  
+
   const uniqueId = slugRow.unique_id;
-  
+
   // Get the solution using the unique_id
   const solutionRow = db
     .prepare("SELECT * FROM mdx_content WHERE id = ? AND type = ?")
     .get(uniqueId, "solution") as any;
-  
+
   if (!solutionRow) {
     return null;
   }
-  
+
   return deserializeMdxContent(solutionRow);
 }
 
@@ -403,10 +219,10 @@ export async function querySolutionByProblemSlug(
  * Returns only modules that actually exist (matching the !!problem.module filter)
  */
 export async function queryModuleIdAndTitleFromProblemBySolutionId(
- uniqueId: string
+  uniqueId: string
 ): Promise<{ id: string; title: string }[]> {
   const db = await getDatabase();
-  
+
   // Find all modules that contain this problem by querying module_problem_lists
   // This matches the logic in queryAllProblemsWithUniqueId
   const moduleListRows = db
@@ -422,7 +238,7 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
   for (const row of moduleListRows) {
     const problemList: ProblemInfo[] = JSON.parse(row.problems_json);
     const hasProblem = problemList.some((p) => p.uniqueId === uniqueId);
-    
+
     if (hasProblem) {
       moduleIds.add(row.module_id);
     }
@@ -433,7 +249,7 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
     const problemRow = db
       .prepare("SELECT module_id FROM problems WHERE unique_id = ? AND module_id IS NOT NULL")
       .get(uniqueId) as { module_id: string } | undefined;
-    
+
     if (problemRow?.module_id) {
       moduleIds.add(problemRow.module_id);
     }
@@ -455,4 +271,53 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
   `).all(...Array.from(moduleIds)) as { id: string; title: string }[];
 
   return rows;
+}
+
+export async function queryUsacoId(id: string): Promise<boolean> {
+  const db = await getDatabase();
+  const row = db
+    .prepare("SELECT * FROM usaco_ids WHERE id = ?")
+    .get(id) as any;
+  return !!row;
+}
+
+/**
+ * Deserialize MdxContent from database row
+ */
+function deserializeMdxContent(row: any): MdxContent {
+  return {
+    body: row.body,
+    fileAbsolutePath: row.file_path, // Note: may need to resolve to absolute
+    frontmatter: JSON.parse(row.frontmatter_json),
+    toc: JSON.parse(row.toc_json),
+    cppOc: row.cpp_oc,
+    javaOc: row.java_oc,
+    pyOc: row.py_oc,
+    mdast: row.mdast_json ? JSON.parse(row.mdast_json) : undefined,
+    fields: {
+      division: row.division || null,
+      gitAuthorTime: row.git_author_time || null,
+    },
+  };
+}
+
+/**
+ * Deserialize lightweight MdxContent from database row (without body, toc, mdast)
+ * Used for listing pages where full content is not needed
+ */
+function deserializeMdxContentLight(row: any): MdxContent {
+  return {
+    body: "", // Empty body for listing pages
+    fileAbsolutePath: row.file_path,
+    frontmatter: JSON.parse(row.frontmatter_json),
+    toc: { cpp: [], java: [], py: [] }, // Empty TOC for listing pages
+    cppOc: row.cpp_oc,
+    javaOc: row.java_oc,
+    pyOc: row.py_oc,
+    mdast: null, // No mdast for listing pages
+    fields: {
+      division: row.division || null,
+      gitAuthorTime: row.git_author_time || null,
+    },
+  };
 }
