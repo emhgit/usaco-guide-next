@@ -273,12 +273,57 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
   return rows;
 }
 
+export async function queryAllModuleIdsAndTitles(): Promise<Array<{ id: string; title: string }>> {
+  const db = await getDatabase();
+  const rows = db.prepare(`
+    SELECT 
+      module_id as id,
+      json_extract(frontmatter_json, '$.title') as title
+    FROM module_frontmatter
+  `).all() as { id: string; title: string }[];
+
+  return rows;
+}
+
 export async function queryUsacoId(id: string): Promise<boolean> {
   const db = await getDatabase();
   const row = db
     .prepare("SELECT * FROM usaco_ids WHERE id = ?")
     .get(id) as any;
   return !!row;
+}
+
+/**
+ * Query all problem dashboard info
+ * Returns an array of objects with properties: inModule, uniqueId, source, name, moduleId
+ */
+export async function queryAllProblemDashboardInfo(): Promise<Array<{
+  inModule: boolean;
+  uniqueId: string;
+  source: string;
+  name: string;
+  moduleId: string | null;
+}>> {
+  const db = await getDatabase();
+  const rows = db
+    .prepare(`
+      SELECT 
+        in_module,
+        unique_id,
+        source,
+        name,
+        module_id
+      FROM problems
+    `)
+    .all() as any[];
+
+  return rows.map((row) => ({
+    inModule: Boolean(row.in_module),
+    uniqueId: row.unique_id,
+    source: row.source,
+    name: row.name,
+    moduleId: row.module_id,
+  }));
 }
 
 /**
