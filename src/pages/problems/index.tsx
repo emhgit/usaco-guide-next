@@ -97,7 +97,7 @@ export default function ProblemsPage({ problemIds }: ProblemsPageProps) {
       ].map((label) => ({
         label,
         value: problemIds.filter(
-          (id) => (userProgress[id] ?? "Not Attempted") == label
+          (id) => (userProgress[id] ?? "Not Attempted") == label,
         ),
       })),
     },
@@ -141,15 +141,17 @@ export default function ProblemsPage({ problemIds }: ProblemsPageProps) {
                 ))}
               </div>
               <ProblemHits />
-              <div className="mt-3 flex flex-wrap justify-center">
-                <Pagination showLast={true} className="pr-4" />
+              <div className="mt-6 flex flex-col items-center space-y-4">
+                <div className="flex justify-center">
+                  <Pagination showLast={true} />
+                </div>
                 <HitsPerPage
                   items={[
                     { label: "24 hits per page", value: 24, default: true },
                     { label: "32 hits per page", value: 32 },
                     { label: "48 hits per page", value: 48 },
                   ]}
-                  className="mt-1 lg:mt-0"
+                  className="text-gray-900 dark:text-gray-300"
                 />
               </div>
             </div>

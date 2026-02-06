@@ -95,14 +95,13 @@ function ProblemHit({ hit }: ProblemHitProps) {
           <a
             href={
               hit.solution.kind === "internal"
-                ? `${getProblemURL({
+                ? `/problems/${getProblemURL({
                     ...hit,
                     uniqueId: hit.objectID,
                   })}/solution`
                 : hit.solution.url
             }
             target="_blank"
-            rel="noreferrer"
             className="dark:text-dark-med-emphasis text-sm text-gray-500"
           >
             View Solution
@@ -121,7 +120,7 @@ function ProblemHit({ hit }: ProblemHitProps) {
           <br />
           <a
             href={`https://ide.usaco.guide/usaco/${problem.uniqueId.substring(
-              problem.uniqueId.indexOf("-") + 1
+              problem.uniqueId.indexOf("-") + 1,
             )}`}
             target="_blank"
             rel="noreferrer"
