@@ -1,12 +1,13 @@
 import Database from 'better-sqlite3';
 import { getWritableDatabase } from '../src/lib/database';
-import { MdxContent, ProblemInfo, MdxFrontmatter } from '../src/types/content';
+import { MdxContent, ProblemInfo } from '../src/types/content';
 import type { ProblemMetadata } from '../src/models/problem';
 import path from 'path';
 import { CONTENT_DIR, SOLUTIONS_DIR } from '../src/lib/constants';
 import { readdir } from 'fs/promises';
 
-async function main() {
+main();
+export async function main() {
   console.log("Starting content indexing...");
   const startTime = Date.now();
 
@@ -215,10 +216,10 @@ async function getBatchGitTimestamps(
   // Batch files to avoid Windows command line length limit (~8191 chars)
   // Use smaller batches to be safe (50 files per batch, ~200 chars per path = ~10KB per batch)
   const BATCH_SIZE = 50;
-  
+
   for (let i = 0; i < filePaths.length; i += BATCH_SIZE) {
     const batch = filePaths.slice(i, i + BATCH_SIZE);
-    
+
     try {
       const result = execSync(
         `git log --format="%ct|%H" --name-only -- ${batch.map(f => `"${f}"`).join(' ')}`,
@@ -250,7 +251,7 @@ async function indexProblems(db: Database.Database): Promise<void> {
   const { getProblemInfo, checkInvalidUsacoMetadata } = await import('../src/models/problem');
   const { moduleIDToSectionMap } = await import('../content/ordering');
   const freshOrdering = await import('../content/ordering');
-  
+
   const allFiles = await readdir(CONTENT_DIR, { recursive: true });
   const problemFiles = allFiles.filter(
     (file): file is string =>
@@ -335,7 +336,7 @@ async function indexProblems(db: Database.Database): Promise<void> {
           parsedContent[tableId].forEach((metadata: ProblemMetadata) => {
             checkInvalidUsacoMetadata(metadata);
             const problemInfo = getProblemInfo(metadata, freshOrdering);
-            
+
             // Note: We don't load the full module here, just store the moduleId
             // The module will be loaded lazily when querying if needed
             allProblems.push({
@@ -403,7 +404,7 @@ async function indexModuleFrontmatter(db: Database.Database): Promise<void> {
   const transaction = db.transaction((items: Array<{ id: string; file_path: string; frontmatter_json: string }>) => {
     for (const item of items) {
       const frontmatter = JSON.parse(item.frontmatter_json);
-      
+
       if (!(frontmatter.id in moduleIDToSectionMap)) {
         throw new Error(
           `Module ID does not show up in moduleIDToSectionMap: ${frontmatter.id}, path: ${item.file_path}`
@@ -449,13 +450,13 @@ async function indexProblemSlugs(db: Database.Database): Promise<void> {
   for (const row of rows) {
     const problem: ProblemInfo = JSON.parse(row.problem_data_json);
     const slug = getProblemURL(problem);
-    
+
     if (problemSlugs.has(slug) && problemSlugs.get(slug) !== problem.uniqueId) {
       throw new Error(
         `The problems ${problemSlugs.get(slug)} and ${problem.uniqueId} have the same slugs!`
       );
     }
-    
+
     problemSlugs.set(slug, problem.uniqueId);
   }
 
