@@ -2,19 +2,17 @@ import * as React from "react";
 import ProblemSolutions from "../../../../components/ProblemSolutions";
 import SubmitProblemSolutionModal from "../../../../components/SubmitProblemSolutionModal";
 import { ShortProblemInfo } from "../../../../models/problem";
-import { removeDuplicates } from "../../../../utils/utils";
 import { GetStaticProps, GetStaticPaths } from "next";
-import { ProblemInfo } from "../../../../types/content";
 import { useRouter } from "next/router";
 
 interface UserSolutionsProps {
   problem: ShortProblemInfo;
-  allProblemInfo: ProblemInfo[];
+  modulesThatHaveProblem: { id: string; title: string }[];
 }
 
 export default function UserSolutionsTemplate({
   problem,
-  allProblemInfo,
+  modulesThatHaveProblem,
 }: UserSolutionsProps) {
   const router = useRouter();
   const [isSubmitModalOpen, setIsSubmitModalOpen] = React.useState(false);
@@ -22,17 +20,6 @@ export default function UserSolutionsTemplate({
   React.useEffect(() => {
     if (!problem) router.push("/");
   }, []);
-
-  if (router.isFallback) {
-    return <div>Loading...</div>;
-  }
-
-  const modulesThatHaveProblem: { id: string; title: string }[] =
-    removeDuplicates(
-      allProblemInfo
-        .filter((x) => !!x.module)
-        .map((x) => ({ id: x.moduleId, title: x.module?.frontmatter?.title }))
-    );
 
   if (!problem) return null;
 
@@ -57,47 +44,32 @@ export default function UserSolutionsTemplate({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const { loadAllProblemSlugs, loadAllUSACOIds } = await import(
-      "../../../../lib/loadContent"
+    const { queryAllProblemIds, queryUsacoId } = await import(
+      "../../../../lib/queryContent"
     );
     const div_to_probs = await import(
       "../../../../components/markdown/ProblemsList/DivisionList/div_to_probs.json"
     );
-    const problemSlugs = await loadAllProblemSlugs();
-    const usacoIds = await loadAllUSACOIds();
-    const paths = Array.from(
-      problemSlugs.values().map((slug) => ({
-        params: { slug: String(slug) },
-      }))
-    );
-    const usacoIdsToProblemsMap = new Map<string, [string, string, string]>();
+    const problemIds = await queryAllProblemIds();
+    const paths = problemIds.map((id: string) => ({
+      params: {
+        slug: id,
+      },
+    }));
     const divisions = ["Bronze", "Silver", "Gold", "Platinum"];
-    divisions.forEach((division) => {
-      div_to_probs[division].forEach((problem: [string, string, string]) => {
+    for (const division of divisions) {
+      for (const problem of div_to_probs[division]) {
         const uniqueId = "usaco-" + problem[0];
-        if (!usacoIds.has(uniqueId)) {
+        const exists = await queryUsacoId(uniqueId);
+        if (!exists) {
           paths.push({
             params: {
               slug: uniqueId,
             },
           });
-          usacoIdsToProblemsMap.set(uniqueId, problem);
         }
-      });
-    });
-    const { USACO_IDS_TO_PROBLEMS_MAP_FILE } = await import(
-      "../../../../lib/constants"
-    );
-    const { writeFile } = await import("fs/promises");
-    const { mkdir } = await import("fs/promises");
-    const path = await import("path");
-    await mkdir(path.dirname(USACO_IDS_TO_PROBLEMS_MAP_FILE), {
-      recursive: true,
-    });
-    await writeFile(
-      USACO_IDS_TO_PROBLEMS_MAP_FILE,
-      JSON.stringify(Array.from(usacoIdsToProblemsMap.entries()))
-    );
+      }
+    }
     return { paths, fallback: false };
   } catch (error) {
     console.error("Error loading problem slugs:", error);
@@ -107,46 +79,45 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { USACO_IDS_TO_PROBLEMS_MAP_FILE } = await import(
-      "../../../../lib/constants"
+    const div_to_probs = await import(
+      "../../../../components/markdown/ProblemsList/DivisionList/div_to_probs.json"
     );
-    const { loadAllProblems } = await import("../../../../lib/loadContent");
-    const readFile = await import("fs/promises");
-    // Explicitly convert slug to string
-    const { slug: rawSlug } = context.params || {};
-    const slug = String(rawSlug); // Ensure slug is always a string
-    const usacoIdsToProblemsMap = new Map(
-      JSON.parse(
-        await readFile.readFile(USACO_IDS_TO_PROBLEMS_MAP_FILE, "utf-8")
-      )
-    );
-    const uniqueId = slug;
+    const { queryProblem, queryModuleIdAndTitleFromProblemBySolutionId } =
+      await import("../../../../lib/queryContent");
+    const { slug } = context.params as { slug: string };
     let problem: ShortProblemInfo | null = null;
-    if (usacoIdsToProblemsMap.has(slug)) {
-      const problemInfo = usacoIdsToProblemsMap.get(slug)!;
-      problem = {
-        uniqueId,
-        name: problemInfo[2],
-        url: "",
-      };
+    // Check if this is a USACO problem first
+    if (slug.startsWith("usaco-")) {
+      const divisions = ["Bronze", "Silver", "Gold", "Platinum"];
+      for (const division of divisions) {
+        for (const problemEntry of div_to_probs[division]) {
+          const uniqueId = "usaco-" + problemEntry[0];
+          if (uniqueId === slug) {
+            problem = {
+              uniqueId,
+              name: problemEntry[2],
+              url: "",
+            };
+            break;
+          }
+        }
+        if (problem) break;
+      }
     }
-    const loadedProblems = await loadAllProblems();
-    problem =
-      problem ||
-      loadedProblems.problems.find((problem) => problem.uniqueId === uniqueId);
-    const allProblemInfo = loadedProblems.problems.filter(
-      (problem) => problem.uniqueId === uniqueId
-    );
-    if (!allProblemInfo || allProblemInfo.length === 0) {
-      console.error(`Problem not found for slug: ${uniqueId}`);
+    // For non-USACO problems or if USACO problem wasn't found, query from database
+    problem = problem ? problem : await queryProblem(slug);
+    if (!problem) {
+      console.error("Problem not found:", slug);
       return {
         notFound: true,
       };
     }
+    const modulesThatHaveProblem: { id: string; title: string }[] =
+      await queryModuleIdAndTitleFromProblemBySolutionId(problem.uniqueId);
     return {
       props: {
         problem,
-        allProblemInfo,
+        modulesThatHaveProblem,
       },
     };
   } catch (error) {
