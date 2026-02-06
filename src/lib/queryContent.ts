@@ -81,8 +81,8 @@ export async function queryProblem(
 
   // Load module if module_id exists
   if (problem.moduleId) {
-    const module = await queryModule(problem.moduleId);
-    problem.module = module || undefined;
+    const mod = await queryModule(problem.moduleId);
+    problem.module = mod || undefined;
   }
 
   return problem;

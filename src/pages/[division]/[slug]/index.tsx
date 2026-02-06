@@ -30,7 +30,7 @@ export default function ModuleTemplate({
 }: ModulePageProps): JSX.Element {
   const moduleInfo = React.useMemo(
     () => graphqlToModuleInfo(moduleData),
-    [moduleData]
+    [moduleData],
   );
   const isLoaded = useIsUserDataLoaded();
 
@@ -79,24 +79,21 @@ export default function ModuleTemplate({
               "position": 3,
               "name": "${moduleInfo.title}",
               "item": "https://usaco.guide/${moduleInfo.section}/${
-          moduleInfo.id
-        }"
+                moduleInfo.id
+              }"
             }]
           }
         `}</script>
       </Head>
       <div className="py-4">
         <ConfettiProvider>
-            <MarkdownProblemListsProvider
-              value={moduleProblemLists?.problemLists}
-            >
-              <MarkdownLayout
-                markdownData={moduleInfo}
-                frontmatter={frontmatter}
-              >
-                <Markdown body={moduleData.body} />
-              </MarkdownLayout>
-            </MarkdownProblemListsProvider>
+          <MarkdownProblemListsProvider
+            value={moduleProblemLists?.problemLists}
+          >
+            <MarkdownLayout markdownData={moduleInfo} frontmatter={frontmatter}>
+              <Markdown body={moduleData.body} />
+            </MarkdownLayout>
+          </MarkdownProblemListsProvider>
         </ConfettiProvider>
       </div>
     </Layout>
@@ -105,7 +102,9 @@ export default function ModuleTemplate({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   // Load all modules to generate paths
-  const { queryAllModuleFrontmatter } = await import("../../../lib/queryContent");
+  const { queryAllModuleFrontmatter } = await import(
+    "../../../lib/queryContent"
+  );
   const data = await queryAllModuleFrontmatter();
   const paths = data
     .map(({ division, frontmatter }) => {
@@ -126,7 +125,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { queryModule, queryModuleProblemsLists, queryAllModuleFrontmatter } = await import("../../../lib/queryContent");
+    const { queryModule, queryModuleProblemsLists, queryAllModuleFrontmatter } =
+      await import("../../../lib/queryContent");
     const { division, slug } = context.params as {
       division: string;
       slug: string;
@@ -135,8 +135,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
       console.error("Missing division or slug in params");
       return { notFound: true };
     }
-    const module = await queryModule(slug);
-    if (!module) {
+    const mod = await queryModule(slug);
+    if (!mod) {
       console.error(`Module not found for slug: ${slug}`);
       return { notFound: true };
     }
@@ -146,15 +146,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
       return { notFound: true };
     }
     const moduleProblemLists = await queryModuleProblemsLists(slug);
-      return {
-        props: {
-          moduleData: module,
-          moduleProblemLists: moduleProblemLists ?? null,
-          frontmatter: frontmatterData.map((x) => x.frontmatter),
-        },
-      };
-    } catch (error) {
-      console.error(`Error loading module in getStaticProps:`, error);
-      return { notFound: true };
-    }
+    return {
+      props: {
+        moduleData: mod,
+        moduleProblemLists: moduleProblemLists ?? null,
+        frontmatter: frontmatterData.map((x) => x.frontmatter),
+      },
+    };
+  } catch (error) {
+    console.error(`Error loading module in getStaticProps:`, error);
+    return { notFound: true };
+  }
 };
