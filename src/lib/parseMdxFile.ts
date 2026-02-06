@@ -16,7 +16,6 @@ import remarkExtractImages from "../mdx-plugins/remark-extract-images";
 import { MdxContent, MdxFrontmatter } from "../types/content";
 import { getLastUpdated } from "./getGitAuthorTimestamp";
 import { moduleIDToSectionMap, SectionID } from "../../content/ordering";
-import { ProcessedImage } from "./imageUtils";
 
 export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   const { readFile } = await import("fs/promises");
