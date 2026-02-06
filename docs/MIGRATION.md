@@ -12,7 +12,7 @@
 
 ## Overview
 
-Currently, the USACO Guide repository uses Gatsby. This repository contains the code for the migration to Next.js. The goal of this migration is a framework change to improve:
+Currently, the [USACO Guide](https://github.com/cpinitiative/usaco-guide) repository uses Gatsby. This repository contains the code for the migration to Next.js. The goal of this migration is a framework change to improve:
 
 - Performance
   - Faster builds, faster development startup, and faster content compilation
@@ -21,7 +21,7 @@ Currently, the USACO Guide repository uses Gatsby. This repository contains the 
   - Modern React framework with up-to-date MDX plugins
   - Simplified build pipeline
 - Scalability
-  - Dynamic support for large-scale `.mdx` content
+  - Dynamic support for large-scale MDX content
 
 ## Current Status
 
@@ -133,7 +133,7 @@ Key characteristics:
     - Module IDs
     - Problem sources
 
-This yields predictable $\mathcal{O}(log n)$ behavior during page generation.
+This yields predictable $\mathcal{O}(\log n)$ behavior during page generation.
 
 ### Database Access Layer
 
@@ -163,13 +163,13 @@ During `next build`:
 
 ### Complexity Analysis
 
-This architecture changes the asymptotic behavior of the system. Build ingestion is one-time $\mathcal{O}(n)$ traversal of content. Page generation is $\mathcal{O}(log n)$ indexed lookups per query. This addresses scalability issues that emerge as content volume rises.
+This architecture changes the asymptotic behavior of the system. Build ingestion is one-time $\mathcal{O}(n)$ traversal of content. Page generation is $\mathcal{O}(\log n)$ indexed lookups per query. This addresses scalability issues that emerge as content volume rises.
 
 ### Database Schema Design
 
 #### Table: `mdx_content`
 
-Stores parsed MDX files (both modules and solutions).
+Stores parsed `.mdx` files (both modules and solutions).
 
 ```sql
 CREATE TABLE mdx_content (
@@ -286,28 +286,26 @@ CREATE TABLE usaco_ids (
 
 **Note**
 
-All static files have been moved to the [public/](../public/) directory because Next.js can only serve static files from there. The `migrate-imports.cjs` script was used to update all relative imports to absolute imports in the [content/](../content/) and [solutions/](../solutions/) directories.
+All static files have been moved to the [/public/](../public/) directory because Next.js can only serve static files from there. The [migrate-imports.cjs](../scripts/migrate-imports.cjs) script was used to update all relative imports to absolute imports in the [/content/](../content/) and [/solutions/](../solutions/) directories.
 
 ## Performance & Quality Benchmarking Plan
-
-### Goals
 
 Gatsby and Next.js will be compared across:
 
 1. Build & dev performance
-   MDX compilation time
-   Dev server startup time
-   Production build time
-   HMR latency
+   - MDX compilation time
+   - Dev server startup time
+   - Production build time
+   - HMR latency
 
 2. Code quality
-   TypeScript type-check speed
-   Linting speed
-   Dependency freshness
+   - TypeScript type-check speed
+   - Linting speed
+   - Dependency freshness
 
 3. Runtime performance
-   Core Web Vitals (LCP, INP, CLS)
-   Total JS shipped per page
+   - Core Web Vitals (LCP, INP, CLS)
+   - Total JS shipped per page
 
 Benchmarks will be tracked over time and included in PRs when relevant.
 
@@ -327,6 +325,8 @@ Benchmarks will be tracked over time and included in PRs when relevant.
 
 - [ ] Document benchmark results in docs/benchmarks.md
 
+### Gatsby Benchmarks
+
 | Metric            | Value |
 | ----------------- | ----- |
 | MDX compile time  | TBD   |
@@ -336,6 +336,8 @@ Benchmarks will be tracked over time and included in PRs when relevant.
 | LCP               | TBD   |
 | INP               | TBD   |
 | CLS               | TBD   |
+
+### Next.js Benchmarks
 
 | Metric            | Value |
 | ----------------- | ----- |
