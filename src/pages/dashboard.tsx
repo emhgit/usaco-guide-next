@@ -30,12 +30,20 @@ import {
   useProblemsProgressInfo,
 } from "../utils/getProgressInfo";
 import { GetStaticProps } from "next";
-import { MdxContent, ProblemInfo } from "../types/content";
 import { CowImagesProvider } from "../context/CowImagesContext";
 
 interface DashboardProps {
-  loadedModules: MdxContent[];
-  problems: ProblemInfo[];
+  loadedModuleInfo: {
+    id: string;
+    title: string;
+  }[];
+  loadedProblemInfo: {
+    inModule: boolean;
+    uniqueId: string;
+    source: string;
+    name: string;
+    moduleId: string;
+  }[];
   cowImages: {
     name: string;
     src: string;
@@ -43,23 +51,23 @@ interface DashboardProps {
 }
 
 export default function DashboardPage({
-  loadedModules,
-  problems,
+  loadedModuleInfo,
+  loadedProblemInfo,
   cowImages,
 }: DashboardProps) {
-  const moduleIDToName = loadedModules.reduce(
+  const moduleIDToName = loadedModuleInfo.reduce(
     (acc, cur) => {
-      acc[cur.frontmatter.id] = cur.frontmatter.title;
+      acc[cur.id] = cur.title;
       return acc;
     },
-    {} as { [key: string]: string }
+    {} as { [key: string]: string },
   );
   const problemIDMap = React.useMemo(() => {
     // 1. problems in modules
-    const res = problems.reduce((acc, cur) => {
+    const res = loadedProblemInfo.reduce((acc, cur) => {
       const problem = cur;
       // ignore problems that don't have an associated module (extraProblems.json)
-      if (problem.module) {
+      if (problem.inModule) {
         if (!(problem.uniqueId in acc)) {
           acc[problem.uniqueId] = {
             label: `${problem.source}: ${problem.name}`,
@@ -67,10 +75,10 @@ export default function DashboardPage({
           };
         }
         acc[problem.uniqueId].modules.push({
-          url: `${moduleIDToURLMap[problem.module.frontmatter.id]}/#problem-${
+          url: `${moduleIDToURLMap[problem.moduleId]}/#problem-${
             problem.uniqueId
           }`,
-          moduleId: problem.module.frontmatter.id,
+          moduleId: problem.moduleId,
         });
       }
       return acc;
@@ -94,7 +102,7 @@ export default function DashboardPage({
       }
     }
     return res;
-  }, [problems]);
+  }, [loadedProblemInfo]);
   const lastViewedModuleID = useLastViewedModule();
   const userProgressOnModules = useUserProgressOnModules();
   const userProgressOnProblems = useUserProgressOnProblems();
@@ -112,7 +120,7 @@ export default function DashboardPage({
             userProgressOnModules[x] === "Practicing" ||
             userProgressOnModules[x] === "Skipped" ||
             (showIgnored && userProgressOnModules[x] === "Ignored")) &&
-          moduleIDToSectionMap.hasOwnProperty(x)
+          moduleIDToSectionMap.hasOwnProperty(x),
       )
       .map((x) => ({
         label: `${SECTION_LABELS[moduleIDToSectionMap[x]]}: ${
@@ -134,7 +142,7 @@ export default function DashboardPage({
             userProgressOnProblems[x] === "Solving" ||
             userProgressOnProblems[x] === "Skipped" ||
             (showIgnored && userProgressOnProblems[x] === "Ignored")) &&
-          problemIDMap.hasOwnProperty(x)
+          problemIDMap.hasOwnProperty(x),
       )
       .map((x) => ({
         label: problemIDMap[x].label,
@@ -150,7 +158,7 @@ export default function DashboardPage({
   const lastViewedSection =
     moduleIDToSectionMap[lastViewedModuleID] || "general";
   const moduleProgressIDs = Object.keys(moduleIDToName).filter(
-    (x) => moduleIDToSectionMap[x] === lastViewedSection
+    (x) => moduleIDToSectionMap[x] === lastViewedSection,
   );
   const allModulesProgressInfo = useModulesProgressInfo(moduleProgressIDs);
 
@@ -158,8 +166,8 @@ export default function DashboardPage({
     return Object.keys(problemIDMap).filter((problemID) =>
       problemIDMap[problemID].modules.some(
         (module: { url: string; moduleId: string }) =>
-          moduleIDToSectionMap[module.moduleId] === lastViewedSection
-      )
+          moduleIDToSectionMap[module.moduleId] === lastViewedSection,
+      ),
     );
   }, [problemIDMap, lastViewedSection]);
   const allProblemsProgressInfo = useProblemsProgressInfo(problemStatisticsIDs);
@@ -284,34 +292,29 @@ export default function DashboardPage({
 
 export const getStaticProps: GetStaticProps = async () => {
   try {
-    const { loadAllModules, loadAllProblems, loadCowImages } = await import(
-      "../lib/loadContent"
-    );
-    const loadedModules = await loadAllModules();
-    if (!loadedModules || loadedModules.size === 0) {
+    const { loadCowImages } = await import("../lib/loadContent");
+    const { queryAllModuleIdsAndTitles, queryAllProblemDashboardInfo } =
+      await import("../lib/queryContent");
+    const loadedModuleInfo = await queryAllModuleIdsAndTitles();
+    if (!loadedModuleInfo || loadedModuleInfo.length === 0) {
       console.error("No modules loaded or failed to load modules");
       return { notFound: true };
     }
-    const loadedProblems = await loadAllProblems();
-    if (!loadedProblems) {
-      console.error("Failed to load modules or problems");
+    const loadedProblemInfo = await queryAllProblemDashboardInfo();
+    if (!loadedProblemInfo || loadedProblemInfo.length === 0) {
+      console.error("No problems loaded or failed to load problems");
       return { notFound: true };
     }
     const cowImages = await loadCowImages();
     return {
       props: {
-        loadedModules: Array.from(loadedModules.values()),
-        problems: loadedProblems.problems,
+        loadedModuleInfo,
+        loadedProblemInfo,
         cowImages,
       },
     };
   } catch (error) {
-    console.error("Error loading modules:", error);
-    return {
-      props: {
-        loadedModules: null,
-        loadedProblems: null,
-      },
-    };
+    console.error("Error loading dashboard data:", error);
+    return { notFound: true };
   }
 };
