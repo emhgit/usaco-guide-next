@@ -82,7 +82,7 @@ export async function queryProblem(
   // Load module if module_id exists
   if (problem.moduleId) {
     const mod = await queryModule(problem.moduleId);
-    problem.module = mod || undefined;
+    problem.module = mod || null;
   }
 
   return problem;
@@ -191,7 +191,7 @@ export async function querySolutionByProblemSlug(
   // Get the unique_id from the slug
   const slugRow = db
     .prepare("SELECT unique_id FROM problem_slugs WHERE slug = ?")
-    .get(slug) as { unique_id: string } | undefined;
+    .get(slug) as { unique_id: string } | null;
 
   if (!slugRow) {
     return null;
@@ -248,7 +248,7 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
   if (moduleIds.size === 0) {
     const problemRow = db
       .prepare("SELECT module_id FROM problems WHERE unique_id = ? AND module_id IS NOT NULL")
-      .get(uniqueId) as { module_id: string } | undefined;
+      .get(uniqueId) as { module_id: string } | null;
 
     if (problemRow?.module_id) {
       moduleIds.add(problemRow.module_id);
@@ -338,7 +338,7 @@ function deserializeMdxContent(row: any): MdxContent {
     cppOc: row.cpp_oc,
     javaOc: row.java_oc,
     pyOc: row.py_oc,
-    mdast: row.mdast_json ? JSON.parse(row.mdast_json) : undefined,
+    mdast: row.mdast_json ? JSON.parse(row.mdast_json) : null,
     fields: {
       division: row.division || null,
       gitAuthorTime: row.git_author_time || null,
