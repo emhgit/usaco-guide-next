@@ -7,7 +7,14 @@
 - [Overview](#overview)
 - [Current Status](#current-status)
 - [Motivation](#motivation)
+  - [Why Next.js?](#why-nextjs)
 - [Architecture Changes](#architecture-changes)
+  - [High-Level Architecture](#high-level-architecture)
+  - [Ingestion Layer (Prebuild Indexing)](#ingestion-layer-prebuild-indexing)
+  - [Query Layer](#query-layer)
+  - [Page Generation (Next.js)](#page-generation-nextjs)
+  - [Complexity Analysis](#complexity-analysis)
+  - [Database Schema Design](#database-schema-design)
 - [Performance & Quality Benchmarking](#performance--quality-benchmarking-plan)
 
 ## Overview
@@ -38,7 +45,7 @@ This migration is **in progress**. Many core features have already been implemen
 - [ ] Configure redirects
 - [ ] Update algolia config for Next.js (indexing script in `/scripts`)
 - [x] Copy over all other components/scripts/utils
-- [ ] Update storybook config for next.js
+- [ ] Update storybook config for Next.js
 - [ ] Copy over stories
 - [ ] Add new modules and solutions
 - [ ] Update deployment scripts
@@ -85,10 +92,11 @@ The migration replaces Gatsby’s GraphQL-based build with a two-phase static pi
    - Page generation is parallel and decoupled from content traversal
 
 Invariants:
-All content must be representable without filesystem access during page generation.
-Page components must not directly parse MDX or JSON directly.
 
-### Ingestion Layer (prebuild indexing)
+- All content must be representable without filesystem access during page generation.
+- Page components must not directly parse MDX or JSON directly.
+
+### Ingestion Layer (Prebuild Indexing)
 
 File: [index-content.ts](../scripts/index-content.ts)
 
@@ -153,7 +161,7 @@ File: [queryContent.ts](../src/lib/queryContent.ts)
 
 This layer provides query functions to abstract away SQL queries. For example, the `querySolution` and `queryModule` functions take an `id: string` as an explicit argument and return the proper data from the database. These functions use explicit types to match the expected content.
 
-## Page generation (Next.js)
+### Page Generation (Next.js)
 
 During `next build`:
 
@@ -188,6 +196,7 @@ CREATE TABLE mdx_content (
   created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
 
+
 CREATE INDEX idx_mdx_content_type ON mdx_content(type);
 CREATE INDEX idx_mdx_content_division ON mdx_content(division);
 ```
@@ -212,6 +221,7 @@ CREATE TABLE problems (
   problem_data_json TEXT NOT NULL         -- Full ProblemInfo as JSON for quick retrieval
 );
 
+
 CREATE INDEX idx_problems_module_id ON problems(module_id);
 CREATE INDEX idx_problems_source ON problems(source);
 ```
@@ -229,6 +239,7 @@ CREATE TABLE module_problem_lists (
   UNIQUE(module_id, list_id)
 );
 
+
 CREATE INDEX idx_module_problem_lists_module_id ON module_problem_lists(module_id);
 ```
 
@@ -245,6 +256,7 @@ CREATE TABLE module_frontmatter (
   UNIQUE(module_id)
 );
 
+
 CREATE INDEX idx_module_frontmatter_division ON module_frontmatter(division);
 ```
 
@@ -258,6 +270,7 @@ CREATE TABLE solution_frontmatter (
   solution_id TEXT NOT NULL,             -- Foreign key to mdx_content.id
   frontmatter_json TEXT NOT NULL         -- JSON string of MdxFrontmatter
 );
+
 
 CREATE INDEX idx_solution_frontmatter_solution_id ON solution_frontmatter(solution_id);
 ```
@@ -286,7 +299,7 @@ CREATE TABLE usaco_ids (
 
 **Note**
 
-All static files have been moved to the [/public/](../public/) directory because Next.js can only serve static files from there. The [migrate-imports.cjs](../scripts/migrate-imports.cjs) script was used to update all relative imports to absolute imports in the [/content/](../content/) and [/solutions/](../solutions/) directories.
+All static files (e.g., images, videos, etc.) have been moved to the [/public/](../public/) directory because Next.js can only serve static files from there. The [migrate-imports.cjs](../scripts/migrate-imports.cjs) script was used to update all relative imports to absolute imports in the [/content/](../content/) and [/solutions/](../solutions/) directories.
 
 ## Performance & Quality Benchmarking Plan
 
