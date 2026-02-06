@@ -1,5 +1,4 @@
 import { visit } from "unist-util-visit";
-import processImage from "../lib/imageUtils";
 
 export default function remarkExtractImages(options = {}) {
   if (!options.images) {
