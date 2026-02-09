@@ -12,7 +12,8 @@
     "clean": "rm -rf dist .next public/images public/data",
     "check-ts-errors": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --project-token 6f3c58ad349c --exit-zero-on-changes"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -38,6 +39,7 @@
     "bad-words": "^4.0.0",
     "better-sqlite3": "^12.6.2",
     "child_process": "^1.0.2",
+    "chromatic": "^15.0.0",
     "classnames": "^2.5.1",
     "dayjs": "^1.11.13",
     "easymde": "^2.20.0",
