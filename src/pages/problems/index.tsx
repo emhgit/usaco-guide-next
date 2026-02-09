@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Chapter } from "../../../content/ordering";
 
 import {
@@ -31,6 +31,8 @@ interface ProblemsPageProps {
 
 export default function ProblemsPage({ problemIds }: ProblemsPageProps) {
   const userProgress = useUserProgressOnProblems();
+  const [shuffle, sendShuffle] = useState(0);
+  const [random, sendRandom] = useState(0);
   const selectionMetadata: SelectionProps[] = [
     {
       attribute: "difficulty",
@@ -140,18 +142,60 @@ export default function ProblemsPage({ problemIds }: ProblemsPageProps) {
                   </div>
                 ))}
               </div>
-              <ProblemHits />
-              <div className="mt-6 flex flex-col items-center space-y-4">
-                <div className="flex justify-center">
-                  <Pagination showLast={true} />
-                </div>
+              <div className="mb-5 flex justify-center gap-3">
+                <button
+                  onClick={() => sendShuffle(shuffle + 1)}
+                  className="inline-flex items-center rounded-md border border-blue-500 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-blue-400 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                  title={"Shuffle problems"}
+                >
+                  <svg
+                    className={"mr-2 h-5 w-5 text-gray-200"}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Shuffle
+                </button>
+                <button
+                  onClick={() => sendRandom(random + 1)}
+                  className="inline-flex items-center rounded-md border border-blue-500 bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none dark:border-blue-400 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                  title={"Go to a random unsolved problem"}
+                >
+                  <svg
+                    className={"mr-2 h-5 w-5 text-gray-200"}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8" cy="8" r="1" />
+                    <circle cx="16" cy="8" r="1" />
+                    <circle cx="8" cy="16" r="1" />
+                    <circle cx="16" cy="16" r="1" />
+                    <circle cx="12" cy="12" r="1" />
+                  </svg>
+                  Random
+                </button>
+              </div>
+              <ProblemHits shuffle={shuffle} random={random} />
+              <div className="mt-3 flex flex-wrap justify-center">
+                <Pagination showLast={true} className="pr-4" />
                 <HitsPerPage
                   items={[
                     { label: "24 hits per page", value: 24, default: true },
                     { label: "32 hits per page", value: 32 },
                     { label: "48 hits per page", value: 48 },
                   ]}
-                  className="text-gray-900 dark:text-gray-300"
+                  className="mt-1 lg:mt-0"
                 />
               </div>
             </div>
