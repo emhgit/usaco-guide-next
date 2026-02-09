@@ -12,6 +12,32 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   // Configure page extensions to include MDX files
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+
+  // 1. Redirects Configuration
+  async redirects() {
+    try {
+      const path = await import("path")
+      const fs = await import("fs")
+      // Path assumes redirects.txt is in the root of your project
+      const filePath = path.resolve(process.cwd(), "src/redirects.txt");
+      const redirectsData = fs.readFileSync(filePath, "utf8");
+
+      return redirectsData
+        .split("\n")
+        .filter((line) => line.trim() !== "" && !line.startsWith("#"))
+        .map((line) => {
+          const [from, to] = line.split("\t");
+          return {
+            source: from.trim(),
+            destination: to.trim(),
+            permanent: true,
+          };
+        });
+    } catch (e) {
+      console.warn("Could not find or parse src/redirects.txt", e);
+      return [];
+    }
+  },
 };
 
 export default nextConfig;
