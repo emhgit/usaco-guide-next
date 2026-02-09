@@ -42,7 +42,8 @@ This migration is **in progress**. Many core features have already been implemen
 - [x] Copy over `api/` directory and convert Gatsby syntax to Next.js syntax
 - [x] Implement Groups (Set each component to the proper file under `pages/`, i have already converted the components)
 - [x] Implement editor (investigate why auth isn't working; might be bc dev mode)
-- [ ] Configure redirects
+- [x] Configure redirects
+- [x] Configure webpack
 - [ ] Update algolia config for Next.js (indexing script in `/scripts`)
 - [x] Copy over all other components/scripts/utils
 - [ ] Update storybook config for Next.js
