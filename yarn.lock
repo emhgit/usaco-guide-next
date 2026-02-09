@@ -4518,6 +4518,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/path-browserify@npm:^1":
+  version: 1.0.3
+  resolution: "@types/path-browserify@npm:1.0.3"
+  checksum: 10c0/6ed6de375c210dbc20d171ab547be6065ce9904463ca8ca63443a3b23efc7234ff5400d62be05b9be36fc2e863b77592c2e607896988ad39a45276b8a7e42d70
+  languageName: node
+  linkType: hard
+
 "@types/prismjs@npm:^1.26.0":
   version: 1.26.5
   resolution: "@types/prismjs@npm:1.26.5"
@@ -12201,6 +12208,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"null-loader@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "null-loader@npm:4.0.1"
+  dependencies:
+    loader-utils: "npm:^2.0.0"
+    schema-utils: "npm:^3.0.0"
+  peerDependencies:
+    webpack: ^4.0.0 || ^5.0.0
+  checksum: 10c0/fe9a74a928c9ddc1eab7be0e4322516439562d6efd6feeb0f7c61777d4b79a6a8e5a6bc8133deb59408f3f423bdf84c154a88168154a583154e9e33d544b4d42
+  languageName: node
+  linkType: hard
+
 "object-assign@npm:^4, object-assign@npm:^4.1.1":
   version: 4.1.1
   resolution: "object-assign@npm:4.1.1"
@@ -14348,7 +14367,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"schema-utils@npm:^3.1.1":
+"schema-utils@npm:^3.0.0, schema-utils@npm:^3.1.1":
   version: 3.3.0
   resolution: "schema-utils@npm:3.3.0"
   dependencies:
@@ -15988,6 +16007,7 @@ __metadata:
     "@types/mdast": "npm:^3"
     "@types/mdx": "npm:^2.0.13"
     "@types/node": "npm:^24.1.0"
+    "@types/path-browserify": "npm:^1"
     "@types/reach__router": "npm:^1"
     "@types/react": "npm:^19"
     "@types/react-calendar-heatmap": "npm:^1"
@@ -16018,7 +16038,9 @@ __metadata:
     mdast: "npm:^3.0.0"
     mdast-util-to-string: "npm:^4.0.0"
     next: "npm:15.4.5"
+    null-loader: "npm:^4.0.1"
     octokit: "npm:^5.0.3"
+    path-browserify: "npm:^1.0.1"
     postcss: "npm:^8.5.6"
     prettier: "npm:^3.6.2"
     prism-react-renderer: "npm:^2.4.1"

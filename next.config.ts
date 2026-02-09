@@ -38,6 +38,39 @@ const nextConfig: NextConfig = {
       return [];
     }
   },
+
+  // 2. Webpack Configuration
+  webpack: (config, { isServer, webpack }) => {
+    // Polyfill/Alias 'path' and disable 'fs' for client-side
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      path: require.resolve("path-browserify"),
+    };
+
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+    };
+
+    // Firebase Null Loader for Server-Side Rendering
+    if (isServer) {
+      config.module.rules.push({
+        test: /firebase/,
+        use: "null-loader",
+      });
+    }
+
+    // Provide 'process' for browser
+    if (!isServer) {
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          process: "process/browser",
+        })
+      );
+    }
+
+    return config;
+  },
 };
 
 export default nextConfig;
