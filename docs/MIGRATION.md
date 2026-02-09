@@ -46,8 +46,8 @@ This migration is **in progress**. Many core features have already been implemen
 - [x] Configure webpack
 - [ ] Update algolia config for Next.js (indexing script in `/scripts`)
 - [x] Copy over all other components/scripts/utils
-- [ ] Update storybook config for Next.js
-- [ ] Copy over stories
+- [x] Update storybook config for Next.js
+- [x] Copy over stories
 - [ ] Add new modules and solutions
 - [ ] Update deployment scripts
 - [ ] Update docs
