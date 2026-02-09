@@ -95,7 +95,7 @@ The migration replaces Gatsby’s GraphQL-based build with a two-phase static pi
 Invariants:
 
 - All content must be representable without filesystem access during page generation.
-- Page components must not directly parse MDX or JSON directly.
+- Page components must not directly parse MDX or JSON.
 
 ### Ingestion Layer (Prebuild Indexing)
 
