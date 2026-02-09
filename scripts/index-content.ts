@@ -6,7 +6,7 @@ import path from 'path';
 import { CONTENT_DIR, SOLUTIONS_DIR } from '../src/lib/constants';
 import { readdir } from 'fs/promises';
 
-main();
+main().catch(console.error);
 
 export async function main() {
   console.log("Starting content indexing...");
@@ -60,8 +60,6 @@ export async function main() {
     db.close();
   }
 }
-
-main().catch(console.error);
 
 function createSchema(db: Database.Database): void {
   // Drop existing tables if rebuilding
