@@ -52,6 +52,10 @@ This migration is **in progress**. Many core features have already been implemen
 - [ ] Update deployment scripts
 - [ ] Update docs
 
+**Note:**
+
+All static files (e.g., images, videos, etc.) have been moved to the [/public/](../public/) directory because Next.js can only serve static files from there. The [migrate-imports.cjs](../scripts/migrate-imports.cjs) script was used to update all relative imports to absolute imports in the [/content/](../content/) and [/solutions/](../solutions/) directories.
+
 ## Motivation
 
 ### Why Next.js?
@@ -174,16 +178,20 @@ During `next build`:
 
 ### Complexity Analysis
 
+- Average `.mdx` (`/content/`) file size: ~11.91 KB
+- Average `.mdx` (`/solutions/`) file size: ~5.11 KB
+- Average `.json` (`/content/`) file size: ~3.93 KB
+
 #### Gatsby Architecture Complexity (Previous)
 
 **Core Bottlenecks:**
 
 - **MDX Processing**: $\mathcal{O}(M \times (C + I \times (F + \text{ImageProcessing})))$
-  - $M$ = 883 MDX files, $C$ = content size, $I$ = images per file
+  - $M$ = ~883 MDX files, $C$ = content size, $I$ = images per file
   - Each file processed with 9 remark + 3 rehype plugins = high constant factor
   - Image processing: $\mathcal{O}(I \times F)$ where $F$ = total files in system
 - **Solution-to-Problem Filtering**: $\mathcal{O}(S \times P)$ (quadratic)
-  - $S$ = solutions, $P$ = 1451 problems
+  - $S$ = solutions, $P$ = ~1451 problems
   - Each solution scans all problems to find matches
 - **Git Operations**: $\mathcal{O}(M_{\text{content}} \times G)$
   - Individual `git log` calls per content file
@@ -208,8 +216,8 @@ The new architecture eliminates these bottlenecks through separation of concerns
 
 - File system traversal: $\mathcal{O}(n)$ where $n$ = total content files
 - MDX processing: $\mathcal{O}(M \times C)$ (single pass, no repeated image lookups)
-- Problem deduplication: $\mathcal{O}(P \log P)$ (efficient Map-based)
-- Git operations: $\mathcal{O}(n)$ (batched commands)
+- Problem deduplication: $\mathcal{O}(P)$ (efficient Map-based)
+- Git operations: Amortized $\mathcal{O}(n)$ (batched commands)
 - Database indexing: $\mathcal{O}(N \log N)$ where $N$ = total rows
 
 **Build Phase:**
@@ -219,23 +227,17 @@ The new architecture eliminates these bottlenecks through separation of concerns
 - No content parsing: MDX pre-compiled during ingestion
 
 **Overall Next.js Complexity:**
-$\mathcal{O}(n) + \mathcal{O}(p \times \log n)$ (linear + logarithmic)
+
+- **Ingestion phase:** $\mathcal{O}(n + M \times C + N \log N)$
+- **Build phase:** $\mathcal{O}(p \times q \times \log n)$, where $q$ is a small constant number of queries per page
 
 #### Performance Improvements
 
 **Algorithmic Gains:**
 
 - Eliminated $\mathcal{O}(S \times P)$ quadratic solution filtering
-- Replaced $\mathcal{O}(M \times I \times F)$ image lookups with $\mathcal{O}(1)$ database queries
-- Reduced git operations from $\mathcal{O}(M \times G)$ to $\mathcal{O}(n)$ via batching
+- Reduced git operations from $\mathcal{O}(M \times G)$ to amortized $\mathcal{O}(n)$ via batching
 - Replaced repeated MDX compilation with single-pass processing
-
-**Practical Impact:**
-
-- Build times scale linearly with content instead of superlinearly
-- Incremental builds possible (only re-index changed content)
-- Predictable performance regardless of content size
-- Bounded memory usage during page generation
 
 ### Database Schema Design
 
@@ -360,10 +362,6 @@ CREATE TABLE usaco_ids (
   id TEXT PRIMARY KEY
 );
 ```
-
-**Note**
-
-All static files (e.g., images, videos, etc.) have been moved to the [/public/](../public/) directory because Next.js can only serve static files from there. The [migrate-imports.cjs](../scripts/migrate-imports.cjs) script was used to update all relative imports to absolute imports in the [/content/](../content/) and [/solutions/](../solutions/) directories.
 
 ## Performance & Quality Benchmarking Plan
 
