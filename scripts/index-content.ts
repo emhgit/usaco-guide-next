@@ -7,6 +7,7 @@ import { CONTENT_DIR, SOLUTIONS_DIR } from '../src/lib/constants';
 import { readdir } from 'fs/promises';
 
 main();
+
 export async function main() {
   console.log("Starting content indexing...");
   const startTime = Date.now();
