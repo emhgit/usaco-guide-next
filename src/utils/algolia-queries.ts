@@ -1,174 +1,144 @@
-/* eslint-disable @next/next/no-assign-module-variable */
 import { moduleIDToSectionMap } from "../../content/ordering";
 import {
-  AlgoliaEditorFile,
   AlgoliaEditorModuleFile,
   AlgoliaEditorSolutionFile,
 } from "../models/algoliaEditorFile";
 import { AlgoliaProblemInfo } from "../models/problem";
-import { MdxContent, ProblemInfo } from "../types/content";
 import extractSearchableText from "./extract-searchable-text";
+import {
+  queryAllModuleFrontmatter,
+  queryAllProblemDashboardInfo,
+  queryProblem,
+  queryModuleIdAndTitleFromProblemBySolutionId,
+  queryModule,
+  querySolution,
+} from "../lib/queryContent";
 
-/*
-export async function getAlgoliaRecords() {
-  // Fetch data directly instead of using GraphQL
-  const { queryModules, queryProblems, querySolutions } = await import("../lib/queryContent");
-  const { modules, problems, solutions } = await Promise.all([
-    queryModules(),
-    queryProblems(),
-    querySolutions(),
-  ]);
+export async function getModuleRecords() {
+  const modules = await queryAllModuleFrontmatter();
 
-  // Transform data into Algolia records
-  const moduleRecords = modules
-    .values()
+  return modules
     .filter((m) => m.frontmatter.id in moduleIDToSectionMap)
-    .map((m) => ({
-      objectID: m.frontmatter.id,
-      ...m.frontmatter,
-      ...m.fields,
-      content: extractSearchableText(JSON.parse(m.mdast)),
-    }));
-
-  const moduleFiles = modules.values();
-  const solutionFiles = solutions.values();
-  const files = { modules: moduleFiles, solutions: solutionFiles };
-  const problemRecords = transformProblems(problems);
-  const fileRecords = transformFiles(files, problems);
-
-  return [
-    {
-      records: moduleRecords,
-      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_modules",
-      matchFields: ["title", "description", "content", "id", "division"],
-    },
-    {
-      records: problemRecords,
-      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_problems",
-      matchFields: [
-        "source",
-        "name",
-        "tags",
-        "url",
-        "difficulty",
-        "isStarred",
-        "tags",
-        "problemModules",
-        "solution",
-      ],
-    },
-    {
-      records: fileRecords,
-      indexName: (process.env.ALGOLIA_INDEX_NAME ?? "dev") + "_editorFiles",
-      matchFields: [
-        "kind",
-        "title",
-        "id",
-        "source",
-        "solutions",
-        "path",
-        "problemModules",
-      ],
-    },
-  ];
+    .map(async (m) => {
+      const fullModule = await queryModule(m.frontmatter.id);
+      return {
+        objectID: m.frontmatter.id,
+        title: m.frontmatter.title,
+        description: m.frontmatter.description,
+        division: m.division,
+        content: fullModule?.mdast ? extractSearchableText(fullModule.mdast) : '',
+      };
+    });
 }
 
-function transformProblems(problems: ProblemInfo[]): AlgoliaProblemInfo[] {
-  const res: AlgoliaProblemInfo[] = [];
+export async function getProblemRecords() {
+  const problems = await queryAllProblemDashboardInfo();
+  const modules = await queryAllModuleFrontmatter();
+  const moduleFiles = modules.map((m) => ({
+    title: m.frontmatter.title,
+    id: m.frontmatter.id,
+    path: m.filePath,
+  }));
+  const records: AlgoliaProblemInfo[] = [];
 
-  problems.forEach((p) => {
-    const existingProblem = res.find((x) => x.objectID === p.uniqueId);
-    const moduleInfo = p.module
-      ? {
-        id: p.module.frontmatter.id,
-        title: p.module.frontmatter.title,
-      }
-      : null;
+  for (const problemInfo of problems) {
+    const fullProblem = await queryProblem(problemInfo.uniqueId);
+    if (!fullProblem) continue;
+
+    const existingProblem = records.find((x) => x.objectID === fullProblem.uniqueId);
+    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(fullProblem.uniqueId);
+    const problemModulesWithPath = problemModules.map(module => {
+      const moduleFile = moduleFiles.find(m => m.id === module.id);
+      return {
+        id: module.id,
+        title: module.title,
+        path: moduleFile?.path || ''
+      };
+    });
 
     if (existingProblem) {
       existingProblem.tags = [
-        ...new Set([...existingProblem.tags, ...(p.tags || [])]),
+        ...new Set([...existingProblem.tags, ...(fullProblem.tags || [])]),
       ];
-      if (
-        moduleInfo &&
-        !existingProblem.problemModules.find(
-          (module) => module.id === moduleInfo.id
-        )
-      ) {
-        existingProblem.problemModules.push(moduleInfo);
-      }
+
+      problemModulesWithPath.forEach((module) => {
+        if (!existingProblem.problemModules.find((m) => m.id === module.id)) {
+          existingProblem.problemModules.push(module);
+        }
+      });
     } else {
-      res.push({
-        objectID: p.uniqueId,
-        name: p.name,
-        source: p.source,
-        tags: p.tags || [],
-        url: p.url,
-        difficulty: p.difficulty,
-        isStarred: p.isStarred,
-        solution: p.solution
+      records.push({
+        objectID: fullProblem.uniqueId,
+        name: fullProblem.name,
+        source: fullProblem.source,
+        tags: fullProblem.tags || [],
+        url: fullProblem.url,
+        difficulty: fullProblem.difficulty,
+        isStarred: fullProblem.isStarred || false,
+        solution: fullProblem.solution
           ? (Object.fromEntries(
-            Object.entries(p.solution).filter(([_, v]) => v != null)
+            Object.entries(fullProblem.solution).filter(([_, v]) => v != null)
           ) as any)
           : null,
-        problemModules: moduleInfo ? [moduleInfo] : [],
+        problemModules: problemModulesWithPath,
       });
     }
-  });
+  }
 
-  return res;
+  return records;
 }
 
-function transformFiles(
-  data: {
-    modules: MapIterator<MdxContent>,
-    solutions: MapIterator<MdxContent>
-  },
-  problems: ProblemInfo[]
-): AlgoliaEditorFile[] {
-  const moduleFiles: AlgoliaEditorModuleFile[] = Array.from(data.modules).map((m) => ({
+export async function getEditorFileRecords() {
+  const modules = await queryAllModuleFrontmatter();
+  const problems = await queryAllProblemDashboardInfo();
+
+  const moduleFiles: AlgoliaEditorModuleFile[] = modules.map((m) => ({
     title: m.frontmatter.title,
     id: m.frontmatter.id,
-    path: m.fileAbsolutePath,
+    path: m.filePath,
   }));
 
   const solutionFiles: AlgoliaEditorSolutionFile[] = [];
 
-  problems.forEach((problem) => {
-    const module = moduleFiles.find(
-      (file) => file.id === problem.module?.frontmatter.id
-    );
-    const relativePath = Array.from(data.solutions).find(
-      (fileNode) =>
-        fileNode.frontmatter.id === problem.uniqueId
-    )?.fileAbsolutePath;
-    // might need to convert fileAbsolutePath to relativePath
+  for (const problemInfo of problems) {
+    const fullProblem = await queryProblem(problemInfo.uniqueId);
+    if (!fullProblem) continue;
 
-    const file: AlgoliaEditorSolutionFile = solutionFiles.find(
-      (file) => file.id === problem.uniqueId
-    ) || {
-      id: problem.uniqueId,
-      title: problem.name,
-      source: problem.source,
-      solutions: [],
-      path: relativePath ? `solutions/${relativePath}` : null,
-      problemModules: [],
-    };
+    const solution = await querySolution(problemInfo.uniqueId);
+    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(problemInfo.uniqueId);
+    const problemModulesWithPath = problemModules.map(module => {
+      const moduleFile = moduleFiles.find(m => m.id === module.id);
+      return {
+        id: module.id,
+        title: module.title,
+        path: moduleFile?.path || ''
+      };
+    });
 
-    if (solutionFiles.indexOf(file) !== -1) {
-      solutionFiles.splice(solutionFiles.indexOf(file), 1);
+    const existingFile = solutionFiles.find((file) => file.id === problemInfo.uniqueId);
+
+    if (existingFile) {
+      problemModulesWithPath.forEach((module) => {
+        if (!existingFile.problemModules.find((m) => m.id === module.id)) {
+          existingFile.problemModules.push(module);
+        }
+      });
+
+      if (fullProblem.solution) {
+        existingFile.solutions.push({ ...fullProblem.solution });
+      }
+    } else {
+      const newFile: AlgoliaEditorSolutionFile = {
+        id: problemInfo.uniqueId,
+        title: fullProblem.name,
+        source: fullProblem.source,
+        solutions: fullProblem.solution ? [{ ...fullProblem.solution }] : [],
+        path: solution ? solution.fileAbsolutePath : null,
+        problemModules: problemModulesWithPath,
+      };
+      solutionFiles.push(newFile);
     }
-
-    if (module != null) {
-      file.problemModules.push(module);
-    }
-
-    if (problem.solution != null) {
-      file.solutions.push({ ...problem.solution });
-    }
-
-    solutionFiles.push(file);
-  });
+  }
 
   return [
     ...moduleFiles.map<
@@ -180,7 +150,7 @@ function transformFiles(
     })),
     ...solutionFiles.map<
       { kind: 'solution'; objectID: string } & AlgoliaEditorSolutionFile
-    >(x => ({
+    >((x) => ({
       ...x,
       kind: 'solution',
       objectID: x.id,
@@ -188,5 +158,50 @@ function transformFiles(
   ];
 }
 
+export async function getAlgoliaRecords() {
+  const indexPrefix = process.env.ALGOLIA_INDEX_NAME ?? 'dev';
+
+  const [moduleRecords, problemRecords, fileRecords] = await Promise.all([
+    Promise.all(await getModuleRecords()),
+    getProblemRecords(),
+    getEditorFileRecords(),
+  ]);
+
+  return [
+    {
+      records: moduleRecords,
+      indexName: indexPrefix + '_modules',
+      matchFields: ['title', 'description', 'content', 'id', 'division'],
+    },
+    {
+      records: problemRecords,
+      indexName: indexPrefix + '_problems',
+      matchFields: [
+        'source',
+        'name',
+        'tags',
+        'url',
+        'difficulty',
+        'isStarred',
+        'tags',
+        'problemModules',
+        'solution',
+      ],
+    },
+    {
+      records: fileRecords,
+      indexName: indexPrefix + '_editorFiles',
+      matchFields: [
+        'kind',
+        'title',
+        'id',
+        'source',
+        'solutions',
+        'path',
+        'problemModules',
+      ],
+    },
+  ];
+}
+
 export default getAlgoliaRecords;
-*/

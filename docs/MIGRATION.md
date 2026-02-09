@@ -44,7 +44,7 @@ This migration is **in progress**. Many core features have already been implemen
 - [x] Implement editor (investigate why auth isn't working; might be bc dev mode)
 - [x] Configure redirects
 - [x] Configure webpack
-- [ ] Update algolia config for Next.js (indexing script in `/scripts`)
+- [x] Update algolia config for Next.js (indexing script in `/scripts`)
 - [x] Copy over all other components/scripts/utils
 - [x] Update storybook config for Next.js
 - [x] Copy over stories
