@@ -46,17 +46,17 @@ export default function ProblemSubmissionInterface({
   const [submission, editSubmission] = useReducer(
     (
       oldSubmission: ProblemSubmissionRequestData,
-      updates: Partial<ProblemSubmissionRequestData>
+      updates: Partial<ProblemSubmissionRequestData>,
     ): ProblemSubmissionRequestData => ({
       ...oldSubmission,
       ...updates,
     }),
-    emptySubmission
+    emptySubmission,
   );
   const [submissionLink, setSubmissionLink] = React.useState("");
   const activeGroup = useActiveGroup();
   const { submitSolution, submitSubmissionLink } = usePostActions(
-    activeGroup.activeGroupId!
+    activeGroup.activeGroupId!,
   );
 
   const { getRootProps, getInputProps, open, isDragActive } = useDropzone({
@@ -125,7 +125,7 @@ export default function ProblemSubmissionInterface({
           <input
             id="submission-link"
             type="url"
-            className="input"
+            className="input p-2"
             value={submissionLink}
             onChange={(e) => setSubmissionLink(e.target.value)}
           />
@@ -152,7 +152,7 @@ export default function ProblemSubmissionInterface({
           sourceCode: submission.sourceCode!,
         },
         problem.postId,
-        problem.id
+        problem.id,
       );
       setSubmissionID(submissionID);
     } catch (error: any) {
