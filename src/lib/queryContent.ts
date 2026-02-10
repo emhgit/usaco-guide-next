@@ -1,5 +1,6 @@
 import { getDatabase } from "./database";
 import { MdxContent, ProblemInfo, MdxFrontmatter, ModuleProblemLists } from "../types/content";
+import { ProblemDifficulty, ProblemSolutionInfo } from "../models/problem";
 
 /**
  * Query solution by ID
@@ -224,7 +225,6 @@ export async function queryModuleIdAndTitleFromProblemBySolutionId(
   const db = await getDatabase();
 
   // Find all modules that contain this problem by querying module_problem_lists
-  // This matches the logic in queryAllProblemsWithUniqueId
   const moduleListRows = db
     .prepare(`
       SELECT module_id, list_id, problems_json 
@@ -324,6 +324,67 @@ export async function queryAllProblemDashboardInfo(): Promise<Array<{
     name: row.name,
     moduleId: row.module_id,
   }));
+}
+
+/**
+ * Query all problems for USACO divisions
+ * Returns all problems with their associated module data if available
+ */
+export async function queryAllProblems(): Promise<ProblemInfo[]> {
+  const db = await getDatabase();
+  const rows = db
+    .prepare(`
+      SELECT 
+        unique_id,
+        name,
+        url,
+        source,
+        source_description,
+        is_starred,
+        difficulty,
+        tags_json,
+        solution_json,
+        in_module,
+        module_id
+      FROM problems
+      ORDER BY source, name
+    `)
+    .all() as any[];
+
+  const problems: ProblemInfo[] = [];
+
+  for (const row of rows) {
+    const problem: ProblemInfo = {
+      uniqueId: row.unique_id,
+      name: row.name,
+      url: row.url,
+      source: row.source,
+      sourceDescription: row.source_description,
+      isStarred: Boolean(row.is_starred),
+      difficulty: row.difficulty as ProblemDifficulty,
+      tags: JSON.parse(row.tags_json || '[]'),
+      solution: JSON.parse(row.solution_json || '{}') as ProblemSolutionInfo,
+      inModule: Boolean(row.in_module),
+      moduleId: row.module_id,
+    };
+
+    problems.push(problem);
+  }
+
+  return problems;
+}
+
+/**
+ * Query problems by USACO divisions
+ * Returns problems filtered to only include USACO division problems
+ */
+export async function queryUsacoDivisionProblems(): Promise<ProblemInfo[]> {
+  const allProblems = await queryAllProblems();
+
+  // Filter problems to only include USACO divisions
+  return allProblems.filter(problem =>
+    problem.source && ['Bronze', 'Silver', 'Gold', 'Platinum'].includes(problem.source)
+  );
 }
 
 /**
