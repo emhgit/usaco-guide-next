@@ -50,6 +50,7 @@
     "gray-matter": "^4.0.3",
     "hast-util-to-string": "^3.0.1",
     "hast-util-to-text": "^4.0.2",
+    "instantsearch.css": "^8.10.0",
     "instantsearch.js": "^4.79.2",
     "jotai": "^2.12.5",
     "katex": "^0.16.22",

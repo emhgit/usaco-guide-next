@@ -10413,6 +10413,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"instantsearch.css@npm:^8.10.0":
+  version: 8.10.0
+  resolution: "instantsearch.css@npm:8.10.0"
+  dependencies:
+    tweakpane: "npm:4.0.5"
+  checksum: 10c0/0589a7dab3b52f131f304b2c702ec0db8746cd5101f0bd9ee200f6049e0c4d8dc5a0beb0959a901f9dbb9f51c563322d92fd593f0a297180145f1a224c2275ab
+  languageName: node
+  linkType: hard
+
 "instantsearch.js@npm:4.79.2, instantsearch.js@npm:^4.79.2":
   version: 4.79.2
   resolution: "instantsearch.js@npm:4.79.2"
@@ -16438,6 +16447,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tweakpane@npm:4.0.5":
+  version: 4.0.5
+  resolution: "tweakpane@npm:4.0.5"
+  checksum: 10c0/c2058c1b1747f95db2227e274c879728fa828894af000c48f5206259ef4e5d1369ab553b82ce31cf62e396dc40707df96bed7cc0d105a89dcc1718bef2900e1f
+  languageName: node
+  linkType: hard
+
 "type-check@npm:^0.4.0, type-check@npm:~0.4.0":
   version: 0.4.0
   resolution: "type-check@npm:0.4.0"
@@ -16937,6 +16953,7 @@ __metadata:
     gray-matter: "npm:^4.0.3"
     hast-util-to-string: "npm:^3.0.1"
     hast-util-to-text: "npm:^4.0.2"
+    instantsearch.css: "npm:^8.10.0"
     instantsearch.js: "npm:^4.79.2"
     jotai: "npm:^2.12.5"
     katex: "npm:^0.16.22"
