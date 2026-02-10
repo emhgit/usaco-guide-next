@@ -221,7 +221,7 @@ export default function ProblemSubmissionInterface({
           onChange={(e) => editSubmission({ sourceCode: e.target.value })}
           className={`input font-mono${
             isDragActive ? "border-blue-600 ring-1 ring-blue-600" : ""
-          }`}
+          } p-2`}
           placeholder="Paste code, or drag and drop a file over this textbox."
           required
         />

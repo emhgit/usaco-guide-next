@@ -111,16 +111,14 @@ export default function SyllabusTemplate({
   }, [] as string[]);
 
   const moduleProgressInfo = useModulesProgressInfo(moduleIDs);
-  
+
   const problemsProgressInfo = useProblemsProgressInfo(problemIDs);
   const useProgressBarForCategory = (category: (typeof section)[0]) => {
     const categoryModuleIds = category.items.map(
-      (module) => module.frontmatter.id
+      (module) => module.frontmatter.id,
     );
     const categoryProblemIds = problemIDs
-      .filter((id) =>
-        categoryModuleIds.includes(id || "")
-      )
+      .filter((id) => categoryModuleIds.includes(id || ""))
       .map((x) => x);
     const problemsProgressInfo = useProblemsProgressInfo(categoryProblemIds);
     return (
@@ -220,7 +218,7 @@ export default function SyllabusTemplate({
                             item.javaOc,
                             item.pyOc,
                             [],
-                            item.fields?.gitAuthorTime
+                            item.fields?.gitAuthorTime,
                           )
                         }
                       />
@@ -253,7 +251,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { queryProblemIdsByDivision, queryModulesByDivision } = await import("../../lib/queryContent");
+    const { queryProblemIdsByDivision, queryModulesByDivision } = await import(
+      "../../lib/queryContent"
+    );
     const { division } = context.params as { division: SectionID };
     const allModules = await queryModulesByDivision(division);
     if (!allModules) {
