@@ -45,3 +45,5 @@ next-env.d.ts
 content.db
 content.db-shm
 content.db-wal
+
+.cursor

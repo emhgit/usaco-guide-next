@@ -16,8 +16,8 @@ import Markdown from "../../../../components/markdown/Markdown";
 interface SolutionTemplateProps {
   solutionForSlug: MdxContent;
   modulesThatHaveProblem: {
-      id: string;
-      title: string;
+    id: string;
+    title: string;
   }[];
   problemInfo: ProblemInfo;
   frontmatter: MdxFrontmatter[];
@@ -35,8 +35,9 @@ export default function SolutionTemplate({
       solutionForSlug.frontmatter.source,
       `${solutionForSlug.frontmatter.source} - ${solutionForSlug.frontmatter.title}`,
       solutionForSlug.frontmatter.author,
+      solutionForSlug.frontmatter.contributors ?? null,
       solutionForSlug.toc,
-      solutionForSlug.fileAbsolutePath
+      solutionForSlug.fileAbsolutePath,
     );
   }, [solutionForSlug]);
 
@@ -58,14 +59,11 @@ export default function SolutionTemplate({
             problem,
           }}
         >
-            <MarkdownLayout
-              markdownData={markdownData}
-              frontmatter={frontmatter}
-            >
-              <div className="py-4">
-                <Markdown body={solutionForSlug.body} />
-              </div>
-            </MarkdownLayout>
+          <MarkdownLayout markdownData={markdownData} frontmatter={frontmatter}>
+            <div className="py-4">
+              <Markdown body={solutionForSlug.body} />
+            </div>
+          </MarkdownLayout>
         </ProblemSolutionContext.Provider>
       </ConfettiProvider>
     </Layout>
@@ -74,8 +72,12 @@ export default function SolutionTemplate({
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
-    const { queryProblemSlugsForSolutionsIds } = await import ("../../../../lib/queryContent");
-    const paths = (await queryProblemSlugsForSolutionsIds()).map((slug => ({params: {slug}})));
+    const { queryProblemSlugsForSolutionsIds } = await import(
+      "../../../../lib/queryContent"
+    );
+    const paths = (await queryProblemSlugsForSolutionsIds()).map((slug) => ({
+      params: { slug },
+    }));
     return {
       paths,
       fallback: false,
@@ -91,7 +93,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { querySolutionByProblemSlug, queryModuleIdAndTitleFromProblemBySolutionId, queryProblem, queryAllModuleFrontmatter } = await import("../../../../lib/queryContent");
+    const {
+      querySolutionByProblemSlug,
+      queryModuleIdAndTitleFromProblemBySolutionId,
+      queryProblem,
+      queryAllModuleFrontmatter,
+    } = await import("../../../../lib/queryContent");
     const { slug } = context.params as {
       slug: string;
     };
@@ -102,9 +109,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
         notFound: true,
       };
     }
-    const modulesThatHaveProblem = await queryModuleIdAndTitleFromProblemBySolutionId(solutionForSlug.frontmatter.id);
+    const modulesThatHaveProblem =
+      await queryModuleIdAndTitleFromProblemBySolutionId(
+        solutionForSlug.frontmatter.id,
+      );
     if (!modulesThatHaveProblem) {
-      console.error(`Problems not found for solution id: ${solutionForSlug.frontmatter.id}`);
+      console.error(
+        `Problems not found for solution id: ${solutionForSlug.frontmatter.id}`,
+      );
       return {
         notFound: true,
       };
@@ -112,7 +124,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     const problemInfo = await queryProblem(solutionForSlug.frontmatter.id);
     if (!problemInfo) {
-      console.error(`Problem not found for solution id: ${solutionForSlug.frontmatter.id}`);
+      console.error(
+        `Problem not found for solution id: ${solutionForSlug.frontmatter.id}`,
+      );
       return {
         notFound: true,
       };
@@ -129,7 +143,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
         solutionForSlug,
         modulesThatHaveProblem,
         problemInfo,
-        frontmatter: loadedModuleFrontmatter.map((module) => module.frontmatter),
+        frontmatter: loadedModuleFrontmatter.map(
+          (module) => module.frontmatter,
+        ),
       },
     };
   } catch (error) {
