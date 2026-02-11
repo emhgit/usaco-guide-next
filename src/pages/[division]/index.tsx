@@ -97,12 +97,14 @@ export interface SyllabusProps {
   division: SectionID;
   allModules: { [key: string]: MdxContent };
   problemIDs: string[];
+  problemDashboardInfo: Array<{uniqueId: string, moduleId: string | null}>;
 }
 
 export default function SyllabusTemplate({
   division,
   allModules,
   problemIDs,
+  problemDashboardInfo
 }: SyllabusProps) {
   const section = getModulesForDivision(allModules, division);
 
@@ -117,12 +119,12 @@ export default function SyllabusTemplate({
     const categoryModuleIds = category.items.map(
       (module) => module.frontmatter.id,
     );
-    const categoryProblemIds = problemIDs
-      .filter((id) => categoryModuleIds.includes(id || ""))
-      .map((x) => x);
+    const categoryProblemIds = problemDashboardInfo
+      .filter((p) => p.moduleId && categoryModuleIds.includes(p.moduleId))
+      .map((p) => p.uniqueId);
     const problemsProgressInfo = useProblemsProgressInfo(categoryProblemIds);
     return (
-      categoryProblemIds.length > 1 && (
+      categoryProblemIds.length > 0 && (
         <DashboardProgressSmall
           {...problemsProgressInfo}
           total={categoryProblemIds.length}
@@ -251,7 +253,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   try {
-    const { queryProblemIdsByDivision, queryModulesByDivision } = await import(
+    const { queryProblemIdsByDivision, queryModulesByDivision, queryAllProblemDashboardInfo } = await import(
       "../../lib/queryContent"
     );
     const { division } = context.params as { division: SectionID };
@@ -261,6 +263,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
       return { notFound: true };
     }
     const problemIDs = await queryProblemIdsByDivision(division);
+    const allProblemDashboardInfo = await queryAllProblemDashboardInfo();
+    const problemDashboardInfo = allProblemDashboardInfo.filter((p) => problemIDs.includes(p.uniqueId));
     if (!problemIDs) {
       console.error("Failed to query problem IDs for division:", division);
       return { notFound: true };
@@ -270,6 +274,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         division,
         allModules,
         problemIDs,
+        problemDashboardInfo
       },
     };
   } catch (error) {
