@@ -25,8 +25,7 @@
       "isStarred": false,
       "tags": ["Tree", "Connected Components", "Diameter"],
       "solutionMetadata": {
-        "kind": "autogen-label-from-site",
-        "site": "CF"
+        "kind": "internal"
       }
     },
     {
@@ -147,6 +146,18 @@
       "difficulty": "Normal",
       "isStarred": false,
       "tags": ["Tree"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-1520",
+      "name": "Ski Slope",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1520",
+      "source": "Silver",
+      "difficulty": "Normal",
+      "isStarred": false,
+      "tags": ["Tree", "Sorting", "Binary Search"],
       "solutionMetadata": {
         "kind": "internal"
       }
