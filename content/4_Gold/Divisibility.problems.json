@@ -80,6 +80,18 @@
       }
     },
     {
+      "uniqueId": "cses-3398",
+      "name": "Permutation Rounds",
+      "url": "https://cses.fi/problemset/task/3398",
+      "source": "CSES",
+      "difficulty": "Easy",
+      "isStarred": true,
+      "tags": ["Functional Graph", "Prime Factorization"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
       "uniqueId": "cses-1081",
       "name": "Common Divisors",
       "url": "https://cses.fi/problemset/task/1081",
@@ -130,6 +142,18 @@
       }
     },
     {
+      "uniqueId": "spoj-lcmsum",
+      "name": "LCM Sum",
+      "url": "https://www.spoj.com/problems/LCMSUM/",
+      "source": "SPOJ",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Divisibility", "LCM", "Euler Totient"],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
       "uniqueId": "cf-1499D",
       "name": "The Number of Pairs",
       "url": "https://codeforces.com/contest/1499/problem/D",
@@ -140,6 +164,19 @@
       "solutionMetadata": {
         "kind": "autogen-label-from-site",
         "site": "CF"
+      }
+    },
+    {
+      "uniqueId": "ac-abc420G",
+      "name": "sqrt(n²+n+X)",
+      "url": "https://atcoder.jp/contests/abc420/tasks/abc420_g",
+      "source": "AC",
+      "difficulty": "Hard",
+      "isStarred": false,
+      "tags": ["Divisibility"],
+      "solutionMetadata": {
+        "kind": "autogen-label-from-site",
+        "site": "AC"
       }
     }
   ]
