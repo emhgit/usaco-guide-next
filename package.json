@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "yarn tsx scripts/load-content.ts && next dev",
-    "prebuild": "yarn clean && yarn tsx scripts/load-content.ts",
+    "prebuild": "yarn clean && yarn tsx scripts/index-content.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rm -rf dist .next public/images public/data",
+    "clean": "rm -rf dist .next data",
     "check-ts-errors": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

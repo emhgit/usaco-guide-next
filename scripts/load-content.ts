@@ -16,19 +16,10 @@ async function needsRebuild(): Promise<boolean> {
 }
 
 async function load() {
-  try {
-    console.log("Starting to load content...");
-    const rebuild = await needsRebuild();
-    if (rebuild) {
-      const { main } = await import('./index-content');
-      await main();
-    }
-  } catch (error) {
-    console.error("Error loading content:");
-    console.error(error);
-  } finally {
-    // Ensure the process exits, but give time for logs to flush
-    setTimeout(() => process.exit(0), 100);
+  console.log("Starting to load content...");
+  const rebuild = await needsRebuild();
+  if (rebuild) {
+    await import('./index-content');
   }
 }
 
