@@ -122,7 +122,7 @@
       "source": "Silver",
       "difficulty": "Normal",
       "isStarred": false,
-      "tags": ["Connected Components"],
+      "tags": ["Connected Components", "Prefix Sums"],
       "solutionMetadata": {
         "kind": "USACO",
         "usacoId": "1040"
@@ -252,8 +252,7 @@
       "isStarred": false,
       "tags": ["Simulation"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1108"
+        "kind": "internal"
       }
     },
     {
@@ -278,19 +277,6 @@
       "tags": ["Sorting", "Greedy"],
       "solutionMetadata": {
         "kind": "internal"
-      }
-    },
-    {
-      "uniqueId": "usaco-1112",
-      "name": "Just Green Enough",
-      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=1112",
-      "source": "Silver",
-      "difficulty": "Normal",
-      "isStarred": false,
-      "tags": ["Prefix Sums"],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1112"
       }
     },
     {
@@ -384,15 +370,14 @@
     },
     {
       "uniqueId": "usaco-1135",
-      "name": "ABC",
+      "name": "Do You Know Your ABCs?",
       "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=1135",
       "source": "Silver",
       "difficulty": "Normal",
       "isStarred": false,
       "tags": ["Set"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1135"
+        "kind": "internal"
       }
     },
     {
@@ -417,8 +402,7 @@
       "isStarred": false,
       "tags": ["1DRQ"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1137"
+        "kind": "internal"
       }
     },
     {
@@ -521,8 +505,7 @@
       "isStarred": false,
       "tags": ["Prefix Sums"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1160"
+        "kind": "internal"
       }
     },
     {
@@ -611,8 +594,7 @@
       "isStarred": false,
       "tags": ["Sorted Set", "Stack", "Linked List"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1183"
+        "kind": "internal"
       }
     },
     {
@@ -664,19 +646,6 @@
       "solutionMetadata": {
         "kind": "USACO",
         "usacoId": "1190"
-      }
-    },
-    {
-      "uniqueId": "usaco-1204",
-      "name": "Photoshoot 2",
-      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1204",
-      "source": "Bronze",
-      "difficulty": "Normal",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1204"
       }
     },
     {
@@ -766,8 +735,7 @@
       "isStarred": false,
       "tags": ["Prefix Sums"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1232"
+        "kind": "internal"
       }
     },
     {
@@ -1189,19 +1157,6 @@
       }
     },
     {
-      "uniqueId": "usaco-1035",
-      "name": "Social Distancing I",
-      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1035",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1035"
-      }
-    },
-    {
       "uniqueId": "usaco-1036",
       "name": "Social Distancing II",
       "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1036",
@@ -1345,16 +1300,15 @@
       }
     },
     {
-      "uniqueId": "usaco-1304",
-      "name": "Moo Route II",
-      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1304",
+      "uniqueId": "usaco-1326",
+      "name": "Milk Sum",
+      "url": "http://usaco.org/index.php?page=viewproblem2&cpid=1326",
       "source": "Silver",
       "difficulty": "N/A",
       "isStarred": false,
-      "tags": ["Graphs", "DP"],
+      "tags": ["Sorting", "Prefix Sums"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1304"
+        "kind": "internal"
       }
     },
     {
@@ -1735,19 +1689,6 @@
       }
     },
     {
-      "uniqueId": "usaco-1350",
-      "name": "Bovine Acrobatics",
-      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=1350",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": ["Greedy", "Deque"],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1350"
-      }
-    },
-    {
       "uniqueId": "usaco-1351",
       "name": "Cycle Correspondence",
       "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=1351",
@@ -2028,7 +1969,7 @@
       "isStarred": false,
       "tags": [],
       "solutionMetadata": {
-        "kind": "USACO",
+        "kind": "internal",
         "usacoId": "1397"
       }
     },
@@ -2310,12 +2251,11 @@
       "name": "Roundabout Rounding",
       "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1443",
       "source": "Bronze",
-      "difficulty": "N/A",
+      "difficulty": "Easy",
       "isStarred": false,
       "tags": [],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1443"
+        "kind": "internal"
       }
     },
     {
@@ -2327,21 +2267,7 @@
       "isStarred": false,
       "tags": [],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1444"
-      }
-    },
-    {
-      "uniqueId": "usaco-1445",
-      "name": "It's Mooin' Time",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1445",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1445"
+        "kind": "internal"
       }
     },
     {
@@ -2355,71 +2281,6 @@
       "solutionMetadata": {
         "kind": "USACO",
         "usacoId": "1446"
-      }
-    },
-    {
-      "uniqueId": "usaco-1447",
-      "name": "Deforestation",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1447",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1447"
-      }
-    },
-    {
-      "uniqueId": "usaco-1448",
-      "name": "2D Conveyor Belt",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1448",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1448"
-      }
-    },
-    {
-      "uniqueId": "usaco-1449",
-      "name": "Cowdependence",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1449",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1449"
-      }
-    },
-    {
-      "uniqueId": "usaco-1450",
-      "name": "Interstellar Intervals",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1450",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1450"
-      }
-    },
-    {
-      "uniqueId": "usaco-1451",
-      "name": "Job Completion",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1451",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1451"
       }
     },
     {
@@ -2462,71 +2323,6 @@
       }
     },
     {
-      "uniqueId": "usaco-1467",
-      "name": "Astral Superposition",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1467",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1467"
-      }
-    },
-    {
-      "uniqueId": "usaco-1468",
-      "name": "It's Mooin' Time II",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1468",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1468"
-      }
-    },
-    {
-      "uniqueId": "usaco-1469",
-      "name": "Cow Checkups",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1469",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1469"
-      }
-    },
-    {
-      "uniqueId": "usaco-1470",
-      "name": "Cow Checkups",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1470",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1470"
-      }
-    },
-    {
-      "uniqueId": "usaco-1471",
-      "name": "Farmer John's Favorite Operation",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1471",
-      "source": "Silver",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1471"
-      }
-    },
-    {
       "uniqueId": "usaco-1472",
       "name": "Table Recovery",
       "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1472",
@@ -2550,19 +2346,6 @@
       "solutionMetadata": {
         "kind": "USACO",
         "usacoId": "1473"
-      }
-    },
-    {
-      "uniqueId": "usaco-1474",
-      "name": "Reachable Pairs",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1474",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1474"
       }
     },
     {
@@ -2605,19 +2388,6 @@
       }
     },
     {
-      "uniqueId": "usaco-1491",
-      "name": "Reflection",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1491",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1491"
-      }
-    },
-    {
       "uniqueId": "usaco-1492",
       "name": "Making Mexes",
       "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1492",
@@ -2631,29 +2401,15 @@
       }
     },
     {
-      "uniqueId": "usaco-1493",
-      "name": "Printing Sequences",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1493",
-      "source": "Bronze",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1493"
-      }
-    },
-    {
       "uniqueId": "usaco-1494",
       "name": "The Best Lineup",
       "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1494",
       "source": "Silver",
-      "difficulty": "N/A",
+      "difficulty": "Normal",
       "isStarred": false,
-      "tags": [],
+      "tags": ["Greedy", "Stack"],
       "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1494"
+        "kind": "internal"
       }
     },
     {
@@ -2680,45 +2436,6 @@
       "solutionMetadata": {
         "kind": "USACO",
         "usacoId": "1496"
-      }
-    },
-    {
-      "uniqueId": "usaco-1497",
-      "name": "Bessie's Function",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1497",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1497"
-      }
-    },
-    {
-      "uniqueId": "usaco-1498",
-      "name": "The Best Subsequence",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1498",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "internal",
-        "hasHints": true
-      }
-    },
-    {
-      "uniqueId": "usaco-1499",
-      "name": "Friendship Editing",
-      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1499",
-      "source": "Gold",
-      "difficulty": "N/A",
-      "isStarred": false,
-      "tags": [],
-      "solutionMetadata": {
-        "kind": "USACO",
-        "usacoId": "1499"
       }
     },
     {
@@ -2770,6 +2487,122 @@
       "tags": ["Prefix Sums", "Sorting", "Binary Search"],
       "solutionMetadata": {
         "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-692",
+      "name": "Secret Cow Code",
+      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=692",
+      "source": "Silver",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "692"
+      }
+    },
+    {
+      "uniqueId": "usaco-1516",
+      "name": "More Cow Photos",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1516",
+      "source": "Bronze",
+      "difficulty": "Easy",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "internal"
+      }
+    },
+    {
+      "uniqueId": "usaco-1517",
+      "name": "It's Mooin' Time III",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1517",
+      "source": "Bronze",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1517"
+      }
+    },
+    {
+      "uniqueId": "usaco-1519",
+      "name": "Compatible Pairs",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1519",
+      "source": "Silver",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1519"
+      }
+    },
+    {
+      "uniqueId": "usaco-1521",
+      "name": "Moo Decomposition",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1521",
+      "source": "Gold",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1521"
+      }
+    },
+    {
+      "uniqueId": "usaco-1522",
+      "name": "Election Queries",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1522",
+      "source": "Gold",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1522"
+      }
+    },
+    {
+      "uniqueId": "usaco-1524",
+      "name": "Forklift Certified",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1524",
+      "source": "Platinum",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1524"
+      }
+    },
+    {
+      "uniqueId": "usaco-1525",
+      "name": "Lazy Sort",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1525",
+      "source": "Platinum",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1525"
+      }
+    },
+    {
+      "uniqueId": "usaco-1526",
+      "name": "Package Pickup",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=1526",
+      "source": "Platinum",
+      "difficulty": "N/A",
+      "isStarred": false,
+      "tags": [],
+      "solutionMetadata": {
+        "kind": "USACO",
+        "usacoId": "1526"
       }
     }
   ]
