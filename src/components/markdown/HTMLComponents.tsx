@@ -2,7 +2,7 @@ import * as React from "react";
 import { useDarkMode } from "../../context/DarkModeContext";
 import CodeBlock from "./CodeBlock/CodeBlock";
 import MarkdownImage from "./MarkdownImage";
-import { MATHDIV, MATHSPAN } from "./MDXComponents";
+import { MATHDIV, MATHSPAN } from "./MathComponents";
 // Note: try to avoid adding inline styles here; rather, use css selectors to target them.
 // Otherwise it's really hard to override some of these styles
 
