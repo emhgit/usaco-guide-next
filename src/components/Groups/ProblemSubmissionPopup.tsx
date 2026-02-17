@@ -22,7 +22,9 @@ function ProblemSubmissionPopup() {
   if (!popupContext) throw new Error("No ProblemSubmissionPopupContext");
   const submission = popupContext.submission;
   const submissionResult = useProblemSubmissionResult(
-    submission && "submissionID" in submission ? submission?.submissionID : null
+    submission && "submissionID" in submission
+      ? submission?.submissionID
+      : null,
   );
   const isDarkMode = useDarkMode();
 
@@ -148,7 +150,7 @@ function ProblemSubmissionPopup() {
 export function ProblemSubmissionPopupProvider({ children }) {
   const [showPopup, setShowPopup] = React.useState(false);
   const [submission, setSubmission] = React.useState<FirebaseSubmission | null>(
-    null
+    null,
   );
   return (
     <ProblemSubmissionPopupContext.Provider

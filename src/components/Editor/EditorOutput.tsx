@@ -13,7 +13,7 @@ import { formatMarkdown } from "../../utils/prettierFormatter";
 import QuizGeneratorModal from "../QuizGeneratorModal";
 
 const RawMarkdownRenderer = React.lazy(
-  () => import("../DynamicMarkdownRenderer/DynamicMarkdownRenderer")
+  () => import("../DynamicMarkdownRenderer/DynamicMarkdownRenderer"),
 );
 
 export const EditorOutput = (): JSX.Element => {
@@ -44,7 +44,7 @@ export const EditorOutput = (): JSX.Element => {
 
   const handleAddProblem = async (
     listId: string,
-    problemMetadata: ProblemMetadata
+    problemMetadata: ProblemMetadata,
   ) => {
     const parsedOldFileData = JSON.parse(problems);
     const tableToEdit = parsedOldFileData[listId];

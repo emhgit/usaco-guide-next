@@ -23,7 +23,7 @@ export default function SubmitProblemSolutionModal({
 }) {
   const [solutionCode, setSolutionCode] = React.useState("");
   const [codeLang, setCodeLang] = React.useState<"cpp" | "java" | "py" | null>(
-    null
+    null,
   );
   const [isCodePublic, setIsCodePublic] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
@@ -117,14 +117,14 @@ export default function SubmitProblemSolutionModal({
           onClick={() => setIsCodePublic(!isCodePublic)}
           className={className(
             "focus:shadow-outline relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden",
-            isCodePublic ? "bg-blue-600" : "bg-gray-200"
+            isCodePublic ? "bg-blue-600" : "bg-gray-200",
           )}
         >
           <span
             aria-hidden="true"
             className={className(
               isCodePublic ? "translate-x-5" : "translate-x-0",
-              "relative inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out"
+              "relative inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition duration-200 ease-in-out",
             )}
           >
             <span
@@ -132,7 +132,7 @@ export default function SubmitProblemSolutionModal({
                 isCodePublic
                   ? "opacity-0 duration-100 ease-out"
                   : "opacity-100 duration-200 ease-in",
-                "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
               )}
             >
               <svg
@@ -154,7 +154,7 @@ export default function SubmitProblemSolutionModal({
                 isCodePublic
                   ? "opacity-100 duration-200 ease-in"
                   : "opacity-0 duration-100 ease-out",
-                "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity"
+                "absolute inset-0 flex h-full w-full items-center justify-center transition-opacity",
               )}
             >
               <svg

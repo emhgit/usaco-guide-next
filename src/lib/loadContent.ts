@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-assign-module-variable */
 import path from "path";
 
 /**
@@ -29,10 +28,9 @@ export async function loadCowImages() {
           /cows/i.test(fullPath) && // Check if path contains 'cows' (case insensitive)
           /\.(jpg|jpeg|png|webp|gif)$/i.test(entry.name) // Common image extensions
         ) {
-          const publicPath = path.relative(
-            path.join(process.cwd(), "public"),
-            fullPath
-          ).replace(/\\/g, "/");
+          const publicPath = path
+            .relative(path.join(process.cwd(), "public"), fullPath)
+            .replace(/\\/g, "/");
           cowImages.push({
             name: path.parse(entry.name).name,
             src: `/${publicPath}`,
@@ -54,7 +52,13 @@ export async function loadCowImages() {
 
 export const loadTeamImages = async () => {
   const { readdir } = await import("fs/promises");
-  const teamImagesDir = path.join(process.cwd(), "public", "content", "team", "images");
+  const teamImagesDir = path.join(
+    process.cwd(),
+    "public",
+    "content",
+    "team",
+    "images",
+  );
   console.log("Loading team images from", teamImagesDir);
   const teamImages: Array<{
     name: string;
@@ -76,10 +80,9 @@ export const loadTeamImages = async () => {
           /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(entry.name) // Common image extensions
         ) {
           // Remove the 'public' prefix from the path
-          const publicPath = path.relative(
-            path.join(process.cwd(), "public"),
-            fullPath
-          ).replace(/\\/g, "/");
+          const publicPath = path
+            .relative(path.join(process.cwd(), "public"), fullPath)
+            .replace(/\\/g, "/");
 
           teamImages.push({
             name: path.basename(entry.name, path.extname(entry.name)),
@@ -95,6 +98,6 @@ export const loadTeamImages = async () => {
     console.error("Error loading team images:", error);
     return [];
   }
-}
+};
 
 export type { MdxContent, ProblemInfo } from "../types/content";

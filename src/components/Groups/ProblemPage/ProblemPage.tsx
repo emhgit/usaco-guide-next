@@ -72,7 +72,7 @@ export default function ProblemPage(props: ProblemPageProps) {
                       onClick={() => {
                         if (
                           confirm(
-                            "Are you sure you want to delete this problem?"
+                            "Are you sure you want to delete this problem?",
                           )
                         ) {
                           deleteProblem(post, problem.id)
@@ -83,7 +83,7 @@ export default function ProblemPage(props: ProblemPageProps) {
                               router.push(
                                 `/groups/${activeGroup.groupData!.id}/post/${
                                   post.id
-                                }`
+                                }`,
                               );
                             })
                             .catch((e) => toast.error(e.message));
@@ -192,7 +192,7 @@ export default function ProblemPage(props: ProblemPageProps) {
                                     ? post.dueTimestamp
                                     : problem.solutionReleaseMode == "custom" &&
                                       problem.solutionReleaseTimestamp) as Timestamp
-                                )?.toDate()
+                                )?.toDate(),
                               ).format("MMMM DD h:mma")}
                             .
                           </p>

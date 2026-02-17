@@ -42,7 +42,7 @@ export default function EditJoinLinkModal({
   const initialExpirationTime = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate() + 7
+    today.getDate() + 7,
   );
 
   if (!link) return null;
@@ -79,7 +79,7 @@ export default function EditJoinLinkModal({
                       onClick={() => {
                         setCopied(true);
                         navigator.clipboard.writeText(
-                          `https://usaco.guide/groups/join?key=${link.id}`
+                          `https://usaco.guide/groups/join?key=${link.id}`,
                         );
                       }}
                       className="focus:outline-hidden"
@@ -172,7 +172,15 @@ export default function EditJoinLinkModal({
                           </label>
 
                           <div className="mt-1">
-                            <React.Suspense fallback={<input className="input" placeholder="Loading date picker..." disabled />}>
+                            <React.Suspense
+                              fallback={
+                                <input
+                                  className="input"
+                                  placeholder="Loading date picker..."
+                                  disabled
+                                />
+                              }
+                            >
                               <Flatpickr
                                 placeholder={"Choose an expiry date date"}
                                 options={{
@@ -187,7 +195,9 @@ export default function EditJoinLinkModal({
                                         (new Date().getTimezoneOffset() > 0
                                           ? "-"
                                           : "+") +
-                                        Math.abs(new Date().getTimezoneOffset()) /
+                                        Math.abs(
+                                          new Date().getTimezoneOffset(),
+                                        ) /
                                           60
                                       ).split(""),
                                     ].join("\\\\"),

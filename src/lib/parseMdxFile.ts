@@ -80,8 +80,9 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   } catch (error) {
     console.error(`Error compiling MDX for ${filePath}:`, error);
     throw new Error(
-      `Error compiling MDX for ${filePath}: ${error instanceof Error ? error.message : String(error)
-      }`
+      `Error compiling MDX for ${filePath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
     );
   }
 
@@ -94,7 +95,7 @@ export async function parseMdxFile(filePath: string): Promise<MdxContent> {
   // Validate language sections
   if (langSecOc < Math.max(cppOc, javaOc, pyOc)) {
     throw new Error(
-      `${filePath}: # lang sections = ${langSecOc} < max(${cppOc},${javaOc},${pyOc})`
+      `${filePath}: # lang sections = ${langSecOc} < max(${cppOc},${javaOc},${pyOc})`,
     );
   }
 

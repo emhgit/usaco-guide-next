@@ -37,7 +37,10 @@ const customRehypeKatex = (options) => {
       try {
         result = renderToString(
           value,
-          assign({}, settings, { displayMode: displayMode, throwOnError: true })
+          assign({}, settings, {
+            displayMode: displayMode,
+            throwOnError: true,
+          }),
         );
       } catch (error) {
         const fn = throwOnError ? "fail" : "message";
@@ -55,7 +58,7 @@ const customRehypeKatex = (options) => {
             displayMode: displayMode,
             throwOnError: false,
             strict: "ignore",
-          })
+          }),
         );
       }
 

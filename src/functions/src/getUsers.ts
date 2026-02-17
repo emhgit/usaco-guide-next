@@ -15,7 +15,7 @@ export default functions.https.onCall(async (request) => {
   if (!callerUid || !users || users.length === 0) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "The function was not called with the correct data, or the caller is not logged in."
+      "The function was not called with the correct data, or the caller is not logged in.",
     );
   }
   const classesPermissions = await admin
@@ -31,7 +31,7 @@ export default functions.https.onCall(async (request) => {
   ) {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "Caller is not an admin or instructor."
+      "Caller is not an admin or instructor.",
     );
   }
   const getUserPromises: Promise<admin.auth.GetUsersResult>[] = [];
@@ -49,6 +49,6 @@ export default functions.https.onCall(async (request) => {
     {
       notFound: [] as admin.auth.UserIdentifier[],
       users: [] as admin.auth.UserRecord[],
-    }
+    },
   );
 });

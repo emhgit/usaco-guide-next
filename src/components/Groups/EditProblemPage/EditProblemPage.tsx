@@ -62,7 +62,7 @@ export default function EditProblemPage(props: Props) {
       }
       return merged as GroupProblemData;
     },
-    originalProblem
+    originalProblem,
   );
   const { saveProblem, deleteProblem } = usePostActions(groupId);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -80,10 +80,10 @@ export default function EditProblemPage(props: Props) {
       query(
         collection(
           getFirestore(firebaseApp),
-          `groups/${groupId}/posts/${postId}/problems/${problemId}/submissions`
+          `groups/${groupId}/posts/${postId}/problems/${problemId}/submissions`,
         ),
-        limit(1)
-      )
+        limit(1),
+      ),
     ).then((resp) => {
       if (resp.docs.length === 0) {
         setCanEditPoints(true);
@@ -319,7 +319,7 @@ export default function EditProblemPage(props: Props) {
                             console.log(date);
                             editProblem({
                               solutionReleaseTimestamp: Timestamp.fromDate(
-                                date[0]
+                                date[0],
                               ),
                             });
                           }}

@@ -158,7 +158,6 @@ export default function ProblemsListItem(
       {isDivisionTable && props.modules && (
         <ListTableCell className="font-medium whitespace-nowrap">
           {problem.moduleLink ? (
-            // eslint-disable-next-line react/jsx-no-target-blank
             <a href={problem.moduleLink} target="_blank">
               Link
             </a>

@@ -41,7 +41,7 @@ export default function EditPostPage(props) {
         ...updates,
       } as PostData;
     },
-    null
+    null,
   );
   const { updatePost, deletePost } = usePostActions(groupId);
 
@@ -143,7 +143,15 @@ export default function EditPostPage(props) {
                 </label>
 
                 <div className="mt-1">
-                  <React.Suspense fallback={<input className="input" placeholder="Loading date picker..." disabled />}>
+                  <React.Suspense
+                    fallback={
+                      <input
+                        className="input"
+                        placeholder="Loading date picker..."
+                        disabled
+                      />
+                    }
+                  >
                     <Flatpickr
                       placeholder={"Choose a post date"}
                       options={{
@@ -182,7 +190,15 @@ export default function EditPostPage(props) {
                   </label>
 
                   <div className="mt-1">
-                    <React.Suspense fallback={<input className="input" placeholder="Loading date picker..." disabled />}>
+                    <React.Suspense
+                      fallback={
+                        <input
+                          className="input"
+                          placeholder="Loading date picker..."
+                          disabled
+                        />
+                      }
+                    >
                       <Flatpickr
                         placeholder={"Choose a due date (optional)"}
                         options={{
@@ -193,7 +209,9 @@ export default function EditPostPage(props) {
                               ...(
                                 "UTC" +
                                 // sign is reversed for some reason
-                                (new Date().getTimezoneOffset() > 0 ? "-" : "+") +
+                                (new Date().getTimezoneOffset() > 0
+                                  ? "-"
+                                  : "+") +
                                 Math.abs(new Date().getTimezoneOffset()) / 60
                               ).split(""),
                             ].join("\\\\"),

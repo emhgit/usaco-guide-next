@@ -20,9 +20,9 @@ export default function EditGroupPage(props) {
   const [group, editGroup] = useReducer(
     (
       old: GroupData | undefined,
-      updates: Partial<GroupData>
+      updates: Partial<GroupData>,
     ): GroupData | undefined => (old ? { ...old, ...updates } : undefined),
-    originalGroup
+    originalGroup,
   );
   const { deleteGroup, updateGroup } = useGroupActions();
   const router = useRouter();
@@ -120,7 +120,7 @@ export default function EditGroupPage(props) {
                   if (
                     confirm("Are you sure you want to delete this group?") &&
                     confirm(
-                      "Are you REALLY sure? Posts and submissions will be permanently deleted."
+                      "Are you REALLY sure? Posts and submissions will be permanently deleted.",
                     )
                   ) {
                     deleteGroup(groupId)

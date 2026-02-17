@@ -68,7 +68,7 @@ export default functions.https.onCall(async (request) => {
       .collection("groups")
       .doc(groupId)
       .collection("leaderboard")
-      .doc(targetUid)
+      .doc(targetUid),
   );
 
   await batch.commit();

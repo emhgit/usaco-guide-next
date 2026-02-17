@@ -6,7 +6,7 @@ export const getModulesForDivision = (
   allModules: {
     [key: string]: MdxContent;
   },
-  division: keyof typeof MODULE_ORDERING
+  division: keyof typeof MODULE_ORDERING,
 ) => {
   return MODULE_ORDERING[division].map((k) => ({
     name: k.name,
@@ -36,7 +36,7 @@ export function graphqlToModuleInfo(mdx: MdxContent): ModuleInfo {
     mdx.frontmatter.frequency,
     mdx.toc,
     mdx.fileAbsolutePath,
-    mdx.fields.gitAuthorTime
+    mdx.fields.gitAuthorTime,
   );
 }
 

@@ -13,7 +13,7 @@ export default function MemberDetail({ member }: { member: MemberInfo }) {
   const { uid: userId } = useFirebaseUser()!;
   const userLeaderboardData = useUserLeaderboardData(
     activeGroup.activeGroupId!,
-    member.uid
+    member.uid,
   );
   const router = useRouter();
 
@@ -26,7 +26,7 @@ export default function MemberDetail({ member }: { member: MemberInfo }) {
   }
   const permissionLevel = getPermissionLevel(
     member.uid,
-    activeGroup.groupData!
+    activeGroup.groupData!,
   );
 
   return (
@@ -91,14 +91,14 @@ export default function MemberDetail({ member }: { member: MemberInfo }) {
               onClick={() => {
                 if (
                   confirm(
-                    "Are you sure you want to remove this member from the group?"
+                    "Are you sure you want to remove this member from the group?",
                   )
                 ) {
                   removeMemberFromGroup(activeGroup.activeGroupId!, member.uid)
                     .then(() =>
                       toast.success(
-                        "This member has been successfully removed from the group."
-                      )
+                        "This member has been successfully removed from the group.",
+                      ),
                     )
                     .catch((e) => toast.error(e));
                 }
@@ -123,18 +123,18 @@ export default function MemberDetail({ member }: { member: MemberInfo }) {
                             : "demote"
                         } ${
                           member.displayName
-                        } to ${newPermission.toLowerCase()}?`
+                        } to ${newPermission.toLowerCase()}?`,
                       )
                     ) {
                       updateMemberPermissions(
                         activeGroup.activeGroupId!,
                         member.uid,
-                        newPermission
+                        newPermission,
                       )
                         .then(() =>
                           toast.success(
-                            `${member.displayName} now has permission level ${newPermission}.`
-                          )
+                            `${member.displayName} now has permission level ${newPermission}.`,
+                          ),
                         )
                         .catch((e) => toast.error(e));
                     }
@@ -153,7 +153,7 @@ export default function MemberDetail({ member }: { member: MemberInfo }) {
               className="btn"
               onClick={() => {
                 alert(
-                  "Viewing group as member. Do not submit any problems. Reload the page to undo."
+                  "Viewing group as member. Do not submit any problems. Reload the page to undo.",
                 );
                 activeGroup.setActiveUserId(member.uid);
                 router.push(`/groups/${activeGroup.activeGroupId!}`);

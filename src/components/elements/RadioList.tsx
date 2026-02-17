@@ -31,7 +31,7 @@ export default function RadioList({
                 idx === options.length - 1 && "rounded-br-md rounded-bl-md",
                 checked
                   ? "z-10 border-blue-200 bg-blue-50 dark:border-blue-700 dark:bg-blue-900"
-                  : "border-gray-200 dark:border-gray-700"
+                  : "border-gray-200 dark:border-gray-700",
               )
             }
           >
@@ -45,7 +45,7 @@ export default function RadioList({
                     active
                       ? "ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-700"
                       : "",
-                    "mt-0.5 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border"
+                    "mt-0.5 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border",
                   )}
                   aria-hidden="true"
                 >
@@ -61,7 +61,7 @@ export default function RadioList({
                       "block text-sm font-medium",
                       checked
                         ? "text-blue-900 dark:text-blue-100"
-                        : "text-gray-900 dark:text-gray-100"
+                        : "text-gray-900 dark:text-gray-100",
                     )}
                   >
                     {labelMap[option]}
@@ -73,7 +73,7 @@ export default function RadioList({
                         "block text-sm",
                         checked
                           ? "text-blue-700 dark:text-blue-300"
-                          : "text-gray-500 dark:text-gray-400"
+                          : "text-gray-500 dark:text-gray-400",
                       )}
                     >
                       {descriptionMap[option]}

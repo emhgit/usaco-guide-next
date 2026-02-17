@@ -219,7 +219,7 @@ export default function FeedItem({
                         confirm("Are you sure you want to delete this post?")
                       ) {
                         deletePost(post.id!).catch((e) =>
-                          toast.error(e.message)
+                          toast.error(e.message),
                         );
                       }
                     }}

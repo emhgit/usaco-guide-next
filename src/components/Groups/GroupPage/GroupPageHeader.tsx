@@ -90,8 +90,8 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                         if (groupId) {
                           createNewPost("assignment").then((postId) =>
                             router.push(
-                              `/groups/${groupId}/post/${postId}/edit`
-                            )
+                              `/groups/${groupId}/post/${postId}/edit`,
+                            ),
                           );
                         }
                       }}
@@ -106,8 +106,8 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                         if (groupId) {
                           createNewPost("announcement").then((postId) =>
                             router.push(
-                              `/groups/${groupId}/post/${postId}/edit`
-                            )
+                              `/groups/${groupId}/post/${postId}/edit`,
+                            ),
                           );
                         }
                       }}
@@ -156,10 +156,10 @@ export default function GroupPageHeader(props: { group: GroupData }) {
                     if (
                       groupId &&
                       confirm(
-                        "Are you sure you want to leave this group? You will not be able to rejoin unless you are provided with another link."
+                        "Are you sure you want to leave this group? You will not be able to rejoin unless you are provided with another link.",
                       ) &&
                       prompt(
-                        'Are you REALLY sure? Please type "Yes I am sure I want to leave"'
+                        'Are you REALLY sure? Please type "Yes I am sure I want to leave"',
                       )!
                         .toLowerCase()
                         .indexOf("yes i am sure i want to leave") > -1

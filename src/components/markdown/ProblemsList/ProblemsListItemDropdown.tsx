@@ -55,7 +55,7 @@ function ViewSolutionsContent({
 }
 
 export default function ProblemsListItemDropdown(
-  props: ProblemsListItemProps & { isFocusProblem: boolean }
+  props: ProblemsListItemProps & { isFocusProblem: boolean },
 ) {
   const [copied, setCopied] = React.useState(false);
 
@@ -106,7 +106,7 @@ export default function ProblemsListItemDropdown(
                 navigator.clipboard.writeText(
                   window.location.href.split(/[?#]/)[0] +
                     "#problem-" +
-                    problem.uniqueId
+                    problem.uniqueId,
                 );
               }}
             >
@@ -116,7 +116,7 @@ export default function ProblemsListItemDropdown(
               <a
                 className="block w-full px-4 py-2 text-left text-sm font-normal! text-gray-700! hover:bg-gray-100! hover:text-gray-900! focus:outline-hidden dark:text-gray-300! dark:hover:bg-gray-800!"
                 href={`https://ide.usaco.guide/usaco/${problem.uniqueId.substring(
-                  problem.uniqueId.indexOf("-") + 1
+                  problem.uniqueId.indexOf("-") + 1,
                 )}`}
                 target="_blank"
                 rel="noreferrer"

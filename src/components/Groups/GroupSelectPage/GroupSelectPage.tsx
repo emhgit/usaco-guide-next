@@ -61,7 +61,7 @@ const GroupSelectPage = () => {
           {groups.isSuccess &&
             (groups.data && groups.data.length > 0 ? (
               groups.data.map(
-                (group) => group && <GroupCard key={group.id} group={group} />
+                (group) => group && <GroupCard key={group.id} group={group} />,
               )
             ) : (
               <div>

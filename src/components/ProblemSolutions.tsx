@@ -52,7 +52,7 @@ export default function ProblemSolutions({
   });
 
   const publicSolutions = (solutions ?? []).filter(
-    (submission) => submission.userID !== firebaseUser?.uid
+    (submission) => submission.userID !== firebaseUser?.uid,
   );
 
   publicSolutions?.sort((a, b) => b.upvotes.length - a.upvotes.length);
@@ -165,7 +165,7 @@ export default function ProblemSolutions({
                   onClick={() => {
                     if (
                       confirm(
-                        "Are you sure you want to delete this submission?"
+                        "Are you sure you want to delete this submission?",
                       )
                     ) {
                       deleteSolution(submission.id);
@@ -236,7 +236,7 @@ export default function ProblemSolutions({
                           onClick={() => {
                             if (
                               confirm(
-                                "Are you sure you want to make this solution private? (Currently it's nontrivial to undo this...)"
+                                "Are you sure you want to make this solution private? (Currently it's nontrivial to undo this...)",
                               )
                             ) {
                               mutateSolution(submission.id, {
@@ -254,7 +254,7 @@ export default function ProblemSolutions({
                           onClick={() => {
                             if (
                               confirm(
-                                "Are you sure you want to delete this solution?"
+                                "Are you sure you want to delete this solution?",
                               )
                             ) {
                               deleteSolution(submission.id);

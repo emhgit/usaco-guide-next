@@ -18,7 +18,7 @@ export default functions.https.onCall(async (request) => {
   if (
     !caller.customClaims.isAdmin &&
     !["BKFOe33Ym7Pc7aQuET57MiljpF03", "7G0y8xGyv4gkowb33Vmn478znod2"].includes(
-      callerUid
+      callerUid,
     )
   ) {
     throw new functions.https.HttpsError("permission-denied", "Not an admin!");

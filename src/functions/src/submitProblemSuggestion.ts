@@ -27,7 +27,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   if (!request.auth?.uid) {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "You must be logged in to suggest a problem!"
+      "You must be logged in to suggest a problem!",
     );
   }
   const submitterName = await admin
@@ -70,7 +70,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   ) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "One or more required arguments were not passed."
+      "One or more required arguments were not passed.",
     );
   }
 
@@ -78,7 +78,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   if (filePath.indexOf("..") > -1) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "The filePath argument contained an unexpected value."
+      "The filePath argument contained an unexpected value.",
     );
   }
   const tagsArr = tags
@@ -123,10 +123,10 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   });
 
   const masterRefsReq = await githubAPI.get(
-    "/repos/cpinitiative/usaco-guide/git/refs/heads"
+    "/repos/cpinitiative/usaco-guide/git/refs/heads",
   );
   const masterRef = masterRefsReq.data.find(
-    (r) => r.ref == "refs/heads/master"
+    (r) => r.ref == "refs/heads/master",
   );
   const masterHash = masterRef.object.sha;
 
@@ -138,7 +138,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
       await githubAPI.get(
         `/repos/cpinitiative/usaco-guide/branches/${
           branchNameBase + (increment === 0 ? "" : "-" + increment)
-        }`
+        }`,
       );
     } catch (error: any) {
       if (error.response && error.response.status === 404) {
@@ -150,7 +150,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   if (!foundEmptyBranch) {
     throw new functions.https.HttpsError(
       "already-exists",
-      "More than five suggestions with the same generated problem ID already exist."
+      "More than five suggestions with the same generated problem ID already exist.",
     );
   }
   const branchName = branchNameBase + (increment === 0 ? "" : "-" + increment);
@@ -162,13 +162,13 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   const oldFileDataReq = await githubAPI.get(
     `/repos/cpinitiative/usaco-guide/contents/content/${filePath.replace(
       /\.mdx$/,
-      ".problems.json"
-    )}?ref=${branchName}`
+      ".problems.json",
+    )}?ref=${branchName}`,
   );
   const oldFileHash = oldFileDataReq.data.sha;
   const oldFileData = Buffer.from(
     oldFileDataReq.data.content,
-    "base64"
+    "base64",
   ).toString();
 
   const parsedOldFileData = JSON.parse(oldFileData);
@@ -207,14 +207,14 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   await githubAPI.put(
     `/repos/cpinitiative/usaco-guide/contents/content/${filePath.replace(
       /\.mdx$/,
-      ".problems.json"
+      ".problems.json",
     )}`,
     {
       content: Buffer.from(formattedNewContent).toString("base64"),
       message: `Feat: add suggested problem '${name}'`,
       branch: branchName,
       sha: oldFileHash,
-    }
+    },
   );
 
   const createdPullRequestReq = await githubAPI.post(
@@ -225,13 +225,13 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
       maintainer_can_modify: true,
       title: `Problem Suggestion: Add "${name}" to ${moduleName}`,
       body: body,
-    }
+    },
   );
 
   const useProblemSuggestionReviewers = false;
   if (useProblemSuggestionReviewers) {
     const reviewersReq = await githubAPI.get(
-      `/repos/cpinitiative/usaco-guide/pulls/${createdPullRequestReq.data.number}/requested_reviewers`
+      `/repos/cpinitiative/usaco-guide/pulls/${createdPullRequestReq.data.number}/requested_reviewers`,
     );
     const reviewersToRemove = reviewersReq.data.users
       .map((user) => user.login)
@@ -246,20 +246,20 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
           reviewers: reviewersToRemove,
           team_reviewers: reviewersReq.data.teams.map((team) => team.slug),
         },
-      }
+      },
     );
     if (
       problemSuggestionReviewers[section].filter(
-        (u) => !keptReviewers.includes(u)
+        (u) => !keptReviewers.includes(u),
       ).length > 0
     ) {
       await githubAPI.post(
         `/repos/cpinitiative/usaco-guide/pulls/${createdPullRequestReq.data.number}/requested_reviewers`,
         {
           reviewers: problemSuggestionReviewers[section].filter(
-            (u) => !keptReviewers.includes(u)
+            (u) => !keptReviewers.includes(u),
           ),
-        }
+        },
       );
     }
   }
@@ -267,7 +267,7 @@ const submitProblemSuggestion = functions.https.onCall(async (request) => {
   // post to /issues/ because github treats all PRs as issues, so the shared features between them (such as labels) use issue api
   await githubAPI.post(
     `/repos/cpinitiative/usaco-guide/issues/${createdPullRequestReq.data.number}/labels`,
-    ["Problem Suggestion"]
+    ["Problem Suggestion"],
   );
 
   return createdPullRequestReq.data.html_url;

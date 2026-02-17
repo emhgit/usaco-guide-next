@@ -69,7 +69,7 @@ export default function PostProblems({
   const router = useRouter();
   const activeGroup = useActiveGroup();
   const { createNewProblem, updateProblemOrdering } = usePostActions(
-    activeGroup.activeGroupId!
+    activeGroup.activeGroupId!,
   );
   const { problems, isLoading } = useActivePostProblems();
 
@@ -78,7 +78,7 @@ export default function PostProblems({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function PostProblems({
             if (a.order === b.order) return a.name < b.name ? -1 : 1;
             return a.order < b.order ? -1 : 1;
           })
-          .map((x) => x.id)
+          .map((x) => x.id),
       );
     } else {
       setItems(post.problemOrdering);
@@ -135,8 +135,8 @@ export default function PostProblems({
                   onClick={() =>
                     createNewProblem(post).then((id) =>
                       router.push(
-                        `/groups/${router.query.id}/post/${router.query.postId}/problems/${id}/edit`
-                      )
+                        `/groups/${router.query.id}/post/${router.query.postId}/problems/${id}/edit`,
+                      ),
                     )
                   }
                   className="btn"

@@ -115,7 +115,7 @@ const ModuleLink = ({ link }: { link: ModuleLinkInfo }): JSX.Element => {
         "link-with-progress-container link-with-progress-container--syllabus",
         linkWithProgressColorClass,
         (progress === "Not Started" || progress === "Ignored") &&
-          "link-with-progress-container--syllabus--small"
+          "link-with-progress-container--syllabus--small",
       )}
     >
       <Link href={link.url}>

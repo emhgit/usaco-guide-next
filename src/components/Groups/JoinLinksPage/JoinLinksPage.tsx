@@ -55,7 +55,7 @@ const JoinLinksPage = () => {
                   className="btn"
                   onClick={async () => {
                     const link = await createJoinLink(
-                      activeGroup.activeGroupId!
+                      activeGroup.activeGroupId!,
                     );
                     setCurLink(link);
                     setIsEditOpen(true);

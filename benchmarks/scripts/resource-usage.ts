@@ -1,12 +1,16 @@
-import { performance, monitorEventLoopDelay, EventLoopMonitorOptions } from 'node:perf_hooks';
-import { exec } from 'child_process';
-import { saveResults } from './utils';
+import {
+  performance,
+  monitorEventLoopDelay,
+  EventLoopMonitorOptions,
+} from "node:perf_hooks";
+import { exec } from "child_process";
+import { saveResults } from "./utils";
 
 // Extend NodeJS.Process interface to include memoryUsage and cpuUsage
 interface ProcessWithMemory extends NodeJS.Process {
   memoryUsage: NodeJS.MemoryUsageFn;
   cpuUsage: (previousValue?: NodeJS.CpuUsage) => NodeJS.CpuUsage;
-  hrtime: NodeJS.HRTime;  // Use the built-in HRTime type
+  hrtime: NodeJS.HRTime; // Use the built-in HRTime type
 }
 
 const processWithMemory = process as unknown as ProcessWithMemory;
@@ -32,7 +36,7 @@ interface ProcessStats {
 export async function measureResourceUsage(
   command: string,
   durationMs = 30000,
-  sampleInterval = 1000
+  sampleInterval = 1000,
 ): Promise<ResourceUsageMetrics> {
   const metrics: ResourceUsageMetrics = {
     memory: {
@@ -83,13 +87,13 @@ export async function measureResourceUsage(
           h.max,
           h.stddev,
           // @ts-ignore - percentiles might not be available in all Node.js versions
-          h.percentiles?.get(95) || h.percentile(95) || 0
+          h.percentiles?.get(95) || h.percentile(95) || 0,
         ];
 
         // Kill the process
         process.kill();
 
-        console.log('Resource monitoring completed');
+        console.log("Resource monitoring completed");
         resolve(metrics);
         return;
       }
@@ -106,10 +110,13 @@ export async function measureResourceUsage(
       const currentHrTime = processWithMemory.hrtime();
       const currentCpuUsage = processWithMemory.cpuUsage(lastCpuUsage);
 
-      const timeDelta = (currentHrTime[0] - lastHrTime[0]) * 1e6 +
+      const timeDelta =
+        (currentHrTime[0] - lastHrTime[0]) * 1e6 +
         (currentHrTime[1] - lastHrTime[1]) / 1e3;
 
-      const cpuPercent = (currentCpuUsage.user + currentCpuUsage.system) / (timeDelta * 1000) * 100;
+      const cpuPercent =
+        ((currentCpuUsage.user + currentCpuUsage.system) / (timeDelta * 1000)) *
+        100;
       metrics.cpu.push(cpuPercent);
 
       lastCpuUsage = processWithMemory.cpuUsage();
@@ -123,81 +130,86 @@ export async function measureResourceUsage(
       });
 
       lastSampleTime = now;
-
     }, sampleInterval);
   });
 }
 
 export async function measureBuildResources(): Promise<void> {
-  console.log('Measuring resource usage during build...');
-  const buildMetrics = await measureResourceUsage('yarn build');
+  console.log("Measuring resource usage during build...");
+  const buildMetrics = await measureResourceUsage("yarn build");
 
   const timestamp = new Date().toISOString();
   const results = [
     {
-      metric: 'build.memory.heap.peak',
+      metric: "build.memory.heap.peak",
       value: Math.max(...buildMetrics.memory.heapUsed) / 1024 / 1024,
-      unit: 'MB',
+      unit: "MB",
       timestamp,
     },
     {
-      metric: 'build.memory.rss.peak',
+      metric: "build.memory.rss.peak",
       value: Math.max(...buildMetrics.memory.rss) / 1024 / 1024,
-      unit: 'MB',
+      unit: "MB",
       timestamp,
     },
     {
-      metric: 'build.cpu.peak',
+      metric: "build.cpu.peak",
       value: Math.max(...buildMetrics.cpu),
-      unit: '%',
+      unit: "%",
       timestamp,
     },
     {
-      metric: 'build.event_loop_delay.p95',
+      metric: "build.event_loop_delay.p95",
       value: buildMetrics.eventLoopDelay[3], // 95th percentile
-      unit: 'ms',
+      unit: "ms",
       timestamp,
     },
   ];
 
-  await saveResults(results, `resource-usage-build-${timestamp.replace(/[:.]/g, '-')}.json`);
-  console.log('Build resource usage measurement completed');
+  await saveResults(
+    results,
+    `resource-usage-build-${timestamp.replace(/[:.]/g, "-")}.json`,
+  );
+  console.log("Build resource usage measurement completed");
 }
 
 export async function measureDevServerResources(): Promise<void> {
-  console.log('Measuring resource usage of dev server...');
-  const devMetrics = await measureResourceUsage('yarn dev', 60000);
+  console.log("Measuring resource usage of dev server...");
+  const devMetrics = await measureResourceUsage("yarn dev", 60000);
 
   const timestamp = new Date().toISOString();
   const results = [
     {
-      metric: 'dev.memory.heap.peak',
+      metric: "dev.memory.heap.peak",
       value: Math.max(...devMetrics.memory.heapUsed) / 1024 / 1024,
-      unit: 'MB',
+      unit: "MB",
       timestamp,
     },
     {
-      metric: 'dev.memory.rss.peak',
+      metric: "dev.memory.rss.peak",
       value: Math.max(...devMetrics.memory.rss) / 1024 / 1024,
-      unit: 'MB',
+      unit: "MB",
       timestamp,
     },
     {
-      metric: 'dev.cpu.peak',
+      metric: "dev.cpu.peak",
       value: Math.max(...devMetrics.cpu),
-      unit: '%',
+      unit: "%",
       timestamp,
     },
     {
-      metric: 'dev.event_loop_delay.p95',
+      metric: "dev.event_loop_delay.p95",
       value: devMetrics.eventLoopDelay[3], // 95th percentile
-      unit: 'ms',
+      unit: "ms",
       timestamp,
     },
   ];
 
-  await saveResults(results, `resource-usage-dev-${timestamp.replace(/[:.]/g, '-')}.json`);
-  console.log('Dev server resource usage measurement completed');
+  await saveResults(
+    results,
+    `resource-usage-dev-${timestamp.replace(/[:.]/g, "-")}.json`,
+  );
+  console.log("Dev server resource usage measurement completed");
 }
 
 // Run if this file is executed directly
@@ -207,7 +219,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       await measureBuildResources();
       await measureDevServerResources();
     } catch (error) {
-      console.error('Error measuring resource usage:', error);
+      console.error("Error measuring resource usage:", error);
       process.exit(1);
     }
   })();

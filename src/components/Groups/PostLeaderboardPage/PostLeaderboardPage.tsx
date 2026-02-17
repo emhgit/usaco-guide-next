@@ -35,7 +35,7 @@ export default function PostLeaderboardPage(props: PostLeaderboardPageProps) {
   const openProblemSubmissionPopup = useProblemSubmissionPopupAction();
   const handleOpenSubmissionsDetail = (
     problemId: string,
-    submissionId: string
+    submissionId: string,
   ) => {
     getDoc(
       doc(
@@ -47,8 +47,8 @@ export default function PostLeaderboardPage(props: PostLeaderboardPageProps) {
         "problems",
         problemId,
         "submissions",
-        submissionId
-      ) as DocumentReference<FirebaseSubmission>
+        submissionId,
+      ) as DocumentReference<FirebaseSubmission>,
     )
       .then((doc) => {
         const submission = { ...doc.data(), id: doc.id } as FirebaseSubmission;
@@ -126,7 +126,7 @@ export default function PostLeaderboardPage(props: PostLeaderboardPageProps) {
                   (payload as { problemId: string; submissionId: string })
                     .problemId,
                   (payload as { problemId: string; submissionId: string })
-                    .submissionId
+                    .submissionId,
                 );
               }
             }}

@@ -57,7 +57,7 @@ const compile = async ({ markdown, problems }) => {
         ],
         outputFormat: "function-body",
         jsxImportSource: "react",
-      }
+      },
     );
 
     const code = String(compiledResult);

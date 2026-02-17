@@ -9,7 +9,7 @@ type ProblemListItemSolutionProps = {
 };
 
 export default function ProblemListItemSolution(
-  props: ProblemListItemSolutionProps
+  props: ProblemListItemSolutionProps,
 ): JSX.Element {
   const { problem } = props;
   let contents: JSX.Element | null = null;
@@ -88,7 +88,7 @@ export default function ProblemListItemSolution(
     throw new Error(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      "Couldn't determine problem solution type " + problem.solution.kind
+      "Couldn't determine problem solution type " + problem.solution.kind,
     );
   }
   return contents;

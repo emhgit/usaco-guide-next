@@ -11,7 +11,7 @@ export default function UserData() {
 
   const handleExportUserData = () => {
     const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(
-      JSON.stringify(userData)
+      JSON.stringify(userData),
     )}`;
     const downloadAnchorNode = document.createElement("a");
     downloadAnchorNode.setAttribute("href", dataStr);

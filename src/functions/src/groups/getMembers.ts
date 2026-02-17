@@ -15,7 +15,7 @@ export default functions.https.onCall(async (request) => {
   if (!callerUid || !groupId) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "The function was not called with the correct data, or the caller is not logged in."
+      "The function was not called with the correct data, or the caller is not logged in.",
     );
   }
   const groupData = await admin
@@ -30,7 +30,7 @@ export default functions.https.onCall(async (request) => {
   if (!isAdmin && !groupData.memberIds.includes(callerUid)) {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "The calling user is not a member of the requested group."
+      "The calling user is not a member of the requested group.",
     );
   }
   const members = [
@@ -44,7 +44,7 @@ export default functions.https.onCall(async (request) => {
   // while users remain, get the data for the first 100
   while (members.length > 0) {
     getUserPromises.push(
-      admin.auth().getUsers(members.splice(0, 100).map((uid) => ({ uid })))
+      admin.auth().getUsers(members.splice(0, 100).map((uid) => ({ uid }))),
     );
   }
   return (await Promise.all(getUserPromises))
@@ -52,7 +52,7 @@ export default functions.https.onCall(async (request) => {
       if (result.notFound.length !== 0) {
         throw new functions.https.HttpsError(
           "internal",
-          "A user ID in the firebase document could not be fetched."
+          "A user ID in the firebase document could not be fetched.",
         );
       }
       return result.users;

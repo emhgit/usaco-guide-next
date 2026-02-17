@@ -1,10 +1,10 @@
-import Database from 'better-sqlite3';
-import { getWritableDatabase } from '../src/lib/database';
-import { MdxContent, ProblemInfo } from '../src/types/content';
-import type { ProblemMetadata } from '../src/models/problem';
-import path from 'path';
-import { CONTENT_DIR, SOLUTIONS_DIR } from '../src/lib/constants';
-import { readdir } from 'fs/promises';
+import Database from "better-sqlite3";
+import { getWritableDatabase } from "../src/lib/database";
+import { MdxContent, ProblemInfo } from "../src/types/content";
+import type { ProblemMetadata } from "../src/models/problem";
+import path from "path";
+import { CONTENT_DIR, SOLUTIONS_DIR } from "../src/lib/constants";
+import { readdir } from "fs/promises";
 
 main().catch(console.error);
 
@@ -151,14 +151,13 @@ function createSchema(db: Database.Database): void {
   `);
 }
 
-
 async function indexMdxFiles(
   db: Database.Database,
   files: string[],
-  type: 'module' | 'solution',
-  baseDir: string
+  type: "module" | "solution",
+  baseDir: string,
 ): Promise<void> {
-  const { parseMdxFile } = await import('../src/lib/parseMdxFile');
+  const { parseMdxFile } = await import("../src/lib/parseMdxFile");
   const insertStmt = db.prepare(`
       INSERT INTO mdx_content (
         id, type, file_path, frontmatter_json, body, toc_json,
@@ -167,29 +166,33 @@ async function indexMdxFiles(
     `);
 
   // Batch git commands for performance
-  const gitTimestamps = await getBatchGitTimestamps(files.map(f => path.join(baseDir, f)));
+  const gitTimestamps = await getBatchGitTimestamps(
+    files.map((f) => path.join(baseDir, f)),
+  );
 
-  const transaction = db.transaction((items: Array<{ file: string, content: MdxContent }>) => {
-    for (const { file, content } of items) {
-      const relativePath = path.relative(baseDir, content.fileAbsolutePath);
-      const gitTime = gitTimestamps.get(content.fileAbsolutePath) || null;
+  const transaction = db.transaction(
+    (items: Array<{ file: string; content: MdxContent }>) => {
+      for (const { file, content } of items) {
+        const relativePath = path.relative(baseDir, content.fileAbsolutePath);
+        const gitTime = gitTimestamps.get(content.fileAbsolutePath) || null;
 
-      insertStmt.run(
-        content.frontmatter.id,
-        type,
-        relativePath,
-        JSON.stringify(content.frontmatter),
-        content.body,
-        JSON.stringify(content.toc),
-        content.mdast ? JSON.stringify(content.mdast) : null,
-        content.cppOc,
-        content.javaOc,
-        content.pyOc,
-        content.fields?.division || null,
-        gitTime,
-      );
-    }
-  });
+        insertStmt.run(
+          content.frontmatter.id,
+          type,
+          relativePath,
+          JSON.stringify(content.frontmatter),
+          content.body,
+          JSON.stringify(content.toc),
+          content.mdast ? JSON.stringify(content.mdast) : null,
+          content.cppOc,
+          content.javaOc,
+          content.pyOc,
+          content.fields?.division || null,
+          gitTime,
+        );
+      }
+    },
+  );
 
   // Process files in batches with controlled concurrency
   const BATCH_SIZE = 10;
@@ -200,16 +203,16 @@ async function indexMdxFiles(
         const filePath = path.join(baseDir, file);
         const content = await parseMdxFile(filePath);
         return { file, content };
-      })
+      }),
     );
     transaction(items);
   }
 }
 
 async function getBatchGitTimestamps(
-  filePaths: string[]
+  filePaths: string[],
 ): Promise<Map<string, string>> {
-  const { execSync } = await import('child_process');
+  const { execSync } = await import("child_process");
   const timestamps = new Map<string, string>();
 
   // Batch files to avoid Windows command line length limit (~8191 chars)
@@ -221,24 +224,27 @@ async function getBatchGitTimestamps(
 
     try {
       const result = execSync(
-        `git log --format="%ct|%H" --name-only -- ${batch.map(f => `"${f}"`).join(' ')}`,
-        { encoding: 'utf-8', maxBuffer: 10 * 1024 * 1024 }
+        `git log --format="%ct|%H" --name-only -- ${batch.map((f) => `"${f}"`).join(" ")}`,
+        { encoding: "utf-8", maxBuffer: 10 * 1024 * 1024 },
       );
 
       // Parse output
-      const lines = result.split('\n');
+      const lines = result.split("\n");
       let currentTimestamp: string | null = null;
 
       for (const line of lines) {
-        if (line.includes('|')) {
-          const [timestamp] = line.split('|');
+        if (line.includes("|")) {
+          const [timestamp] = line.split("|");
           currentTimestamp = new Date(parseInt(timestamp) * 1000).toISOString();
         } else if (line.trim() && currentTimestamp) {
           timestamps.set(path.resolve(line.trim()), currentTimestamp);
         }
       }
     } catch (error) {
-      console.warn(`Failed to get git timestamps for batch ${Math.floor(i / BATCH_SIZE) + 1}:`, error);
+      console.warn(
+        `Failed to get git timestamps for batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
+        error,
+      );
     }
   }
 
@@ -246,16 +252,18 @@ async function getBatchGitTimestamps(
 }
 
 async function indexProblems(db: Database.Database): Promise<void> {
-  const { readdir, readFile } = await import('fs/promises');
-  const { getProblemInfo, checkInvalidUsacoMetadata } = await import('../src/models/problem');
-  const { moduleIDToSectionMap } = await import('../content/ordering');
-  const freshOrdering = await import('../content/ordering');
+  const { readdir, readFile } = await import("fs/promises");
+  const { getProblemInfo, checkInvalidUsacoMetadata } = await import(
+    "../src/models/problem"
+  );
+  const { moduleIDToSectionMap } = await import("../content/ordering");
+  const freshOrdering = await import("../content/ordering");
 
   const allFiles = await readdir(CONTENT_DIR, { recursive: true });
   const problemFiles = allFiles.filter(
     (file): file is string =>
-      typeof file === 'string' &&
-      (file.endsWith('.problems.json') || file.endsWith('extraProblems.json'))
+      typeof file === "string" &&
+      (file.endsWith(".problems.json") || file.endsWith("extraProblems.json")),
   );
 
   const insertProblemStmt = db.prepare(`
@@ -270,47 +278,58 @@ async function indexProblems(db: Database.Database): Promise<void> {
     VALUES (?, ?, ?)
   `);
 
-  const transaction = db.transaction((problems: ProblemInfo[], moduleProblemLists: Array<{ moduleId: string; problemLists: Array<{ listId: string; problems: ProblemInfo[] }> }>) => {
-    // Insert problems
-    for (const problem of problems) {
-      insertProblemStmt.run(
-        problem.uniqueId,
-        problem.name,
-        problem.url,
-        problem.source,
-        problem.sourceDescription || null,
-        problem.isStarred ? 1 : 0,
-        problem.difficulty,
-        JSON.stringify(problem.tags),
-        JSON.stringify(problem.solution),
-        problem.inModule ? 1 : 0,
-        problem.moduleId || null,
-        JSON.stringify(problem)
-      );
-    }
-
-    // Insert module problem lists
-    for (const moduleList of moduleProblemLists) {
-      for (const problemList of moduleList.problemLists) {
-        insertModuleProblemListStmt.run(
-          moduleList.moduleId,
-          problemList.listId,
-          JSON.stringify(problemList.problems)
+  const transaction = db.transaction(
+    (
+      problems: ProblemInfo[],
+      moduleProblemLists: Array<{
+        moduleId: string;
+        problemLists: Array<{ listId: string; problems: ProblemInfo[] }>;
+      }>,
+    ) => {
+      // Insert problems
+      for (const problem of problems) {
+        insertProblemStmt.run(
+          problem.uniqueId,
+          problem.name,
+          problem.url,
+          problem.source,
+          problem.sourceDescription || null,
+          problem.isStarred ? 1 : 0,
+          problem.difficulty,
+          JSON.stringify(problem.tags),
+          JSON.stringify(problem.solution),
+          problem.inModule ? 1 : 0,
+          problem.moduleId || null,
+          JSON.stringify(problem),
         );
       }
-    }
-  });
+
+      // Insert module problem lists
+      for (const moduleList of moduleProblemLists) {
+        for (const problemList of moduleList.problemLists) {
+          insertModuleProblemListStmt.run(
+            moduleList.moduleId,
+            problemList.listId,
+            JSON.stringify(problemList.problems),
+          );
+        }
+      }
+    },
+  );
 
   const allProblems: ProblemInfo[] = [];
-  const allModuleProblemLists: Array<{ moduleId: string; problemLists: Array<{ listId: string; problems: ProblemInfo[] }> }> = [];
+  const allModuleProblemLists: Array<{
+    moduleId: string;
+    problemLists: Array<{ listId: string; problems: ProblemInfo[] }>;
+  }> = [];
 
   for (const file of problemFiles) {
     const filePath = path.join(CONTENT_DIR, file);
     const fileName = path.basename(file);
-    const isExtraProblems = fileName === 'extraProblems.json';
+    const isExtraProblems = fileName === "extraProblems.json";
 
     try {
-      const content = await readFile(filePath, 'utf-8');
+      const content = await readFile(filePath, "utf-8");
       let parsedContent;
       try {
         parsedContent = JSON.parse(content);
@@ -318,19 +337,21 @@ async function indexProblems(db: Database.Database): Promise<void> {
         throw new Error(`Unable to parse JSON file: ${filePath}`);
       }
 
-      const moduleId: string = parsedContent['MODULE_ID'];
+      const moduleId: string = parsedContent["MODULE_ID"];
       if (!moduleId && !isExtraProblems) {
-        throw new Error(`MODULE_ID not found in problem JSON file: ${filePath}`);
+        throw new Error(
+          `MODULE_ID not found in problem JSON file: ${filePath}`,
+        );
       }
 
       if (!isExtraProblems && !(moduleId in moduleIDToSectionMap)) {
         throw new Error(
-          `.problems.json moduleId does not correspond to module: '${moduleId}', path: ${filePath}`
+          `.problems.json moduleId does not correspond to module: '${moduleId}', path: ${filePath}`,
         );
       }
 
       Object.keys(parsedContent).forEach((tableId) => {
-        if (tableId === 'MODULE_ID') return;
+        if (tableId === "MODULE_ID") return;
         try {
           parsedContent[tableId].forEach((metadata: ProblemMetadata) => {
             checkInvalidUsacoMetadata(metadata);
@@ -345,14 +366,17 @@ async function indexProblems(db: Database.Database): Promise<void> {
             });
           });
         } catch (e) {
-          console.error('Failed to create problem info for', parsedContent[tableId]);
+          console.error(
+            "Failed to create problem info for",
+            parsedContent[tableId],
+          );
           throw new Error(e.toString());
         }
       });
 
       if (moduleId) {
         const problemLists = Object.keys(parsedContent)
-          .filter((x) => x !== 'MODULE_ID')
+          .filter((x) => x !== "MODULE_ID")
           .map((listId) => ({
             listId,
             problems: parsedContent[listId].map((x: ProblemMetadata) => {
@@ -392,28 +416,41 @@ async function indexProblems(db: Database.Database): Promise<void> {
 }
 
 async function indexModuleFrontmatter(db: Database.Database): Promise<void> {
-  const { moduleIDToSectionMap } = await import('../content/ordering');
+  const { moduleIDToSectionMap } = await import("../content/ordering");
   const insertStmt = db.prepare(`
     INSERT INTO module_frontmatter (file_path, module_id, frontmatter_json, division)
     VALUES (?, ?, ?, ?)
   `);
 
-  const rows = db.prepare('SELECT id, file_path, frontmatter_json FROM mdx_content WHERE type = ?').all('module') as any[];
+  const rows = db
+    .prepare(
+      "SELECT id, file_path, frontmatter_json FROM mdx_content WHERE type = ?",
+    )
+    .all("module") as any[];
 
-  const transaction = db.transaction((items: Array<{ id: string; file_path: string; frontmatter_json: string }>) => {
-    for (const item of items) {
-      const frontmatter = JSON.parse(item.frontmatter_json);
+  const transaction = db.transaction(
+    (
+      items: Array<{ id: string; file_path: string; frontmatter_json: string }>,
+    ) => {
+      for (const item of items) {
+        const frontmatter = JSON.parse(item.frontmatter_json);
 
-      if (!(frontmatter.id in moduleIDToSectionMap)) {
-        throw new Error(
-          `Module ID does not show up in moduleIDToSectionMap: ${frontmatter.id}, path: ${item.file_path}`
+        if (!(frontmatter.id in moduleIDToSectionMap)) {
+          throw new Error(
+            `Module ID does not show up in moduleIDToSectionMap: ${frontmatter.id}, path: ${item.file_path}`,
+          );
+        }
+
+        const division = moduleIDToSectionMap[frontmatter.id];
+        insertStmt.run(
+          item.file_path,
+          item.id,
+          item.frontmatter_json,
+          division,
         );
       }
-
-      const division = moduleIDToSectionMap[frontmatter.id];
-      insertStmt.run(item.file_path, item.id, item.frontmatter_json, division);
-    }
-  });
+    },
+  );
 
   transaction(rows);
 }
@@ -424,25 +461,35 @@ async function indexSolutionFrontmatter(db: Database.Database): Promise<void> {
     VALUES (?, ?, ?)
   `);
 
-  const rows = db.prepare('SELECT id, file_path, frontmatter_json FROM mdx_content WHERE type = ?').all('solution') as any[];
+  const rows = db
+    .prepare(
+      "SELECT id, file_path, frontmatter_json FROM mdx_content WHERE type = ?",
+    )
+    .all("solution") as any[];
 
-  const transaction = db.transaction((items: Array<{ id: string; file_path: string; frontmatter_json: string }>) => {
-    for (const item of items) {
-      insertStmt.run(item.file_path, item.id, item.frontmatter_json);
-    }
-  });
+  const transaction = db.transaction(
+    (
+      items: Array<{ id: string; file_path: string; frontmatter_json: string }>,
+    ) => {
+      for (const item of items) {
+        insertStmt.run(item.file_path, item.id, item.frontmatter_json);
+      }
+    },
+  );
 
   transaction(rows);
 }
 
 async function indexProblemSlugs(db: Database.Database): Promise<void> {
-  const { getProblemURL } = await import('../src/models/problem');
+  const { getProblemURL } = await import("../src/models/problem");
   const insertStmt = db.prepare(`
     INSERT INTO problem_slugs (slug, unique_id)
     VALUES (?, ?)
   `);
 
-  const rows = db.prepare('SELECT problem_data_json FROM problems').all() as any[];
+  const rows = db
+    .prepare("SELECT problem_data_json FROM problems")
+    .all() as any[];
   const problemSlugs = new Map<string, string>();
 
   // Validate consistency (similar to validateProblemConsistency)
@@ -452,20 +499,25 @@ async function indexProblemSlugs(db: Database.Database): Promise<void> {
 
     if (problemSlugs.has(slug) && problemSlugs.get(slug) !== problem.uniqueId) {
       throw new Error(
-        `The problems ${problemSlugs.get(slug)} and ${problem.uniqueId} have the same slugs!`
+        `The problems ${problemSlugs.get(slug)} and ${problem.uniqueId} have the same slugs!`,
       );
     }
 
     problemSlugs.set(slug, problem.uniqueId);
   }
 
-  const transaction = db.transaction((items: Array<{ slug: string; uniqueId: string }>) => {
-    for (const { slug, uniqueId } of items) {
-      insertStmt.run(slug, uniqueId);
-    }
-  });
+  const transaction = db.transaction(
+    (items: Array<{ slug: string; uniqueId: string }>) => {
+      for (const { slug, uniqueId } of items) {
+        insertStmt.run(slug, uniqueId);
+      }
+    },
+  );
 
-  const items = Array.from(problemSlugs.entries()).map(([slug, uniqueId]) => ({ slug, uniqueId }));
+  const items = Array.from(problemSlugs.entries()).map(([slug, uniqueId]) => ({
+    slug,
+    uniqueId,
+  }));
   transaction(items);
 }
 
@@ -475,13 +527,15 @@ async function indexUSACOIds(db: Database.Database): Promise<void> {
     VALUES (?)
   `);
 
-  const rows = db.prepare('SELECT problem_data_json FROM problems').all() as any[];
+  const rows = db
+    .prepare("SELECT problem_data_json FROM problems")
+    .all() as any[];
   const usacoIds = new Set<string>();
 
   // Extract USACO IDs (similar to validateProblemConsistency)
   for (const row of rows) {
     const problem: ProblemInfo = JSON.parse(row.problem_data_json);
-    if (problem.uniqueId.startsWith('usaco')) {
+    if (problem.uniqueId.startsWith("usaco")) {
       usacoIds.add(problem.uniqueId);
     }
   }

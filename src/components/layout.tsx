@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { useAnalyticsEffect } from '../hooks/useAnalyticsEffect';
-import { useUpdateStreakEffect } from '../hooks/useUpdateStreakEffect';
+import * as React from "react";
+import { useAnalyticsEffect } from "../hooks/useAnalyticsEffect";
+import { useUpdateStreakEffect } from "../hooks/useUpdateStreakEffect";
 
 const Layout = ({
   children,
@@ -15,9 +15,7 @@ const Layout = ({
 }): JSX.Element => {
   useAnalyticsEffect();
   useUpdateStreakEffect({ setLastViewedModule });
-  return (
-      <div className="font-sans">{children}</div>
-  );
+  return <div className="font-sans">{children}</div>;
 };
 
 export default Layout;

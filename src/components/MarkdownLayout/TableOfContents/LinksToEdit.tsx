@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import * as React from 'react';
-import useSuffix from './useSuffix';
+import Link from "next/link";
+import * as React from "react";
+import useSuffix from "./useSuffix";
 
 const LinksToEdit = ({ className = null as string | null }) => {
   return (
@@ -8,7 +8,7 @@ const LinksToEdit = ({ className = null as string | null }) => {
       href={`/editor/?filepath=${useSuffix()}`}
       target="_blank"
       className={className ?? undefined}
-    > 
+    >
       Edit this page
       <svg
         className="mb-1 ml-1 inline-block h-5 w-4 text-gray-400 group-hover:text-blue-400"

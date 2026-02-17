@@ -35,7 +35,7 @@ export default onDocumentWritten(
           const userDoc = await transaction.get(userRef);
           if (!problemDoc.exists) {
             throw new Error(
-              "The post, group, or problem being submitted to couldn't be found."
+              "The post, group, or problem being submitted to couldn't be found.",
             );
           }
           if (!userDoc.exists) transaction.set(userRef, {});
@@ -58,7 +58,7 @@ export default onDocumentWritten(
             .reduce((acc, cur) => acc + userData[postId][cur], 0);
           userData.totalPoints = Object.keys(userData)
             .filter(
-              (x) => x !== "totalPoints" && x !== "details" && x !== "userInfo"
+              (x) => x !== "totalPoints" && x !== "details" && x !== "userInfo",
             )
             .reduce((acc, cur) => acc + userData[cur].totalPoints, 0);
 
@@ -96,5 +96,5 @@ export default onDocumentWritten(
         await recalculateLeaderboard(afterData);
       }
     }
-  }
+  },
 );

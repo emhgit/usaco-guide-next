@@ -35,7 +35,7 @@ export default function AdminSettings() {
     try {
       const response = await (httpsCallable(
         getFunctions(firebaseApp),
-        "getUsers"
+        "getUsers",
       )({
         users: [{ email }],
       }) as any);
@@ -59,7 +59,7 @@ export default function AdminSettings() {
     if (!userData.customClaims?.isAdmin && userPermissions?.isAdmin) {
       if (
         !confirm(
-          "Are you sure you want to grant this user admin permissions? This will give the user complete control over the database!"
+          "Are you sure you want to grant this user admin permissions? This will give the user complete control over the database!",
         )
       ) {
         return;
@@ -71,7 +71,7 @@ export default function AdminSettings() {
     try {
       await httpsCallable(
         getFunctions(firebaseApp),
-        "setUserClaims"
+        "setUserClaims",
       )({
         target: userData.uid,
         claims: userPermissions,
@@ -80,7 +80,7 @@ export default function AdminSettings() {
         "Updated user permissions! The target user may have to sign out and sign back in to complete the changes.",
         {
           duration: 6000,
-        }
+        },
       );
       handleSearch(null);
     } catch (e: any) {

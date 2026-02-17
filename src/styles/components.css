@@ -76,25 +76,25 @@
   font-weight: normal !important;
   text-align: center;
 
-  &[data-placement^='top'] > .tippy-arrow::before {
+  &[data-placement^="top"] > .tippy-arrow::before {
     border-top-color: var(--tooltip-bg-color) !important;
   }
-  &[data-placement^='bottom'] > .tippy-arrow::before {
+  &[data-placement^="bottom"] > .tippy-arrow::before {
     border-bottom-color: var(--tooltip-bg-color) !important;
   }
-  &[data-placement^='left'] > .tippy-arrow::before {
+  &[data-placement^="left"] > .tippy-arrow::before {
     border-left-color: var(--tooltip-bg-color) !important;
   }
-  &[data-placement^='right'] > .tippy-arrow::before {
+  &[data-placement^="right"] > .tippy-arrow::before {
     border-right-color: var(--tooltip-bg-color) !important;
   }
 }
 
 .tippy-tooltip--asterisk {
-  &[data-placement^='top'] {
+  &[data-placement^="top"] {
     transform: translateY(10px);
   }
-  &[data-placement^='bottom'] {
+  &[data-placement^="bottom"] {
     transform: translateY(-7px);
   }
 }
@@ -116,8 +116,8 @@
   border-radius: 0px 0px 4px 4px;
   font-size: 12px;
   font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 
   /* copy from tailwind defaults */
   &:hover {

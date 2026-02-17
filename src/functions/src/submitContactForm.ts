@@ -20,7 +20,7 @@ const submitContactForm = functions.https.onCall(async (request) => {
   if (!name || !topic || !message || !email) {
     throw new functions.https.HttpsError(
       "invalid-argument",
-      "One or more required arguments were not passed."
+      "One or more required arguments were not passed.",
     );
   }
   const body =
@@ -62,7 +62,7 @@ const submitContactForm = functions.https.onCall(async (request) => {
       title: title,
       body: body,
       labels: labels,
-    }
+    },
   );
 
   await admin.firestore().collection("contactFormSubmissions").add({

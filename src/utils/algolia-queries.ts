@@ -26,7 +26,9 @@ export async function getModuleRecords() {
         title: m.frontmatter.title,
         description: m.frontmatter.description,
         division: m.division,
-        content: fullModule?.mdast ? extractSearchableText(fullModule.mdast) : '',
+        content: fullModule?.mdast
+          ? extractSearchableText(fullModule.mdast)
+          : "",
       };
     });
 }
@@ -45,14 +47,18 @@ export async function getProblemRecords() {
     const fullProblem = await queryProblem(problemInfo.uniqueId);
     if (!fullProblem) continue;
 
-    const existingProblem = records.find((x) => x.objectID === fullProblem.uniqueId);
-    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(fullProblem.uniqueId);
-    const problemModulesWithPath = problemModules.map(module => {
-      const moduleFile = moduleFiles.find(m => m.id === module.id);
+    const existingProblem = records.find(
+      (x) => x.objectID === fullProblem.uniqueId,
+    );
+    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(
+      fullProblem.uniqueId,
+    );
+    const problemModulesWithPath = problemModules.map((module) => {
+      const moduleFile = moduleFiles.find((m) => m.id === module.id);
       return {
         id: module.id,
         title: module.title,
-        path: moduleFile?.path || ''
+        path: moduleFile?.path || "",
       };
     });
 
@@ -77,8 +83,10 @@ export async function getProblemRecords() {
         isStarred: fullProblem.isStarred || false,
         solution: fullProblem.solution
           ? (Object.fromEntries(
-            Object.entries(fullProblem.solution).filter(([_, v]) => v != null)
-          ) as any)
+              Object.entries(fullProblem.solution).filter(
+                ([_, v]) => v != null,
+              ),
+            ) as any)
           : null,
         problemModules: problemModulesWithPath,
       });
@@ -105,17 +113,21 @@ export async function getEditorFileRecords() {
     if (!fullProblem) continue;
 
     const solution = await querySolution(problemInfo.uniqueId);
-    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(problemInfo.uniqueId);
-    const problemModulesWithPath = problemModules.map(module => {
-      const moduleFile = moduleFiles.find(m => m.id === module.id);
+    const problemModules = await queryModuleIdAndTitleFromProblemBySolutionId(
+      problemInfo.uniqueId,
+    );
+    const problemModulesWithPath = problemModules.map((module) => {
+      const moduleFile = moduleFiles.find((m) => m.id === module.id);
       return {
         id: module.id,
         title: module.title,
-        path: moduleFile?.path || ''
+        path: moduleFile?.path || "",
       };
     });
 
-    const existingFile = solutionFiles.find((file) => file.id === problemInfo.uniqueId);
+    const existingFile = solutionFiles.find(
+      (file) => file.id === problemInfo.uniqueId,
+    );
 
     if (existingFile) {
       problemModulesWithPath.forEach((module) => {
@@ -149,17 +161,17 @@ export async function getEditorFileRecords() {
       objectID: x.id,
     })),
     ...solutionFiles.map<
-      { kind: 'solution'; objectID: string } & AlgoliaEditorSolutionFile
+      { kind: "solution"; objectID: string } & AlgoliaEditorSolutionFile
     >((x) => ({
       ...x,
-      kind: 'solution',
+      kind: "solution",
       objectID: x.id,
     })),
   ];
 }
 
 export async function getAlgoliaRecords() {
-  const indexPrefix = process.env.ALGOLIA_INDEX_NAME ?? 'dev';
+  const indexPrefix = process.env.ALGOLIA_INDEX_NAME ?? "dev";
 
   const [moduleRecords, problemRecords, fileRecords] = await Promise.all([
     Promise.all(await getModuleRecords()),
@@ -170,35 +182,35 @@ export async function getAlgoliaRecords() {
   return [
     {
       records: moduleRecords,
-      indexName: indexPrefix + '_modules',
-      matchFields: ['title', 'description', 'content', 'id', 'division'],
+      indexName: indexPrefix + "_modules",
+      matchFields: ["title", "description", "content", "id", "division"],
     },
     {
       records: problemRecords,
-      indexName: indexPrefix + '_problems',
+      indexName: indexPrefix + "_problems",
       matchFields: [
-        'source',
-        'name',
-        'tags',
-        'url',
-        'difficulty',
-        'isStarred',
-        'tags',
-        'problemModules',
-        'solution',
+        "source",
+        "name",
+        "tags",
+        "url",
+        "difficulty",
+        "isStarred",
+        "tags",
+        "problemModules",
+        "solution",
       ],
     },
     {
       records: fileRecords,
-      indexName: indexPrefix + '_editorFiles',
+      indexName: indexPrefix + "_editorFiles",
       matchFields: [
-        'kind',
-        'title',
-        'id',
-        'source',
-        'solutions',
-        'path',
-        'problemModules',
+        "kind",
+        "title",
+        "id",
+        "source",
+        "solutions",
+        "path",
+        "problemModules",
       ],
     },
   ];

@@ -20,7 +20,7 @@ export default function FocusProblem({
   }
   if (problemList.problems.length !== 1) {
     throw new Error(
-      `The focus problem list ${problemID} should have exactly one problem.`
+      `The focus problem list ${problemID} should have exactly one problem.`,
     );
   }
 

@@ -16,7 +16,7 @@ export default function MembersPage(): JSX.Element {
     maxResults: 200,
   });
   const [activeMemberId, setActiveMemberId] = React.useState<string | null>(
-    null
+    null,
   );
 
   React.useEffect(() => {

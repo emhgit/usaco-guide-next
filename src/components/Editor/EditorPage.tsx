@@ -26,20 +26,20 @@ import SEO from "../seo";
 
 // Lazy load heavy components
 const EditorOutput = lazy(() =>
-  import("./EditorOutput").then((module) => ({ default: module.EditorOutput }))
+  import("./EditorOutput").then((module) => ({ default: module.EditorOutput })),
 );
 const EditorSidebar = lazy(() =>
   import("./EditorSidebar/EditorSidebar").then((module) => ({
     default: module.EditorSidebar,
-  }))
+  })),
 );
 const EditorTopNav = lazy(() =>
-  import("./EditorTopNav").then((module) => ({ default: module.EditorTopNav }))
+  import("./EditorTopNav").then((module) => ({ default: module.EditorTopNav })),
 );
 const MainEditorInterface = lazy(() =>
   import("./MainEditorInterface").then((module) => ({
     default: module.MainEditorInterface,
-  }))
+  })),
 );
 
 export default function EditorPage(): JSX.Element {
@@ -47,7 +47,9 @@ export default function EditorPage(): JSX.Element {
   const { query } = router;
   const editor = useAtomValue(monacoEditorInstanceAtom);
   const openOrCreateExistingFile = useSetAtom(openOrCreateExistingFileAtom);
-  const setToken = useSetAtom(tokenAtom as WritableAtom<string | null, [string | null], void>);
+  const setToken = useSetAtom(
+    tokenAtom as WritableAtom<string | null, [string | null], void>,
+  );
 
   React.useEffect(() => {
     const code = query.code as string;

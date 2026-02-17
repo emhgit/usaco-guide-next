@@ -15,7 +15,7 @@ export default function PostPage(
   props: RouteComponentProps<{
     groupId: string;
     postId: string;
-  }>
+  }>,
 ) {
   if (!props.groupId || !props.postId) {
     throw "Misplaced PostPage component! This should be under the param URL with :groupId and :postId";

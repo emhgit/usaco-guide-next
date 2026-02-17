@@ -52,3 +52,5 @@ content.db-wal
 
 # Optional eslint cache
 .eslintcache
+
+lighthouse-*.json

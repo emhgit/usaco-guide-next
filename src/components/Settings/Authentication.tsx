@@ -10,10 +10,10 @@ export default function Authentication() {
 
   if (firebaseUser) {
     linkedWithGoogle = !!firebaseUser.providerData.find(
-      (provider) => provider.providerId === "google.com"
+      (provider) => provider.providerId === "google.com",
     );
     linkedWithGithub = !!firebaseUser.providerData.find(
-      (provider) => provider.providerId === "github.com"
+      (provider) => provider.providerId === "github.com",
     );
   }
 

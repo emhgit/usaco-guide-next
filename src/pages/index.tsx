@@ -207,7 +207,7 @@ export default function IndexPage({ teamImages }: IndexPageProps): JSX.Element {
           <h2
             className={classNames(
               headerClassesNoText,
-              "text-black dark:text-gray-100"
+              "text-black dark:text-gray-100",
             )}
           >
             <div className="dark:hidden">
@@ -285,7 +285,7 @@ export default function IndexPage({ teamImages }: IndexPageProps): JSX.Element {
                   alt="USACO Forum Screenshot"
                   placeholder="blur"
                   blurDataURL={`data:image/svg+xml;base64,${Buffer.from(
-                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/>`
+                    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/>`,
                   ).toString("base64")}`}
                   layout="constrained"
                   width={560}

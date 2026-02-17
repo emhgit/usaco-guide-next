@@ -27,5 +27,5 @@ export default onSchedule(
         console.error(err);
         throw new Error("Export operation failed");
       });
-  }
+  },
 );

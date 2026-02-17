@@ -16,8 +16,8 @@ const nextConfig: NextConfig = {
   // 1. Redirects Configuration
   async redirects() {
     try {
-      const path = await import("path")
-      const fs = await import("fs")
+      const path = await import("path");
+      const fs = await import("fs");
       // Path assumes redirects.txt is in the root of your project
       const filePath = path.resolve(process.cwd(), "src/redirects.txt");
       const redirectsData = fs.readFileSync(filePath, "utf8");
@@ -65,7 +65,7 @@ const nextConfig: NextConfig = {
       config.plugins.push(
         new webpack.ProvidePlugin({
           process: "process/browser",
-        })
+        }),
       );
     }
 

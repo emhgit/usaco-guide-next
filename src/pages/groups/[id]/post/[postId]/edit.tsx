@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 
 const EditPostPage = dynamic(
   () => import("../../../../../components/Groups/EditPostPage/EditPostPage"),
-  { ssr: false }
+  { ssr: false },
 );
 
 const Index = () => {

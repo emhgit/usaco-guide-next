@@ -18,7 +18,7 @@ export default function EditProblemHintSection({
       // hint was deleted
       if (!currentProblemHint) return; // should not happen
       const hintIdx = problem.hints.findIndex(
-        (hint) => hint.id === currentProblemHint.id
+        (hint) => hint.id === currentProblemHint.id,
       );
       if (hintIdx === -1) {
         throw new Error("Couldn't find hint to delete");
@@ -29,7 +29,7 @@ export default function EditProblemHintSection({
     } else {
       if (currentProblemHint) {
         const hintIdx = problem.hints.findIndex(
-          (hint) => hint.id === currentProblemHint.id
+          (hint) => hint.id === currentProblemHint.id,
         );
         if (hintIdx === -1) {
           throw new Error("Couldn't find hint to edit");

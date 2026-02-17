@@ -152,7 +152,7 @@ export default function TopNavigationBar({
       <nav
         className={classNames(
           !transparent && "bg-white shadow-sm dark:bg-gray-900",
-          "relative"
+          "relative",
         )}
       >
         <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8">
@@ -186,14 +186,14 @@ export default function TopNavigationBar({
                   <PopoverButton
                     className={classNames(
                       "text-gray-500 hover:border-gray-300 focus:border-gray-300 dark:hover:border-gray-500 dark:focus:border-gray-500",
-                      "group dark:text-dark-high-emphasis inline-flex h-full items-center space-x-2 border-b-2 border-transparent pt-0.5 text-base leading-6 font-medium transition duration-150 ease-in-out hover:text-gray-900 focus:text-gray-900 focus:outline-hidden"
+                      "group dark:text-dark-high-emphasis inline-flex h-full items-center space-x-2 border-b-2 border-transparent pt-0.5 text-base leading-6 font-medium transition duration-150 ease-in-out hover:text-gray-900 focus:text-gray-900 focus:outline-hidden",
                     )}
                   >
                     <span>Resources</span>
                     <ChevronDownIcon
                       className={classNames(
                         "text-gray-400",
-                        "dark:text-dark-med-emphasis dark:group-hover:text-dark-med-emphasis dark:group-focus:text-dark-med-emphasis h-5 w-5 transition duration-150 ease-in-out group-hover:text-gray-500 group-focus:text-gray-500"
+                        "dark:text-dark-med-emphasis dark:group-hover:text-dark-med-emphasis dark:group-focus:text-dark-med-emphasis h-5 w-5 transition duration-150 ease-in-out group-hover:text-gray-500 group-focus:text-gray-500",
                       )}
                       aria-hidden="true"
                     />

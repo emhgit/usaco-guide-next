@@ -9,7 +9,7 @@ import { useCowImages } from "../../context/CowImagesContext";
 
 const ComeBackTimer = ({ tomorrowMilliseconds }) => {
   const [milliseconds, setMilliseconds] = React.useState(
-    tomorrowMilliseconds - Date.now()
+    tomorrowMilliseconds - Date.now(),
   );
 
   React.useEffect(() => {

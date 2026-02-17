@@ -19,7 +19,7 @@ export default function GroupLeaderboardPage(): JSX.Element {
     if (!posts || !activeGroup.groupData!.postOrdering) return null;
     return activeGroup
       .groupData!.postOrdering.map((postId) =>
-        posts.find((post) => post.id === postId)
+        posts.find((post) => post.id === postId),
       )
       .filter((post) => post?.type === "assignment" && post.isPublished);
   }, [posts]);
