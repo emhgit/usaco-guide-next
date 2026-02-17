@@ -157,7 +157,7 @@ export async function measureBuildMetrics(iterations = 5): Promise<void> {
     })),
   ];
 
-  await saveResults(results, `build-metrics-${timestamp}.json`);
+  await saveResults(results, `build-metrics-${timestamp}`);
   console.log("\n--- Build Metrics Completed ---");
   console.log("Results saved to benchmarks/data/");
 }

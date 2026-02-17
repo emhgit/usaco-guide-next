@@ -168,7 +168,7 @@ export async function measureBuildResources(): Promise<void> {
 
   await saveResults(
     results,
-    `resource-usage-build-${timestamp.replace(/[:.]/g, "-")}.json`,
+    `resource-usage-build-${timestamp.replace(/[:.]/g, "-")}`,
   );
   console.log("Build resource usage measurement completed");
 }
@@ -207,7 +207,7 @@ export async function measureDevServerResources(): Promise<void> {
 
   await saveResults(
     results,
-    `resource-usage-dev-${timestamp.replace(/[:.]/g, "-")}.json`,
+    `resource-usage-dev-${timestamp.replace(/[:.]/g, "-")}`,
   );
   console.log("Dev server resource usage measurement completed");
 }

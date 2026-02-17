@@ -128,7 +128,7 @@ export async function measureWebVitals(iterations = 5): Promise<void> {
     // Save results
     await saveResults(
       results,
-      `web-vitals-${timestamp.replace(/[:.]/g, "-")}.json`,
+      `web-vitals-${timestamp.replace(/[:.]/g, "-")}`,
     );
 
     console.log("\n--- Web Vitals Metrics ---");

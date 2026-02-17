@@ -94,7 +94,7 @@ export async function measureContentQueries(iterations = 1000): Promise<void> {
   // Save results
   await saveResults(
     results,
-    `content-query-metrics-${timestamp.replace(/[:.]/g, "-")}.json`,
+    `content-query-metrics-${timestamp.replace(/[:.]/g, "-")}`,
   );
 
   console.log("\n--- Content Query Metrics ---");
