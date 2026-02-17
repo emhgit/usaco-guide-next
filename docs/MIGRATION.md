@@ -368,58 +368,43 @@ CREATE TABLE usaco_ids (
 Gatsby and Next.js will be compared across:
 
 1. Build & dev performance
-   - MDX compilation time
-   - Dev server startup time
-   - Production build time
-   - HMR latency
+   - BUILD_COLD - Cold production build time
+   - BUILD_WARM - Cached production build time
+   - DEV_STARTUP - Dev server startup latency
+   - CONTENT_INGEST_TIME - Time to parse + index content
 
-2. Code quality
-   - TypeScript type-check speed
-   - Linting speed
-   - Dependency freshness
+2. Query performance
+   - CONTENT_QUERY_LATENCY_AVG
+   - CONTENT_QUERY_LATENCY_P95
 
-3. Runtime performance
-   - Core Web Vitals (LCP, INP, CLS)
-   - Total JS shipped per page
+3. Code quality
+   - TS_CHECK_TIME - TypeScript type-check speed
+   - LINT_TIME - Linting speed
+   - FRESH_DEPS - Dependency freshness
 
-Benchmarks will be tracked over time and included in PRs when relevant.
+4. Runtime performance
+   - LCP
+   - CLS
+   - INP
+   - FCP
+   - BUNDLE_SIZE
 
-### Performance / Quality Tasks
+[Benchmarks](/benchmarks/) will be tracked over time and included in PRs when relevant.
 
-- [ ] Add MDX compilation timing instrumentation
+### Framework Benchmarks Comparison
 
-- [ ] Add dev startup timing script
-
-- [ ] Add build timing script (cold + warm cache)
-
-- [ ] Add dependency freshness reporting
-
-- [ ] Add bundle analyzer baseline
-
-- [ ] Add Web Vitals reporting (lab + field)
-
-- [ ] Document benchmark results in docs/benchmarks.md
-
-### Gatsby Benchmarks
-
-| Metric            | Value |
-| ----------------- | ----- |
-| MDX compile time  | TBD   |
-| Dev startup time  | TBD   |
-| Build time (cold) | TBD   |
-| Build time (warm) | TBD   |
-| LCP               | TBD   |
-| INP               | TBD   |
-| CLS               | TBD   |
-
-### Next.js Benchmarks
-
-| Metric            | Value |
-| ----------------- | ----- |
-| MDX compile time  | TBD   |
-| Dev startup time  | TBD   |
-| Build time (cold) | TBD   |
-| Build time (warm) | TBD   |
-| LCP               | TBD   |
-| INP               | TBD   |
-| CLS               | TBD   |
+| Metric                    | Gatsby | Next.js |
+| ------------------------- | ------ | ------- |
+| BUILD_COLD                | TBD    | TBD     |
+| BUILD_WARM                | TBD    | TBD     |
+| DEV_STARTUP               | TBD    | TBD     |
+| CONTENT_INGEST_TIME       | -      | TBD     |
+| CONTENT_QUERY_LATENCY_AVG | TBD    | TBD     |
+| CONTENT_QUERY_LATENCY_P95 | TBD    | TBD     |
+| TS_CHECK_TIME             | TBD    | TBD     |
+| LINT_TIME                 | TBD    | TBD     |
+| FRESH_DEPS                | TBD    | TBD     |
+| LCP                       | TBD    | TBD     |
+| INP                       | TBD    | TBD     |
+| CLS                       | TBD    | TBD     |
+| FCP                       | TBD    | TBD     |

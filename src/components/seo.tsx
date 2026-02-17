@@ -23,10 +23,10 @@ const SEO: React.FC<SEOProps> = ({
 }) => {
   const { asPath } = useRouter();
   const siteUrl = siteMetadata.siteUrl;
-  const siteTitle = siteMetadata.title; // Replace with your site title
-  const metaDescription = description || siteMetadata.description; // Replace with your site description
+  const siteTitle = siteMetadata.title;
+  const metaDescription = description || siteMetadata.description;
   const canonicalUrl = `${siteUrl}${asPath}`;
-  const defaultImage = "/assets/social-media-image.jpg"; // Path to your default social media image in the public folder
+  const defaultImage = "/assets/social-media-image.jpg";
 
   const metaImage = image || {
     src: defaultImage,
