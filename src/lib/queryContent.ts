@@ -137,24 +137,24 @@ export async function queryModulesByDivision(
 }
 
 /**
- * Query problem IDs by division
- * Returns an array of unique problem IDs for problems in modules of the given division
+ * Query problem data by division
+ * Returns an array of objects containing problem IDs and their module IDs for problems in modules of the given division
  */
-export async function queryProblemIdsByDivision(
+export async function queryProblemDataByDivision(
   division: string,
-): Promise<string[]> {
+): Promise<Array<{ id: string; moduleId: string }>> {
   const db = await getDatabase();
   // Join problems with module_frontmatter to get division
   const rows = db
     .prepare(`
-      SELECT DISTINCT p.unique_id 
+      SELECT DISTINCT p.unique_id as id, p.module_id as moduleId
       FROM problems p
       INNER JOIN module_frontmatter mf ON p.module_id = mf.module_id
       WHERE mf.division = ? AND p.in_module = 1
     `)
-    .all(division) as any[];
+    .all(division) as Array<{ id: string; moduleId: string }>;
 
-  return rows.map((row) => row.unique_id);
+  return rows;
 }
 
 /**
