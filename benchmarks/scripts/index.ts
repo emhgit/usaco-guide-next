@@ -4,6 +4,7 @@ import { Command } from "commander";
 import { measureBuildMetrics } from "./build-metrics";
 import { measureContentQueries } from "./content-query";
 import { measureWebVitals } from "./web-vitals";
+import { measureCodeQuality } from "./code-quality";
 import {
   measureBuildResources,
   measureDevServerResources,
@@ -35,6 +36,9 @@ program
     console.log("\n=== Web Vitals ===");
     await measureWebVitals();
 
+    console.log("\n=== Code Quality ===");
+    await measureCodeQuality();
+
     console.log("\nAll benchmarks completed.");
   });
 
@@ -58,6 +62,13 @@ program
   .description("Measure content query performance")
   .action(async () => {
     await measureContentQueries();
+  });
+
+program
+  .command("code-quality")
+  .description("Measure code quality metrics (TypeScript checks, linting, dependency freshness)")
+  .action(async () => {
+    await measureCodeQuality();
   });
 
 program
