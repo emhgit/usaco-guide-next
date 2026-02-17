@@ -19,7 +19,7 @@ import { FileListSidebar } from "./FileListSidebar";
 
 function GithubActions() {
   const [fork, setFork] = useAtom(
-    forkAtom as PrimitiveAtom<string | undefined>
+    forkAtom as PrimitiveAtom<string | undefined>,
   );
   const githubInfo = useAtomValue(githubInfoAtom);
   const octokit = useAtomValue(octokitAtom);
@@ -37,8 +37,8 @@ function GithubActions() {
       console.log(data);
       setInstalled(
         !!data.find(
-          (installation) => installation.account?.id === githubInfo.id
-        )
+          (installation) => installation.account?.id === githubInfo.id,
+        ),
       );
     });
     octokit
@@ -50,7 +50,7 @@ function GithubActions() {
       .then((data) => {
         return setFork(
           data.find((repo) => repo.name === "usaco-guide")?.html_url ??
-            undefined
+            undefined,
         );
       });
   }, [githubInfo, branch, octokit, setFork]);
@@ -97,7 +97,7 @@ function GithubActions() {
             headers: {
               "X-GitHub-Api-Version": "2022-11-28",
             },
-          }
+          },
         )
       ).data[0].object.sha;
       octokit
@@ -116,7 +116,7 @@ function GithubActions() {
           setBranchState("Create/Set Branch");
         });
     },
-    [githubInfo, octokit, fork, setBranch]
+    [githubInfo, octokit, fork, setBranch],
   );
   return (
     <>
@@ -176,7 +176,9 @@ function GithubActions() {
               <button
                 onClick={() =>
                   createBranch(
-                    prompt("Branch name? (leave empty for auto-generated name)")
+                    prompt(
+                      "Branch name? (leave empty for auto-generated name)",
+                    ),
                   )
                 }
                 className="btn"
@@ -211,7 +213,7 @@ function GithubSidebar({ loading }: { loading: boolean }) {
         ) : (
           <a
             href={`https://github.com/login/oauth/authorize?client_id=${
-              process.env.GATSBY_EDITOR_CLIENT_ID
+              process.env.EDITOR_CLIENT_ID
             }&redirect_uri=${
               process.env.NODE_ENV === "development"
                 ? "http://localhost:8000/editor"
@@ -239,7 +241,7 @@ export const EditorSidebar = (props): JSX.Element => {
   const [activeFile, setActiveFile] = useAtom(activeFileAtom);
   const openOrCreateExistingFile = useSetAtom(openOrCreateExistingFileAtom);
   const createNewInternalSolutionFile = useSetAtom(
-    createNewInternalSolutionFileAtom
+    createNewInternalSolutionFileAtom,
   );
   const closeFile = useSetAtom(closeFileAtom);
 
@@ -250,7 +252,7 @@ export const EditorSidebar = (props): JSX.Element => {
   const handleCloseFile = (file: string) => {
     if (
       confirm(
-        "Are you sure you want to close this file? You'll lose your changes."
+        "Are you sure you want to close this file? You'll lose your changes.",
       )
     ) {
       closeFile(file);
@@ -260,7 +262,7 @@ export const EditorSidebar = (props): JSX.Element => {
   const handleCloseAllFiles = () => {
     if (
       confirm(
-        "Are you sure you want to close all files? You'll lose all your changes."
+        "Are you sure you want to close all files? You'll lose all your changes.",
       )
     ) {
       for (const file of files) closeFile(file);

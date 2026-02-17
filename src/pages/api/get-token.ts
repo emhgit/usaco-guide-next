@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 const app = new OAuthApp({
   clientType: 'github-app',
-  clientId: process.env.GATSBY_PUBLIC_EDITOR_CLIENT_ID ?? '',
+  clientId: process.env.PUBLIC_EDITOR_CLIENT_ID ?? '',
   clientSecret: process.env.EDITOR_CLIENT_SECRET ?? '',
 });
 

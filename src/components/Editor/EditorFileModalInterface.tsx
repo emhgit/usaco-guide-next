@@ -13,9 +13,7 @@ import {
 } from "../../models/algoliaEditorFile";
 import searchClient from "../../utils/algoliaLiteSearchClient";
 
-const indexName = `${
-  process.env.GATSBY_ALGOLIA_INDEX_NAME ?? "dev"
-}_editorFiles`;
+const indexName = `${process.env.ALGOLIA_INDEX_NAME ?? "dev"}_editorFiles`;
 
 const FileSearch = ({
   onSelect,

@@ -23,7 +23,7 @@ import { useUserProgressOnProblems } from "../../context/UserDataContext/propert
 import searchClient from "../../utils/algoliaLiteSearchClient";
 import { GetStaticProps } from "next";
 
-const indexName = `${process.env.GATSBY_ALGOLIA_INDEX_NAME ?? "dev"}_problems`;
+const indexName = `${process.env.ALGOLIA_INDEX_NAME ?? "dev"}_problems`;
 
 interface ProblemsPageProps {
   problemIds: string[];
