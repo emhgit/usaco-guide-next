@@ -1,8 +1,7 @@
-import { performance } from "node:perf_hooks";
 import { writeFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-const DATA_DIR = join(process.cwd(), "benchmarks", "data");
+export const DATA_DIR = join(process.cwd(), "benchmarks", "data");
 
 export interface BenchmarkResult {
   metric: string;
@@ -24,6 +23,7 @@ export async function saveResults(
 
 export function calculateStats(values: number[]): {
   mean: number;
+  median: number;
   stddev: number;
   min: number;
   max: number;
@@ -42,30 +42,12 @@ export function calculateStats(values: number[]): {
 
   return {
     mean,
+    median: sorted[Math.floor(sorted.length / 2)],
     stddev,
     min: Math.min(...values),
     max: Math.max(...values),
     p95,
   };
-}
-
-export async function measure<T>(
-  fn: () => Promise<T>,
-  iterations = 1,
-): Promise<{ result: T; duration: number }[]> {
-  const results: { result: T; duration: number }[] = [];
-
-  for (let i = 0; i < iterations; i++) {
-    const start = performance.now();
-    const result = await fn();
-    const end = performance.now();
-    results.push({
-      result,
-      duration: end - start,
-    });
-  }
-
-  return results;
 }
 
 export function formatMs(ms: number): string {

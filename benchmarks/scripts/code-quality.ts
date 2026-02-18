@@ -2,8 +2,6 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import { performance } from 'node:perf_hooks';
 import { saveResults, BenchmarkResult } from './utils';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
 const execAsync = promisify(exec);
 

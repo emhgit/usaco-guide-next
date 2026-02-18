@@ -65,7 +65,7 @@ Gatsby has served the USACO Guide well, but several issues have arisen over time
 - Gatsby’s [GraphQL data layer](https://www.gatsbyjs.com/docs/reference/graphql-data-layer/graphql-api/) centralizes all content into a schema and abstracts execution details
   - This prevents developers from optimizing data processing and loading, leading to long development server startup and build times.
 - Plugin ecosystem is outdated
-  - When attempting to update dependencies (e.g., `gatsby-plugin-postcss`), peer dependency conflicts arise. This forces the repository to rely on outdated or deprecated dependencies to maintain functionality.
+  - When attempting to update dependencies (e.g., `gatsby-plugin-postcss`), peer dependency conflicts arise. This forces the repository to rely on outdated or deprecated dependencies to maintain functionality. Additionally, segment fault issues have occurred.
 - Local development can become slow and inconsistent
   - For instance, because of reliance on outdated dependencies, the Hot Module Replacement (HMR) is triggered continuously, which eventually leads to memory leaks.
 
@@ -393,18 +393,18 @@ Gatsby and Next.js will be compared across:
 
 ### Framework Benchmarks Comparison
 
-| Metric                    | Gatsby | Next.js |
-| ------------------------- | ------ | ------- |
-| BUILD_COLD                | TBD    | TBD     |
-| BUILD_WARM                | TBD    | TBD     |
-| DEV_STARTUP               | TBD    | TBD     |
-| CONTENT_INGEST_TIME       | -      | TBD     |
-| CONTENT_QUERY_LATENCY_AVG | TBD    | TBD     |
-| CONTENT_QUERY_LATENCY_P95 | TBD    | TBD     |
-| TS_CHECK_TIME             | TBD    | TBD     |
-| LINT_TIME                 | TBD    | TBD     |
-| FRESH_DEPS                | TBD    | TBD     |
-| LCP                       | TBD    | TBD     |
-| INP                       | TBD    | TBD     |
-| CLS                       | TBD    | TBD     |
-| FCP                       | TBD    | TBD     |
+| Metric                    | Gatsby (Median) | Next.js (Median) |
+| ------------------------- | --------------- | ---------------- |
+| BUILD_COLD                | TBD             | 77.92s           |
+| BUILD_WARM                | TBD             | 66.79s           |
+| DEV_STARTUP               | TBD             | 5.49s            |
+| CONTENT_INGEST_TIME       | -               | TBD              |
+| CONTENT_QUERY_LATENCY_AVG | TBD             | TBD              |
+| CONTENT_QUERY_LATENCY_P95 | TBD             | TBD              |
+| TS_CHECK_TIME             | TBD             | 4.52s            |
+| LINT_TIME                 | TBD             | 4.30s            |
+| FRESH_DEPS                | TBD             | TBD              |
+| LCP                       | TBD             | TBD              |
+| INP                       | TBD             | TBD              |
+| CLS                       | TBD             | TBD              |
+| FCP                       | TBD             | TBD              |
