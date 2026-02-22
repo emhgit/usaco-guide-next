@@ -48,7 +48,7 @@ This migration is **in progress**. Many core features have already been implemen
 - [x] Copy over all other components/scripts/utils
 - [x] Update storybook config for Next.js
 - [x] Copy over stories
-- [ ] Add new modules and solutions
+- [x] Add new modules and solutions
 - [ ] Update deployment scripts
 - [ ] Update docs
 
@@ -64,8 +64,8 @@ Gatsby has served the USACO Guide well, but several issues have arisen over time
 
 - Gatsby’s [GraphQL data layer](https://www.gatsbyjs.com/docs/reference/graphql-data-layer/graphql-api/) centralizes all content into a schema and abstracts execution details
   - This prevents developers from optimizing data processing and loading, leading to long development server startup and build times.
-- Plugin ecosystem is outdated
-  - When attempting to update dependencies (e.g., `gatsby-plugin-postcss`), peer dependency conflicts arise. This forces the repository to rely on outdated or deprecated dependencies to maintain functionality. Additionally, segment fault issues have occurred.
+- The Gatsby plugin ecosystem is outdated
+  - When attempting to update dependencies (e.g., `gatsby-plugin-postcss`), peer dependency conflicts arise. This forces the repository to rely on outdated or deprecated dependencies to maintain functionality. Additionally, segment fault issues have been reported to occur in recent Gatsby releases.
 - Local development can become slow and inconsistent
   - For instance, because of reliance on outdated dependencies, the Hot Module Replacement (HMR) is triggered continuously, which eventually leads to memory leaks.
 
@@ -231,8 +231,6 @@ The new architecture eliminates these bottlenecks through separation of concerns
 - **Ingestion phase:** $\mathcal{O}(n + M \times C + N \log N)$
 - **Build phase:** $\mathcal{O}(p \times q \times \log n)$, where $q$ is a small constant number of queries per page
 
-#### Performance Improvements
-
 **Algorithmic Gains:**
 
 - Eliminated $\mathcal{O}(S \times P)$ quadratic solution filtering
@@ -370,24 +368,24 @@ Gatsby and Next.js will be compared across:
 1. Build & dev performance
    - BUILD_COLD - Cold production build time
    - BUILD_WARM - Cached production build time
-   - DEV_STARTUP - Dev server startup latency
-   - CONTENT_INGEST_TIME - Time to parse + index content
+   - DEV_STARTUP - Development server startup latency
+
+Additionally, CONTENT_INGEST_TIME (time to parse + index content) will be measured for Next.js.
 
 2. Query performance
-   - CONTENT_QUERY_LATENCY_AVG
-   - CONTENT_QUERY_LATENCY_P95
+   - CONTENT_QUERY_LATENCY_AVG - Average/mean query latency
+   - CONTENT_QUERY_LATENCY_P95 - 95th percentile query latency
+
+It is still being decided which GraphQL vs. SQL queries to benchmark.
 
 3. Code quality
    - TS_CHECK_TIME - TypeScript type-check speed
    - LINT_TIME - Linting speed
-   - FRESH_DEPS - Dependency freshness
+   - FRESH_DEPS - Amount of non-updated dependencies
 
 4. Runtime performance
-   - LCP
-   - CLS
-   - INP
-   - FCP
-   - BUNDLE_SIZE
+   - Core Web Vitals (LCP, CLS, INP, FCP)
+   - BUNDLE_SIZE - Total JavaScript bundle size
 
 [Benchmarks](/benchmarks/) will be tracked over time and included in PRs when relevant.
 
