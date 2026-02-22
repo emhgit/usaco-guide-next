@@ -7,7 +7,6 @@ export default async function handler(
 ) {
   try {
     const problems = await queryUsacoDivisionProblems();
-    console.log(problems[0]);
     // Set cache headers for 1 hour
     res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate");
     res.status(200).json({ problems });
