@@ -391,18 +391,18 @@ It is still being decided which GraphQL vs. SQL queries to benchmark.
 
 ### Framework Benchmarks Comparison
 
-| Metric                    | Gatsby (Median) | Next.js (Median) |
-| ------------------------- | --------------- | ---------------- |
-| BUILD_COLD                | TBD             | 77.92s           |
-| BUILD_WARM                | TBD             | 66.79s           |
-| DEV_STARTUP               | TBD             | 5.49s            |
-| CONTENT_INGEST_TIME       | -               | TBD              |
-| CONTENT_QUERY_LATENCY_AVG | TBD             | TBD              |
-| CONTENT_QUERY_LATENCY_P95 | TBD             | TBD              |
-| TS_CHECK_TIME             | TBD             | 4.52s            |
-| LINT_TIME                 | TBD             | 4.30s            |
-| FRESH_DEPS                | TBD             | TBD              |
-| LCP                       | TBD             | TBD              |
-| INP                       | TBD             | TBD              |
-| CLS                       | TBD             | TBD              |
-| FCP                       | TBD             | TBD              |
+| Metric                    | Gatsby | Next.js |
+| ------------------------- | ------ | ------- |
+| Median BUILD_COLD         | TBD    | 77.92s  |
+| Median BUILD_WARM         | TBD    | 66.79s  |
+| Median DEV_STARTUP        | TBD    | 5.49s   |
+| CONTENT_INGEST_TIME       | -      | TBD     |
+| CONTENT_QUERY_LATENCY_AVG | TBD    | TBD     |
+| CONTENT_QUERY_LATENCY_P95 | TBD    | TBD     |
+| Median TS_CHECK_TIME      | TBD    | 4.52s   |
+| Median LINT_TIME          | TBD    | 4.30s   |
+| FRESH_DEPS                | TBD    | TBD     |
+| LCP                       | TBD    | TBD     |
+| INP                       | TBD    | TBD     |
+| CLS                       | TBD    | TBD     |
+| FCP                       | TBD    | TBD     |
