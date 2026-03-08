@@ -128,7 +128,7 @@ export type ProblemInfo = {
   /**
    * In the context of a module, true if the problem is starred. False otherwise.
    */
-  isStarred: boolean;
+  isStarred?: boolean;
   tags: string[];
   solution: ProblemSolutionInfo;
 };
@@ -289,8 +289,8 @@ export function getProblemURL(
   // USACO and CSES sometimes have duplicate problem names
   // so we should add the ID to the URL
   return `/problems/${isUsaco(problem.source) || problem.source === 'CSES'
-      ? problem.uniqueId
-      : slug(problem.source)
+    ? problem.uniqueId
+    : slug(problem.source)
     }-${slug(problem.name.replace(' - ', ''))}`;
 }
 
