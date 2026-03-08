@@ -88,7 +88,7 @@ export default function FocusProblem({
           </p>
           {problem.solution?.kind === "internal" && (
             <a
-              href={`/problems/${getProblemURL(problem)}/solution`}
+              href={`${getProblemURL(problem)}/solution`}
               className="mb-0! inline-flex px-4 py-3 text-xs font-normal! text-gray-400! italic hover:underline sm:px-6"
             >
               <span className="mr-1">View Internal Solution</span>

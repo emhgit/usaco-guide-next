@@ -97,7 +97,7 @@ function ProblemHit({ hit }: ProblemHitProps) {
           <a
             href={
               hit.solution.kind === "internal"
-                ? `/problems/${getProblemURL({
+                ? `${getProblemURL({
                     ...hit,
                     uniqueId: hit.objectID,
                   })}/solution`

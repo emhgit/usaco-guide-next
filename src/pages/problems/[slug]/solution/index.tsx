@@ -76,7 +76,9 @@ export const getStaticPaths: GetStaticPaths = async () => {
       "../../../../lib/queryContent"
     );
     const paths = (await queryProblemSlugsForSolutionsIds()).map((slug) => ({
-      params: { slug },
+      params: { 
+        slug: slug.startsWith('/problems/') ? slug.substring('/problems/'.length) : slug
+      },
     }));
     return {
       paths,
@@ -102,7 +104,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
     const { slug } = context.params as {
       slug: string;
     };
-    const solutionForSlug = await querySolutionByProblemSlug(slug);
+    
+    // The database stores full paths like /problems/usaco-xxx, but Next.js routes pass just the slug
+    const fullSlug = slug.startsWith('/problems/') ? slug : `/problems/${slug}`;
+    const solutionForSlug = await querySolutionByProblemSlug(fullSlug);
     if (!solutionForSlug) {
       console.error(`Solution not found for slug: ${slug}`);
       return {
