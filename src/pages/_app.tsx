@@ -17,10 +17,16 @@ import { UserGroupsProvider } from "../hooks/groups/useUserGroups";
 import { EditorContext } from "../context/EditorContext";
 import { Toaster } from "react-hot-toast";
 import { BlindModeProvider } from "../context/BlindModeContext";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <>
+    <div className={inter.className}>
       <GlobalErrorBoundary>
         <FirebaseProvider>
           <UserDataProvider>
@@ -39,6 +45,6 @@ export default function App({ Component, pageProps }: AppProps) {
         </FirebaseProvider>
       </GlobalErrorBoundary>
       <Toaster position="top-right" />
-    </>
+    </div>
   );
 }

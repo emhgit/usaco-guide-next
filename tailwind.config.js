@@ -10,10 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
+      },
       colors: {
-        fontFamily: {
-          sans: ["Inter var", ...defaultTheme.fontFamily.sans],
-        },
         boxShadow: {
           xs: "0 0 0 1px rgba(0, 0, 0, 0.05)",
           solid: "0 0 0 2px currentColor",
