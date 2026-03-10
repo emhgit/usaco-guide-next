@@ -46,6 +46,10 @@ export async function main() {
     await indexProblemSlugs(db);
     await indexUSACOIds(db);
 
+    // Generate USACO divisions JSON file
+    console.log("Generating USACO divisions JSON...");
+    await generateUsacoDivisionsJson(db);
+
     // Vacuum database
     console.log("Optimizing database...");
     db.exec("VACUUM");
@@ -547,4 +551,63 @@ async function indexUSACOIds(db: Database.Database): Promise<void> {
   });
 
   transaction(Array.from(usacoIds));
+}
+
+async function generateUsacoDivisionsJson(db: Database.Database): Promise<void> {
+  const { writeFile } = await import("fs/promises");
+  const { join } = await import("path");
+
+  // Query all problems and filter for USACO divisions
+  const rows = db
+    .prepare(`
+      SELECT 
+        unique_id,
+        name,
+        url,
+        source,
+        source_description,
+        is_starred,
+        difficulty,
+        tags_json,
+        solution_json,
+        in_module,
+        module_id
+      FROM problems
+      ORDER BY source, name
+    `)
+    .all() as any[];
+
+  const problems: ProblemInfo[] = [];
+
+  for (const row of rows) {
+    const problem: ProblemInfo = {
+      uniqueId: row.unique_id,
+      name: row.name,
+      url: row.url,
+      source: row.source,
+      sourceDescription: row.source_description,
+      isStarred: Boolean(row.is_starred),
+      difficulty: row.difficulty,
+      tags: JSON.parse(row.tags_json || "[]"),
+      solution: JSON.parse(row.solution_json || "{}"),
+      inModule: Boolean(row.in_module),
+      moduleId: row.module_id,
+    };
+
+    problems.push(problem);
+  }
+
+  // Filter problems to only include USACO divisions
+  const usacoDivisionProblems = problems.filter(
+    (problem) =>
+      problem.source &&
+      ["Bronze", "Silver", "Gold", "Platinum"].includes(problem.source),
+  );
+
+  // Write to public directory
+  const publicDir = join(process.cwd(), "public");
+  const outputPath = join(publicDir, "usaco-divisions.json");
+
+  await writeFile(outputPath, JSON.stringify({ problems: usacoDivisionProblems }, null, 2));
+  console.log(`USACO divisions JSON written to: ${outputPath}`);
 }

@@ -169,11 +169,12 @@ export default function DivisionList(): JSX.Element {
   const [seasonHash, setSeasonHash] = React.useState("");
 
   useEffect(() => {
-    const fetchProblems = async () => {
+    const loadProblems = async () => {
       try {
-        const response = await fetch("/api/problems/usaco-divisions");
+        // Try to load from static JSON file first
+        const response = await fetch("/usaco-divisions.json");
         if (!response.ok) {
-          throw new Error("Failed to fetch problems");
+          throw new Error("Failed to load problems data");
         }
         const data = await response.json();
         setProblems(data.problems);
@@ -185,7 +186,7 @@ export default function DivisionList(): JSX.Element {
       }
     };
 
-    fetchProblems();
+    loadProblems();
   }, []);
 
   const probToLink: { [key: string]: string } = {};

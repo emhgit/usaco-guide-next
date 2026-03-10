@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "clean": "rm -rf dist .next data",
+    "clean": "rm -rf dist .next data public/usaco-divisions.json",
     "check-ts-errors": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
