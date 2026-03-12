@@ -1,0 +1,86 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'content/**'
+      - 'solutions/**'
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - 'content/**'
+      - 'solutions/**'
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to retrieve git history of Chromatic
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        run: yarn
+
+      # hack to build graphql types
+      - name: Build GraphQL types
+        run: yarn build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Check for typescript errors
+        run: yarn check-ts-errors
+
+      - name: Run eslint
+        run: yarn eslint --quiet
+
+      - name: Run chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: 6f3c58ad349c
+          token: ${{ secrets.GITHUB_TOKEN }}
+          exitZeroOnChanges: true # don't fail the workflow if snapshots change
+
+  lhci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 20.x
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn
+      - run: yarn build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.13.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+#      - name: Check Links
+#        uses: wunderundfitzig/linkcheck-action@v1
+#        with:
+#          arguments: '--net=host :9000'

@@ -1,0 +1,45 @@
+name: Build Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - uses: dart-lang/setup-dart@v1
+
+      - run: yarn add serve@14.2.4
+      - run: yarn add bundlewatch@0.4.0
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - run: yarn
+      - run: yarn build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+      - run: ./node_modules/.bin/serve public &
+      - run: dart pub global activate linkcheck
+
+      - name: Check Links
+        run: $HOME/.pub-cache/bin/linkcheck --no-nice :3000
+
+      - name: Bundle Watch
+        run: yarn bundlewatch ./public/*.js
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
+          CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
