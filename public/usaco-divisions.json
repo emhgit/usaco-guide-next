@@ -7797,7 +7797,7 @@
       "source": "Silver",
       "sourceDescription": null,
       "isStarred": true,
-      "difficulty": "Normal",
+      "difficulty": "Hard",
       "tags": [
         "Prefix Sums"
       ],
@@ -7943,7 +7943,7 @@
       "source": "Silver",
       "sourceDescription": null,
       "isStarred": false,
-      "difficulty": "Easy",
+      "difficulty": "Very Easy",
       "tags": [
         "Prefix Sums"
       ],
@@ -8827,7 +8827,7 @@
       "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=595",
       "source": "Silver",
       "sourceDescription": null,
-      "isStarred": true,
+      "isStarred": false,
       "difficulty": "Easy",
       "tags": [
         "Prefix Sums"
@@ -9175,11 +9175,11 @@
     {
       "uniqueId": "usaco-715",
       "name": "Why Did the Cow Cross the Road II",
-      "url": "http://www.usaco.org/index.php?page=viewproblem2&cpid=715",
+      "url": "https://usaco.org/index.php?page=viewproblem2&cpid=715",
       "source": "Silver",
       "sourceDescription": null,
       "isStarred": false,
-      "difficulty": "Easy",
+      "difficulty": "Very Easy",
       "tags": [
         "Prefix Sums"
       ],
@@ -9187,7 +9187,7 @@
         "kind": "internal"
       },
       "inModule": true,
-      "moduleId": "prefix-sums"
+      "moduleId": "EXTRA_PROBLEMS"
     },
     {
       "uniqueId": "usaco-716",
