@@ -8,6 +8,7 @@ import "../components/Dashboard/heatmap-styles.css";
 import "react-calendar-heatmap/dist/styles.css";
 import "instantsearch.css/themes/algolia.css";
 import type { AppProps } from "next/app";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import GlobalErrorBoundary from "../context/GlobalErrorBoundary";
 import { FirebaseProvider } from "../context/FirebaseContext";
 import { UserDataProvider } from "../context/UserDataContext/UserDataContext";
@@ -24,9 +25,13 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const GA_MEASUREMENT_ID =
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-1JGYFFBHXN";
+
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <div className={inter.className}>
+      {GA_MEASUREMENT_ID && <GoogleAnalytics gaId={GA_MEASUREMENT_ID} />}
       <GlobalErrorBoundary>
         <FirebaseProvider>
           <UserDataProvider>
