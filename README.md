@@ -1,40 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+![USACO Guide](/assets/banner-image-big.jpg)
 
-## Getting Started
+# USACO Guide
 
-First, run the development server:
+A free collection of curated, high-quality resources to take you from Bronze to
+Platinum and beyond.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Documentation + Contributing
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See the [contributing module](https://usaco.guide/general/contributing). All
+contributions are welcome! To get started, simply pick an
+[issue](https://github.com/cpinitiative/usaco-guide/issues) you'd like to work
+on, leave a comment, and submit a Pull Request!
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+Join our Discord server: https://discord.gg/VCxUzdYhzN
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Our Team
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+The USACO Guide is run by the
+[Competitive Programming Initiative](https://joincpi.org/). We're looking for
+Content Authors to join our team to help us improve the Guide! Learn more
+[here](https://docs.google.com/document/d/13QpXqdiYQwjBLnywGL1FUG7GFdh8SM_1NigIkJl-A7k/edit).
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Tech Stack
 
-## Learn More
+Our front-end is built with:
 
-To learn more about Next.js, take a look at the following resources:
+- React
+- Next.js
+- Typescript
+- Tailwind CSS
+- [Storybook](https://storybook.js.org/) and
+  [Chromatic](https://www.chromatic.com/)
+- MDX (JSX in Markdown) with @mdx-js/mdx compiler
+- Firebase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Contact Info
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+If you have any questions, please reach out to us at usacoguide@gmail.com.
 
-## Deploy on Vercel
+## License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br />This
+work is licensed under a
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative
+Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a>.
