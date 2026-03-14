@@ -33,12 +33,6 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      # hack to build graphql types
-      - name: Build GraphQL types
-        run: yarn build
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-
       - name: Check for typescript errors
         run: yarn check-ts-errors
 
