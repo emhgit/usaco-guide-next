@@ -15511,20 +15511,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-autolink-headings@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "remark-autolink-headings@npm:8.0.0"
-  checksum: 10c0/856f6b4ab5c78bed73b326ab9b759ae1387bf3d26415af76d5dbc003fdfacd9f3cb8df7b6eaf82d6fb7825ad7c4b0f82628fb934e2e6c9da3aeaadfb5d65a624
-  languageName: node
-  linkType: hard
-
-"remark-external-links@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "remark-external-links@npm:10.0.0"
-  checksum: 10c0/4b353a6742ce1458a5a0bacc3b8ed9fd2506a10f9d11453770453d10885b2c73b836c6240c79116b364eaa3d68496e99c071e2b4118be04b770e4bc23dede92e
-  languageName: node
-  linkType: hard
-
 "remark-frontmatter@npm:^5.0.0":
   version: 5.0.0
   resolution: "remark-frontmatter@npm:5.0.0"
@@ -15609,13 +15595,6 @@ __metadata:
     unified: "npm:^11.0.0"
     vfile: "npm:^6.0.0"
   checksum: 10c0/f9eccacfb596d9605581dc05bfad28635d6ded5dd0a18e88af5fd4df0d3fcf9612e1501d4513bc2164d833cfe9636dab20400080b09e53f155c6e1442a1231fb
-  languageName: node
-  linkType: hard
-
-"remark-slug@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "remark-slug@npm:8.0.0"
-  checksum: 10c0/405bc30a9456b4589d3d6d64803ad75ede491f6c5be0c48789020ee326e9319fbb4756e7a4c7a5e69b33aa6fb51b311a0d32be72e1eff9ace04007111aac0109
   languageName: node
   linkType: hard
 
@@ -17986,13 +17965,10 @@ __metadata:
     rehype-parse: "npm:^9.0.1"
     rehype-raw: "npm:^7.0.0"
     rehype-slug: "npm:^6.0.0"
-    remark-autolink-headings: "npm:^8.0.0"
-    remark-external-links: "npm:^10.0.0"
     remark-frontmatter: "npm:^5.0.0"
     remark-gfm: "npm:^4.0.1"
     remark-math: "npm:^6.0.0"
     remark-mdx-frontmatter: "npm:^5.2.0"
-    remark-slug: "npm:^8.0.0"
     seedrandom: "npm:^3.0.5"
     sharp: "npm:^0.34.3"
     storybook: "npm:^10.2.8"
