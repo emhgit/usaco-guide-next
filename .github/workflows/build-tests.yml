@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: 20.x
           corepack: true
+      - name: Enable Corepack
+        run: corepack enable
       - uses: dart-lang/setup-dart@v1
 
       - run: yarn add serve@14.2.4
