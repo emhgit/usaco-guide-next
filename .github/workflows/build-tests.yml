@@ -42,7 +42,7 @@ jobs:
         run: $HOME/.pub-cache/bin/linkcheck --no-nice :3000
 
       - name: Bundle Watch
-        run: yarn bundlewatch ./public/*.js
+        run: yarn bundlewatch .next/static/chunks/*.js
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.BUNDLEWATCH_GITHUB_TOKEN }}
           CI_COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
