@@ -3,10 +3,10 @@ module.exports = {
     collect: {
       startServerCommand: 'yarn start',
       url: [
-        'http://localhost/',
-        'http://localhost/dashboard/',
-        'http://localhost/general/',
-        'http://localhost/silver/prefix-sums-2/',
+        'http://localhost:3000/',
+        'http://localhost:3000/dashboard/',
+        'http://localhost:3000/general/',
+        'http://localhost:3000/silver/prefix-sums-2/',
       ],
     },
     assert: {},
